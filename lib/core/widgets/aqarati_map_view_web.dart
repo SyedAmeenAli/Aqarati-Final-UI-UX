@@ -1,0 +1,41 @@
+import 'dart:ui_web' as ui_web;
+
+import 'package:flutter/material.dart';
+import 'package:web/web.dart' as web;
+
+final Set<String> _registeredViewTypes = {};
+
+/// Real Google Maps on Flutter Web via the classic keyless embed
+/// (`maps.google.com/maps?...&output=embed`) — the same no-API-key
+/// mechanism as Google's own "Share > Embed a map" iframe, generalized to
+/// take any lat/lng so every property gets a real, live map, not a fixed
+/// one-location embed.
+Widget buildWebEmbedMap({required double lat, required double lng, required double zoom, bool interactive = true}) {
+  final src = 'https://maps.google.com/maps?q=$lat,$lng&z=${zoom.round()}&output=embed';
+  final viewType = 'aqarati-map-$lat-$lng-${zoom.round()}-$interactive';
+
+  // registerViewFactory throws if called twice for the same viewType, and
+  // this widget rebuilds often (camera moves, state changes) — register once.
+  if (_registeredViewTypes.add(viewType)) {
+    ui_web.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
+      final iframe = web.HTMLIFrameElement()
+        ..src = src
+        ..style.border = 'none'
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..loading = 'lazy'
+        ..referrerPolicy = 'no-referrer-when-downgrade';
+      // Flutter's IgnorePointer only affects Flutter's own hit-test tree —
+      // a platform-view iframe still receives real DOM pointer events
+      // directly, so a non-interactive preview (e.g. Home's compact card)
+      // must disable pointer events on the iframe element itself, or taps
+      // open Google's own UI instead of the card's onTap.
+      if (!interactive) {
+        iframe.style.pointerEvents = 'none';
+      }
+      return iframe;
+    });
+  }
+
+  return HtmlElementView(viewType: viewType);
+}

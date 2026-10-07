@@ -1,0 +1,147 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/aq/aq_auth_scaffold.dart';
+import '../../../core/aq/aq_forms.dart';
+import '../../../core/aq/aq_primitives.dart';
+import '../../../core/aq/aq_scene.dart';
+import '../../../core/aq/aq_tokens.dart';
+import '../../../core/aq/aq_typography.dart';
+import '../../../core/config/backend_mode.dart';
+import '../../../core/domain/account_models.dart';
+import '../../../core/localization/flow_strings.dart';
+import '../../../data/api/account_api.dart';
+import '../../entry/widgets/entry_common.dart' show MasterLogo;
+import '../state/otp_state.dart';
+
+String _mmss(int s) => '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
+
+/// Phone verification. Every documented state is represented: sending, sent,
+/// entering, verifying, invalid, expired, resend cooldown (server-seeded),
+/// rate limited, network/SMS problems, success then automatic continuation.
+class OtpScreen extends ConsumerStatefulWidget {
+  const OtpScreen({super.key});
+  @override
+  ConsumerState<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends ConsumerState<OtpScreen> {
+  final _pinKey = GlobalKey<AQOtpFieldState>();
+  String _code = '';
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(otpControllerProvider.notifier).send());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
+    final c = AQColors.of(context);
+    final st = ref.watch(otpControllerProvider);
+    final ctl = ref.read(otpControllerProvider.notifier);
+    final me = ref.watch(meProvider).valueOrNull;
+
+    ref.listen<OtpState>(otpControllerProvider, (prev, next) async {
+      if (prev?.phase != OtpPhase.verified && next.phase == OtpPhase.verified) {
+        AQHaptics.success();
+        // Let the success state land, then continue automatically.
+        final wait = AQMotion.reduced(context) ? const Duration(milliseconds: 300) : const Duration(milliseconds: 1100);
+        final router = GoRouter.of(context);
+        await Future<void>.delayed(wait);
+        if (mounted) router.go('/account/active');
+      }
+      if ((next.phase == OtpPhase.invalid || next.phase == OtpPhase.expired) && prev?.phase != next.phase) {
+        _pinKey.currentState?.clear();
+        setState(() => _code = '');
+      }
+    });
+
+    final fieldState = switch (st.phase) {
+      OtpPhase.verifying => AQOtpState.verifying,
+      OtpPhase.verified => AQOtpState.success,
+      OtpPhase.invalid || OtpPhase.expired || OtpPhase.rateLimited || OtpPhase.error => AQOtpState.error,
+      _ => AQOtpState.idle,
+    };
+    final subtitle = switch (st.phase) {
+      OtpPhase.notSent || OtpPhase.sending => f.t('otp.sending'),
+      OtpPhase.verifying => f.t('otp.verifying'),
+      OtpPhase.verified => f.t('otp.continuing'),
+      _ => me?.phoneLast4 == null ? f.t('otp.sentNoPhone') : f.t('otp.sent', {'last4': me!.phoneLast4!}),
+    };
+    final resendLabel = st.cooldown > 0 ? f.t('otp.resendIn', {'s': _mmss(st.cooldown)}) : (st.phase == OtpPhase.notSent ? f.t('otp.send') : f.t('otp.resend'));
+    final busy = st.phase == OtpPhase.sending || st.phase == OtpPhase.verifying;
+
+    return AQAuthScaffold(
+      title: st.phase == OtpPhase.verified ? f.t('otp.verified') : f.t('otp.title'),
+      subtitle: subtitle,
+      onBack: () => aqBack(context, '/entry'),
+      backLabel: f.t('common.back'),
+      bottom: Column(mainAxisSize: MainAxisSize.min, children: [
+        AQPrimaryButton(
+          label: f.t('otp.verifyCta'),
+          loading: st.phase == OtpPhase.verifying,
+          onPressed: _code.length == 6 && st.canType ? () => ctl.verify(_code) : null,
+        ),
+        if (kShowReviewTools) Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: Text(f.t('otp.demoHint'), style: AQTypography.of(context, AQText.labelSmall, color: c.accentDeep))),
+      ]),
+      children: [
+        if (st.errorKey != null && st.phase != OtpPhase.invalid) AQErrorBanner(text: f.t(st.errorKey!)),
+        AQOtpField(
+          key: _pinKey,
+          label: f.t('otp.codeLabel'),
+          state: fieldState,
+          enabled: st.canType,
+          onChanged: (v) => setState(() => _code = v),
+          onCompleted: ctl.verify,
+        ),
+        if (st.phase == OtpPhase.invalid)
+          Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: Center(child: Text(f.t('otp.invalid'), textAlign: TextAlign.center, style: AQTypography.of(context, AQText.bodySmall, color: c.danger)))),
+        if (st.phase != OtpPhase.verified) ...[
+        const SizedBox(height: AQSpacing.x5),
+        Center(child: Text(f.t('otp.expiresHint'), style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint))),
+        const SizedBox(height: AQSpacing.x2),
+        Center(child: Text(f.t('otp.didnt'), style: AQTypography.of(context, AQText.bodyMedium, soft: true))),
+        Center(
+          child: AQTextButton(
+            label: resendLabel,
+            color: st.canResend ? c.accent : c.inkFaint,
+            onPressed: st.canResend && !busy ? ctl.send : null,
+          ),
+        ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Shown after phone verification. For business roles it states plainly that an
+/// active account is not an approved business role.
+class AccountActiveScreen extends ConsumerWidget {
+  const AccountActiveScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final f = FlowStrings.of(context);
+    final me = ref.watch(meProvider);
+    final cfg = me.valueOrNull?.purpose == null ? null : roleConfigs[me.valueOrNull!.purpose];
+    final business = cfg?.needsDocuments ?? false;
+    return AQAuthScaffold(
+      showLogo: false,
+      centered: true,
+      onBack: () => context.go('/entry'),
+      title: f.t('active.title'),
+      subtitle: business ? f.t('active.business') : f.t('active.buyer'),
+      bottom: AQPrimaryButton(label: business ? f.t('active.docs') : f.t('active.home'), onPressed: () => context.go(business ? '/onboarding/verification-intro' : '/home')),
+      children: [
+        const SizedBox(height: AQSpacing.x4),
+        const AQAnimatedCheck(size: 104),
+        const SizedBox(height: AQSpacing.x8),
+        MasterLogo(width: 120),
+        const SizedBox(height: AQSpacing.x6),
+        AQErrorBanner(tone: AQBannerTone.info, text: f.t('secure.note')),
+      ],
+    );
+  }
+}
