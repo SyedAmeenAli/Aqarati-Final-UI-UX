@@ -71,8 +71,9 @@ class _AQTextFieldState extends State<AQTextField> {
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
     final hasError = widget.error != null;
-    final borderColor = hasError ? c.danger : (_focused ? c.accent : c.hairline);
-    final width = hasError || _focused ? 1.5 : 1.0;
+    // Resting: tonal fill, no outline. Focus/error: a single soft ring. One look for every field.
+    final borderColor = hasError ? c.danger : (_focused ? c.accent : Colors.transparent);
+    const width = 1.5;
     return Padding(
       padding: const EdgeInsets.only(bottom: AQSpacing.x4),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -81,7 +82,8 @@ class _AQTextFieldState extends State<AQTextField> {
           curve: AQMotion.standardCurve,
           constraints: const BoxConstraints(minHeight: AQControl.field),
           decoration: BoxDecoration(
-            color: widget.enabled ? c.surface : c.surface.withValues(alpha: 0.5),
+            // Opaque on the page colour so every field is the same tone whatever photo sits behind it.
+            color: Color.alphaBlend(widget.enabled ? c.surface : c.surface.withValues(alpha: 0.5), c.background),
             borderRadius: BorderRadius.circular(AQRadius.medium),
             border: Border.all(color: borderColor, width: width),
           ),
@@ -112,6 +114,10 @@ class _AQTextFieldState extends State<AQTextField> {
                   labelStyle: AQTypography.of(context, AQText.labelMedium, color: hasError ? c.danger : (_focused ? c.accent : c.inkSoft)),
                   floatingLabelStyle: AQTypography.of(context, AQText.labelMedium, color: hasError ? c.danger : (_focused ? c.accent : c.inkSoft)),
                   hintStyle: AQTypography.of(context, AQText.bodyLarge, color: c.inkFaint),
+                  // The app theme fills inputs; the container already paints the surface.
+                  filled: false,
+                  fillColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
@@ -208,7 +214,7 @@ class AQPhoneField extends StatelessWidget {
       prefix: Directionality(
         textDirection: TextDirection.ltr,
         child: Padding(
-          padding: const EdgeInsetsDirectional.only(top: AQSpacing.x3, end: AQSpacing.x3),
+          padding: const EdgeInsetsDirectional.only(top: AQSpacing.x4, end: AQSpacing.x3),
           child: Text('+968', style: AQTypography.of(context, AQText.titleSmall, color: c.inkSoft)),
         ),
       ),

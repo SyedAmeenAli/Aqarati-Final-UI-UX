@@ -9,6 +9,7 @@ import 'logo_handoff.dart';
 
 const _kFilm = 'assets/branding/aqarati_intro.mp4';
 const _kPoster = 'assets/branding/aqarati_intro_poster.jpg';
+const _kLast = 'assets/branding/aqarati_intro_last.jpg';
 const _kHold = Duration(milliseconds: 200);
 const _kHandoff = Duration(milliseconds: 700);
 
@@ -27,6 +28,19 @@ class IntroHost extends ConsumerStatefulWidget {
 
 class _IntroHostState extends ConsumerState<IntroHost> {
   bool _decided = false;
+  bool _warmed = false;
+
+  /// Decode the big photographs while the film plays so the first frame of the
+  /// entry screen never stalls on image decoding during the handoff.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_warmed) return;
+    _warmed = true;
+    for (final a in const ['assets/entry/entry_bg_01.jpg', _kLast]) {
+      precacheImage(AssetImage(a), context).catchError((_) {});
+    }
+  }
 
   @override
   void initState() {
@@ -83,6 +97,7 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
   bool _finishing = false;
   bool _failed = false;
   bool _firstFrame = false;
+  bool _handoff = false;
 
   @override
   void initState() {
@@ -141,6 +156,16 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
     _finishing = true;
     if (hold > Duration.zero) await Future<void>.delayed(hold);
     if (!mounted) return;
+    // Swap the live video for its own last frame before moving anything: scaling and
+    // fading a video texture is what made the handoff stutter; a still is cheap.
+    final v = _video;
+    if (v != null && v.value.isInitialized && !_failed) {
+      await v.pause();
+      if (!mounted) return;
+      setState(() => _handoff = true);
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+    }
     widget.onReveal();
     final simple = widget.reducedMotion || _failed;
     await _move.animateTo(1, duration: simple ? const Duration(milliseconds: 220) : _kHandoff);
@@ -182,7 +207,9 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
       children: [
         // Frame 0 as a still: instant, and the fallback if playback fails.
         Image.asset(_kPoster, fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, _, _) => const SizedBox.shrink()),
-        if (ready)
+        if (_handoff)
+          Image.asset(_kLast, fit: BoxFit.cover, gaplessPlayback: true, filterQuality: FilterQuality.medium, errorBuilder: (_, _, _) => const SizedBox.shrink())
+        else if (ready)
           Opacity(
             opacity: _firstFrame ? 1 : 0,
             child: FittedBox(
@@ -197,7 +224,7 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
       label: 'AQARATI',
       child: AnimatedBuilder(
         animation: _move,
-        child: film,
+        child: RepaintBoundary(child: film),
         builder: (context, film) {
           final t = Curves.easeInOutCubic.transform(_move.value);
           // Fade starts once the mark is most of the way home.
