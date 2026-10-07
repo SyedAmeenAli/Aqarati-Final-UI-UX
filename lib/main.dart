@@ -22,7 +22,7 @@ class AqaratiApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: ThemeData(brightness: Brightness.dark, useMaterial3: true, scaffoldBackgroundColor: const Color(0xFF1A1613), colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF825C3F), brightness: Brightness.dark)),
-      themeMode: ThemeMode.system,
+      themeMode: ref.watch(themeModeProvider),
       routerConfig: appRouter,
       // English at launch; Arabic (RTL) is architected in from day one —
       // add ar to supportedLocales + arb strings when Arabic ships.

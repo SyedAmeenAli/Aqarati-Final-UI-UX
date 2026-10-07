@@ -13,6 +13,6 @@ const onboardingPages = <OnboardingPage>[
     backgroundAsset: 'assets/entry/entry_bg_01.jpg',
     primaryRoute: '/onboarding/purpose',
     loginRoute: '/login',
-    skipRoute: '/login',
+    skipRoute: '/home',
   ),
 ];

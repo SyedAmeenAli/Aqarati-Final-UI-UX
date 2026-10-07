@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// a one-line change once the project's preference store is settled.
 final localeProvider = StateProvider<Locale>((ref) => const Locale('en'));
 
+/// Always opens in light mode; dark is an explicit choice (Account > Appearance).
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
+
 /// Strings for the entry + purpose screens. Arabic copy is a draft and needs
 /// native review (same status as the brand site).
 class EntryStrings {

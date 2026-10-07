@@ -193,6 +193,10 @@ class AccountTab extends StatelessWidget {
             _LangRow(title: 'English', selected: current == 'en', onTap: () => ref.read(localeProvider.notifier).state = const Locale('en')),
             _LangRow(title: 'العربية', selected: current == 'ar', onTap: () => ref.read(localeProvider.notifier).state = const Locale('ar')),
           ]),
+          AQReviewSection(title: f.t('account.appearance'), children: [
+            _LangRow(title: f.t('account.light'), selected: ref.watch(themeModeProvider) == ThemeMode.light, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light),
+            _LangRow(title: f.t('account.dark'), selected: ref.watch(themeModeProvider) == ThemeMode.dark, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark),
+          ]),
           AQSecondaryButton(
             label: f.t('account.signOut'),
             trailingChevron: false,
