@@ -12,7 +12,6 @@ import '../../data/models/enums.dart';
 import '../../data/models/property.dart';
 import '../../data/repositories/app_state_providers.dart';
 import '../../data/repositories/providers.dart';
-import '../enquiry/book_viewing_screen.dart';
 import '../enquiry/enquiry_screen.dart';
 import '../enquiry/make_offer_screen.dart';
 import 'property_gallery_screen.dart';
@@ -399,9 +398,7 @@ class _BookingBar extends StatelessWidget {
               onPressed: () => showAuthGateSheet(
                 context,
                 actionLabel: 'book a viewing',
-                onContinue: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => BookViewingScreen(property: property)),
-                ),
+                onContinue: () => context.push('/property/${property.id}/viewing'),
               ),
               child: FittedBox(
                 fit: BoxFit.scaleDown,

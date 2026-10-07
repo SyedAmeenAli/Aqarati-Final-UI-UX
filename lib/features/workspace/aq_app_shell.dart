@@ -172,15 +172,6 @@ class ExploreTab extends StatelessWidget {
   }
 }
 
-class ActivityTab extends StatelessWidget {
-  const ActivityTab({super.key});
-  @override
-  Widget build(BuildContext context) {
-    final f = FlowStrings.of(context);
-    return _TabPage(title: f.t('activity.title'), children: [_Body(f.t('activity.empty'))]);
-  }
-}
-
 class AccountTab extends StatelessWidget {
   const AccountTab({super.key});
 

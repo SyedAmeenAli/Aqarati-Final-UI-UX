@@ -22,6 +22,10 @@ import '../../features/flow/screens/verification_onboarding_screens.dart';
 import '../../features/flow/screens/verification_status_screens.dart';
 import '../../features/entry/screens/purpose_selection_screen.dart';
 import '../../features/entry/widgets/entry_common.dart';
+import '../../features/viewing/screens/my_viewings_screen.dart';
+import '../../features/viewing/screens/viewing_detail_screen.dart';
+import '../../features/viewing/screens/viewing_schedule_screens.dart';
+import '../../features/viewing/screens/viewing_status_screens.dart';
 import '../aq/aq_scene.dart' show AQRoute;
 import '../../features/workspace/aq_app_shell.dart';
 import 'app_shell.dart';
@@ -58,10 +62,25 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(path: '/app/home', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const HomeTab())),
         GoRoute(path: '/app/explore', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const ExploreTab())),
-        GoRoute(path: '/app/activity', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const ActivityTab())),
+        GoRoute(path: '/app/activity', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const MyViewingsScreen())),
         GoRoute(path: '/app/account', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const AccountTab())),
       ],
     ),
+    // Property viewing journey (screens 39-51). Back reverses the logical journey.
+    GoRoute(path: '/property/:id/viewing', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: ViewingAvailabilityScreen(propertyId: state.pathParameters['id']!))),
+    GoRoute(path: '/property/:id/viewing/slot', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: ViewingSlotScreen(propertyId: state.pathParameters['id']!))),
+    GoRoute(path: '/property/:id/viewing/review', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: ViewingReviewScreen(propertyId: state.pathParameters['id']!))),
+    GoRoute(path: '/property/:id/viewing/conflict', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingConflictScreen(propertyId: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings', redirect: (context, state) => '/app/activity'),
+    GoRoute(path: '/viewings/:id', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: ViewingDetailScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/requested', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingRequestedScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/confirmed', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingConfirmedScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/declined', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingDeclinedScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/reschedule', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: ViewingRescheduleScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/cancel', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: ViewingCancelScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/cancelled', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingCancelledScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/completed', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingCompletedScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/viewings/:id/review', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: ViewingReviewEntryScreen(id: state.pathParameters['id']!, rating: int.tryParse(state.uri.queryParameters['rating'] ?? '')))),
     GoRoute(path: '/saved', builder: (context, state) => const SavedScreen()),
     GoRoute(
       path: '/search',

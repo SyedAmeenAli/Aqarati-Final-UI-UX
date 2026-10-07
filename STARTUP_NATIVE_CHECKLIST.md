@@ -33,3 +33,12 @@ Verified in Flutter Web (Chromium, headless) and in `flutter test` only. **No iO
 - Arabic copy is draft and needs native review.
 - Password minimum (8) and reason-code copy (`reason.*`) are placeholders until the API defines them.
 - QA-only build flags: `REVIEW_TOOLS`, `AQ_THEME=dark`, `AQ_TEXT_SCALE=2.0`.
+
+# Property viewing flow (screens 39-51)
+Verified on Flutter Web only (light, dark, Arabic, 320x568 and 393x852, 200% text on the main path) plus `flutter test`. **No device run.**
+- Routes: `/property/:id/viewing` (39), `/slot` (40), `/review` (41), `/conflict` (49); `/viewings/:id` (47) with `/requested` (42), `/confirmed` (43), `/declined` (44), `/reschedule` (45), `/cancel` + `/cancelled` (46), `/completed` (48), `/review` (review entry); My Viewings and its empty state (50, 51) are the Activity tab.
+- Data: `ViewingRepository` is a frontend contract (availability, request, cancel, accept/decline suggestion, list, get, host). Only a **demo** implementation exists. Confirm the real API shape with the API owners. Host responses are simulated only with `--dart-define=REVIEW_TOOLS=true`, which also seeds one viewing per state.
+- Not built because nothing supports them yet: Call/WhatsApp/Enquiry buttons and Add to Calendar / Get Directions (no launcher plugin), a live map (placeholder only), a request message field, a user-initiated reschedule, the review form itself (screen 48 links to an honest entry page).
+- Photos are the app's own property assets; host avatars are monograms. Arabic copy is draft.
+- Not checked: iOS/Android devices, VoiceOver/TalkBack, haptics, shared-image Hero flight on device, 360x640, Arabic at 200%, a pixel comparison against the reference folder.
+- Known existing issue: the glass nav label "Account" clips at 200% text.

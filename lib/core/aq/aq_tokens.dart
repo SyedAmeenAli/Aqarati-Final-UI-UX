@@ -26,6 +26,8 @@ class AQColors {
   final Color accentDisabled;
   final Color danger;
   final Color success;
+  /// Restrained amber for attention states (decline, reschedule); never an alarm red.
+  final Color warning;
 
   const AQColors._({
     required this.brightness,
@@ -43,6 +45,7 @@ class AQColors {
     required this.accentDisabled,
     required this.danger,
     required this.success,
+    required this.warning,
   });
 
   static const light = AQColors._(
@@ -61,6 +64,7 @@ class AQColors {
     accentDisabled: Color(0xFFB09A86),
     danger: Color(0xFFA2402E),
     success: Color(0xFF4C6B38),
+    warning: Color(0xFF8A5A1F),
   );
 
   static const dark = AQColors._(
@@ -79,6 +83,7 @@ class AQColors {
     accentDisabled: Color(0xFF6B5545),
     danger: Color(0xFFE08A78),
     success: Color(0xFF9DB98A),
+    warning: Color(0xFFD9A86A),
   );
 
   static AQColors of(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? dark : light;

@@ -78,15 +78,17 @@ class _AQButton extends StatelessWidget {
   final String? semanticsLabel;
   final String? leadingIcon;
   final bool trailingChevron;
-  const _AQButton({required this.kind, required this.label, required this.onPressed, this.loading = false, this.compact = false, this.semanticsLabel, this.leadingIcon, this.trailingChevron = true});
+  /// Optional tone override (destructive actions); null keeps the standard look.
+  final Color? background, foreground;
+  const _AQButton({required this.kind, required this.label, required this.onPressed, this.loading = false, this.compact = false, this.semanticsLabel, this.leadingIcon, this.trailingChevron = true, this.background, this.foreground});
 
   @override
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
     final enabled = onPressed != null && !loading;
     final primary = kind == _BtnKind.primary;
-    final fg = primary ? (onPressed == null && c.isDark ? c.inkSoft : c.onAccent) : c.ink;
-    final bg = primary ? (onPressed == null ? c.accentDisabled : c.accent) : c.surface;
+    final fg = foreground ?? (primary ? (onPressed == null && c.isDark ? c.inkSoft : c.onAccent) : c.ink);
+    final bg = background ?? (primary ? (onPressed == null ? c.accentDisabled : c.accent) : c.surface);
     return Semantics(
       button: true,
       enabled: onPressed != null,
@@ -104,17 +106,28 @@ class _AQButton extends StatelessWidget {
             // Primary rests on a subtle lift only; secondary is purely tonal (no border).
             boxShadow: primary && onPressed != null ? AQElevation.subtle : AQElevation.none,
           ),
-          child: Row(children: [
-            SizedBox(width: AQSpacing.x6, child: leadingIcon == null ? null : AQIcon(leadingIcon!, size: AQIconSize.medium, color: fg)),
-            Expanded(
-              child: Center(
-                child: loading
-                    ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: fg))
-                    : Text(label, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.labelLarge, color: fg)),
-              ),
-            ),
-            SizedBox(width: AQSpacing.x6, child: trailingChevron ? AQIcon('chevron-right', size: AQIconSize.medium, color: fg, directional: true) : null),
-          ]),
+          child: leadingIcon != null && !trailingChevron
+              // Icon sits with the label (no reserved side columns), so long labels keep their width.
+              ? Center(
+                  child: loading
+                      ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: fg))
+                      : Row(mainAxisSize: MainAxisSize.min, children: [
+                          AQIcon(leadingIcon!, size: AQIconSize.medium, color: fg),
+                          const SizedBox(width: AQSpacing.x2),
+                          Flexible(child: Text(label, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.labelLarge, color: fg))),
+                        ]),
+                )
+              : Row(children: [
+                  SizedBox(width: leadingIcon == null && !trailingChevron ? 0 : AQSpacing.x6, child: leadingIcon == null ? null : AQIcon(leadingIcon!, size: AQIconSize.medium, color: fg)),
+                  Expanded(
+                    child: Center(
+                      child: loading
+                          ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: fg))
+                          : Text(label, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.labelLarge, color: fg)),
+                    ),
+                  ),
+                  SizedBox(width: leadingIcon == null && !trailingChevron ? 0 : AQSpacing.x6, child: trailingChevron ? AQIcon('chevron-right', size: AQIconSize.medium, color: fg, directional: true) : null),
+                ]),
         ),
       ),
     );
@@ -125,10 +138,11 @@ class AQPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final bool loading, compact, trailingChevron;
-  final String? semanticsLabel;
-  const AQPrimaryButton({super.key, required this.label, required this.onPressed, this.loading = false, this.compact = false, this.semanticsLabel, this.trailingChevron = true});
+  final String? semanticsLabel, leadingIcon;
+  final Color? background, foreground;
+  const AQPrimaryButton({super.key, required this.label, required this.onPressed, this.loading = false, this.compact = false, this.semanticsLabel, this.trailingChevron = true, this.leadingIcon, this.background, this.foreground});
   @override
-  Widget build(BuildContext context) => _AQButton(kind: _BtnKind.primary, label: label, onPressed: onPressed, loading: loading, compact: compact, semanticsLabel: semanticsLabel, trailingChevron: trailingChevron);
+  Widget build(BuildContext context) => _AQButton(kind: _BtnKind.primary, label: label, onPressed: onPressed, loading: loading, compact: compact, semanticsLabel: semanticsLabel, trailingChevron: trailingChevron, leadingIcon: leadingIcon, background: background, foreground: foreground);
 }
 
 class AQSecondaryButton extends StatelessWidget {
@@ -136,9 +150,10 @@ class AQSecondaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool loading, compact, trailingChevron;
   final String? semanticsLabel, leadingIcon;
-  const AQSecondaryButton({super.key, required this.label, required this.onPressed, this.loading = false, this.compact = false, this.semanticsLabel, this.leadingIcon, this.trailingChevron = true});
+  final Color? foreground, background;
+  const AQSecondaryButton({super.key, required this.label, required this.onPressed, this.loading = false, this.compact = false, this.semanticsLabel, this.leadingIcon, this.trailingChevron = true, this.foreground, this.background});
   @override
-  Widget build(BuildContext context) => _AQButton(kind: _BtnKind.secondary, label: label, onPressed: onPressed, loading: loading, compact: compact, semanticsLabel: semanticsLabel, leadingIcon: leadingIcon, trailingChevron: trailingChevron);
+  Widget build(BuildContext context) => _AQButton(kind: _BtnKind.secondary, label: label, onPressed: onPressed, loading: loading, compact: compact, semanticsLabel: semanticsLabel, leadingIcon: leadingIcon, trailingChevron: trailingChevron, foreground: foreground, background: background);
 }
 
 class AQTextButton extends StatelessWidget {
