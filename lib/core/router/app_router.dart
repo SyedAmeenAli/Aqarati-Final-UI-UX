@@ -5,7 +5,6 @@ import '../../features/business/professional_discovery_screen.dart';
 import '../../features/explore/explore_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/messages/messages_screen.dart';
-import '../../features/onboarding/onboarding_flow.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/property/property_detail_screen.dart';
 import '../../features/saved/saved_screen.dart';
@@ -14,6 +13,8 @@ import '../../features/search/search_screen.dart';
 import '../../features/entry/screens/onboarding_entry_screen.dart';
 import '../../features/entry/models/signup_purpose.dart';
 import '../../features/flow/screens/auth_screens.dart';
+import '../../features/flow/screens/email_verification_screen.dart';
+import '../../features/flow/screens/legal_screens.dart';
 import '../../features/flow/screens/otp_screens.dart';
 import '../../features/flow/screens/signup_form_screen.dart';
 import '../../features/flow/screens/approval_screens.dart';
@@ -21,6 +22,7 @@ import '../../features/flow/screens/verification_onboarding_screens.dart';
 import '../../features/flow/screens/verification_status_screens.dart';
 import '../../features/entry/screens/purpose_selection_screen.dart';
 import '../../features/entry/widgets/entry_common.dart';
+import '../aq/aq_scene.dart' show AQRoute;
 import '../../features/workspace/aq_app_shell.dart';
 import 'app_shell.dart';
 
@@ -29,12 +31,15 @@ final appRouter = GoRouter(
   routes: [
     GoRoute(path: '/entry', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const OnboardingEntryScreen())),
     GoRoute(path: '/onboarding/purpose', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const PurposeSelectionScreen())),
+    GoRoute(path: '/legal/terms', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: const LegalScreen(kind: LegalKind.terms))),
+    GoRoute(path: '/legal/privacy', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: const LegalScreen(kind: LegalKind.privacy))),
     GoRoute(path: '/login', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const LoginScreen())),
     GoRoute(path: '/forgot-password', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const ForgotPasswordScreen())),
     GoRoute(path: '/reset-password', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: ResetPasswordScreen(key: ValueKey(state.uri.queryParameters['oobCode']), oobCode: state.uri.queryParameters['oobCode']))),
     for (final o in signupPurposeOptions)
       GoRoute(path: o.route, pageBuilder: (context, state) => brandPage(key: state.pageKey, child: SignupFormScreen(purpose: o.id))),
     GoRoute(path: '/otp', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const OtpScreen())),
+    GoRoute(path: '/verify-email', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const EmailVerificationScreen())),
     GoRoute(path: '/account/active', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const AccountActiveScreen())),
     GoRoute(path: '/onboarding/documents', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const DocumentOnboardingScreen())),
     GoRoute(path: '/onboarding/verification-intro', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const VerificationIntroScreen())),
@@ -45,9 +50,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/verification/resubmit', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const ResubmissionScreen())),
     GoRoute(path: '/verification/resubmit/review', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const ResubmitReviewScreen())),
     GoRoute(path: '/verification/resubmitted', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const ResubmittedScreen())),
-    GoRoute(path: '/verification/approved', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const ApprovedScreen())),
-    GoRoute(path: '/verification/summary', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const VerifiedSummaryScreen())),
-    GoRoute(path: '/workspace/activation', pageBuilder: (context, state) => brandPage(key: state.pageKey, child: const WorkspaceActivationScreen())),
+    GoRoute(path: '/verification/approved', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: const ApprovedScreen())),
+    GoRoute(path: '/verification/summary', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: const VerifiedSummaryScreen())),
+    GoRoute(path: '/workspace/activation', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: const WorkspaceActivationScreen())),
     ShellRoute(
       builder: (context, state, child) => AQAppShell(child: child),
       routes: [
@@ -57,7 +62,6 @@ final appRouter = GoRouter(
         GoRoute(path: '/app/account', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const AccountTab())),
       ],
     ),
-    GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingFlow()),
     GoRoute(path: '/saved', builder: (context, state) => const SavedScreen()),
     GoRoute(
       path: '/search',

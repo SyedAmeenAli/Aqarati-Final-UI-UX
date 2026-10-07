@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart' show CustomSemanticsAction;
 import 'package:flutter/services.dart';
 import 'aq_primitives.dart';
 import 'aq_tokens.dart';
@@ -25,6 +26,8 @@ class AQTextField extends StatefulWidget {
   final Widget? prefix;
   final Widget? suffix;
   final FocusNode? focusNode;
+  /// Quiet confirmation (a small check) once the value is acceptable.
+  final bool valid;
   const AQTextField({
     super.key,
     required this.label,
@@ -43,6 +46,7 @@ class AQTextField extends StatefulWidget {
     this.prefix,
     this.suffix,
     this.focusNode,
+    this.valid = false,
   });
 
   @override
@@ -128,7 +132,15 @@ class _AQTextFieldState extends State<AQTextField> {
                 ),
               ),
             ),
-            if (widget.suffix != null) Padding(padding: const EdgeInsetsDirectional.only(end: AQSpacing.x1), child: widget.suffix),
+            if (widget.suffix != null)
+              Padding(padding: const EdgeInsetsDirectional.only(end: AQSpacing.x1), child: widget.suffix)
+            else
+              AnimatedSwitcher(
+                duration: AQMotion.scaled(context, AQMotion.fast),
+                child: (widget.valid && !hasError)
+                    ? Padding(key: const ValueKey('valid'), padding: const EdgeInsetsDirectional.only(end: AQSpacing.x4), child: Semantics(label: 'valid', excludeSemantics: true, child: AQIcon('check', size: AQIconSize.small, color: c.success)))
+                    : const SizedBox.shrink(key: ValueKey('none')),
+              ),
           ]),
         ),
         AnimatedSize(
@@ -196,8 +208,9 @@ class AQPhoneField extends StatelessWidget {
   final String label, hint;
   final TextEditingController controller;
   final String? error;
+  final bool valid;
   final ValueChanged<String>? onChanged;
-  const AQPhoneField({super.key, required this.label, required this.hint, required this.controller, this.error, this.onChanged});
+  const AQPhoneField({super.key, required this.label, required this.hint, required this.controller, this.error, this.onChanged, this.valid = false});
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +220,7 @@ class AQPhoneField extends StatelessWidget {
       controller: controller,
       hint: hint,
       error: error,
+      valid: valid,
       keyboardType: TextInputType.phone,
       autofill: const [AutofillHints.telephoneNumberNational],
       formatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(8)],
@@ -257,7 +271,10 @@ class AQCheckRow extends StatelessWidget {
   final String label;
   final String? error;
   final ValueChanged<bool> onChanged;
-  const AQCheckRow({super.key, required this.value, required this.label, required this.onChanged, this.error});
+  /// Optional rich label (e.g. tappable links). [label] stays the accessible name.
+  final Widget? richLabel;
+  final Map<CustomSemanticsAction, VoidCallback>? actions;
+  const AQCheckRow({super.key, required this.value, required this.label, required this.onChanged, this.error, this.richLabel, this.actions});
 
   @override
   Widget build(BuildContext context) {
@@ -268,6 +285,7 @@ class AQCheckRow extends StatelessWidget {
         Semantics(
           checked: value,
           label: label,
+          customSemanticsActions: actions,
           excludeSemantics: true,
           child: AQPressable(
             pressedScale: 0.99,
@@ -290,7 +308,7 @@ class AQCheckRow extends StatelessWidget {
                   child: value ? Center(child: AQIcon('check', size: 16, color: c.onAccent)) : null,
                 ),
                 const SizedBox(width: AQSpacing.x3),
-                Expanded(child: Text(label, style: AQTypography.of(context, AQText.bodyMedium, soft: true))),
+                Expanded(child: richLabel ?? Text(label, style: AQTypography.of(context, AQText.bodyMedium, soft: true))),
               ]),
             ),
           ),
@@ -380,7 +398,7 @@ class AQErrorBanner extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(text, style: AQTypography.of(context, AQText.bodyMedium, color: c.ink)),
-              if (action != null) action!,
+              ?action,
             ]),
           ),
         ]),

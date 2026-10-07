@@ -38,9 +38,11 @@ void main() {
 
   test('step validation', () {
     final cfg = roleConfigs[SignupPurpose.interiorExteriorDesign]!;
-    expect(validateStep(cfg, SignupStep.you, const SignupFormValues()).keys, containsAll(['firstName', 'lastName', 'phone', 'email']));
+    expect(validateStep(cfg, SignupStep.you, const SignupFormValues()).keys, containsAll(['firstName', 'lastName']));
+    expect(validateStep(cfg, SignupStep.contact, const SignupFormValues()).keys, containsAll(['phone', 'email']));
     const ok = SignupFormValues(firstName: 'A', lastName: 'B', phone: '91234567', email: 'a@b.co');
     expect(validateStep(cfg, SignupStep.you, ok), isEmpty);
+    expect(validateStep(cfg, SignupStep.contact, ok), isEmpty);
     expect(validateStep(cfg, SignupStep.business, ok).keys, containsAll(['businessName', 'serviceType']));
     expect(validateStep(cfg, SignupStep.account, ok, password: 'short', confirm: 'x').keys, containsAll(['password', 'confirm', 'consent']));
     expect(validateStep(cfg, SignupStep.account, ok.copyWith(consent: true), password: 'Longenough1', confirm: 'Longenough1'), isEmpty);

@@ -22,6 +22,8 @@ class AQAuthScaffold extends StatefulWidget {
   final bool showLogo;
   final double logoWidth;
   final bool centered;
+  /// False on roots of the authenticated area, where Back would only lead to Welcome.
+  final bool showBack;
   const AQAuthScaffold({
     super.key,
     required this.title,
@@ -37,6 +39,7 @@ class AQAuthScaffold extends StatefulWidget {
     this.showLogo = true,
     this.logoWidth = 104,
     this.centered = false,
+    this.showBack = true,
   });
 
   @override
@@ -84,7 +87,7 @@ class _AQAuthScaffoldState extends State<AQAuthScaffold> with SingleTickerProvid
                 child: Column(children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4),
-                    child: AQTopBar(onBack: widget.onBack ?? () => aqBack(context, '/entry'), backLabel: widget.backLabel, actionLabel: widget.actionLabel, onAction: widget.onAction),
+                    child: AQTopBar(onBack: widget.showBack ? (widget.onBack ?? () => aqBack(context, '/entry')) : null, backLabel: widget.backLabel, actionLabel: widget.actionLabel, onAction: widget.onAction),
                   ),
                   Expanded(
                     // Soft fade where content scrolls under the pinned action, instead of a hard cut.
@@ -97,7 +100,6 @@ class _AQAuthScaffoldState extends State<AQAuthScaffold> with SingleTickerProvid
                         stops: [0, 0.94, 1],
                       ).createShader(r),
                       child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
                       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                       padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, 0, AQSpacing.gutter, AQSpacing.x6),
                       child: Column(crossAxisAlignment: widget.centered ? CrossAxisAlignment.center : CrossAxisAlignment.start, children: [

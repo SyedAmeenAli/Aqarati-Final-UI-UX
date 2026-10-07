@@ -40,6 +40,14 @@ abstract class AuthRepository {
   Future<void> confirmPasswordReset(String oobCode, String newPassword);
   Future<void> signOut();
   Future<String?> currentIdToken();
+
+  /// Firebase client email verification (no second email system).
+  Future<void> sendEmailVerification();
+  /// Reloads the Firebase user and reports `emailVerified`.
+  Future<bool> isEmailVerified();
+  Future<String?> currentEmail();
+  /// Firebase `verifyBeforeUpdateEmail`-style change; verification is sent to the new address.
+  Future<void> updateEmail(String email);
 }
 
 /// Default when no Firebase implementation is wired: honest, never pretends.
@@ -59,6 +67,14 @@ class UnavailableAuthRepository implements AuthRepository {
   Future<void> signOut() async {}
   @override
   Future<String?> currentIdToken() async => null;
+  @override
+  Future<void> sendEmailVerification() => throw const AuthException(AuthError.unavailable);
+  @override
+  Future<bool> isEmailVerified() => throw const AuthException(AuthError.unavailable);
+  @override
+  Future<String?> currentEmail() async => null;
+  @override
+  Future<void> updateEmail(String email) => throw const AuthException(AuthError.unavailable);
 }
 
 /// Overridden in main by the demo or the real implementation.

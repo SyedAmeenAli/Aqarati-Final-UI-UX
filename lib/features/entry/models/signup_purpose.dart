@@ -14,6 +14,8 @@ class SignupPurposeOption {
 
   String title(EntryStrings s) => _copy[id]![s.ar ? 2 : 0];
   String description(EntryStrings s) => _copy[id]![s.ar ? 3 : 1];
+  /// One supportive line shown when the role is chosen and at the start of its form.
+  String tagline(EntryStrings s) => _tagline[id]![s.ar ? 1 : 0];
 }
 
 const signupPurposeOptions = <SignupPurposeOption>[
@@ -33,4 +35,14 @@ const Map<SignupPurpose, List<String>> _copy = {
   SignupPurpose.propertyDevelopmentCompany: ['Property Development Company', 'Present your development company and projects.', 'شركة تطوير عقاري', 'اعرض شركتك التطويرية ومشاريعك.'],
   SignupPurpose.buildingArchitecture: ['Building Architecture', 'Register your architecture practice on AQARATI.', 'العمارة والتصميم الإنشائي', 'سجّل مكتبك الهندسي المعماري في عقاراتي.'],
   SignupPurpose.interiorExteriorDesign: ['Interior & Exterior Design', 'Register your interior and exterior design practice.', 'التصميم الداخلي والخارجي', 'سجّل مكتب التصميم الداخلي والخارجي الخاص بك.'],
+};
+
+// en, ar (Arabic is a draft and needs native review)
+const Map<SignupPurpose, List<String>> _tagline = {
+  SignupPurpose.userToShop: ['Find your place in Oman.', 'اعثر على مكانك في عُمان.'],
+  SignupPurpose.realEstateAgent: ['Build trust around every property you represent.', 'ابنِ الثقة حول كل عقار تمثّله.'],
+  SignupPurpose.constructionCompany: ['Put your company where Oman builds.', 'ضع شركتك حيث تبني عُمان.'],
+  SignupPurpose.propertyDevelopmentCompany: ['Bring your developments into a trusted property ecosystem.', 'اجعل مشاريعك جزءًا من منظومة عقارية موثوقة.'],
+  SignupPurpose.buildingArchitecture: ['Let your practice be discovered.', 'دع مكتبك يُكتشف.'],
+  SignupPurpose.interiorExteriorDesign: ['Show the work behind the spaces.', 'اعرض العمل وراء المساحات.'],
 };

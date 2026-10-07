@@ -16,18 +16,47 @@ class DocumentState {
   final int? sizeBytes;
   final DateTime? expiry;
   final String? errorKey;
-  const DocumentState({this.phase = DocPhase.idle, this.progress = 0, this.fileName, this.sizeBytes, this.expiry, this.errorKey});
+  /// Server-known outcome (verified / under review / needs update). Null for a fresh local upload.
+  final DocumentOutcome? outcome;
+  final DateTime? uploadedAt;
+  /// The action the model asks for (replace, upload...). Drives copy; never invents state.
+  final DocAction action;
+  const DocumentState({this.phase = DocPhase.idle, this.progress = 0, this.fileName, this.sizeBytes, this.expiry, this.errorKey, this.outcome, this.uploadedAt, this.action = DocAction.none});
 
   bool get busy => phase == DocPhase.selecting || phase == DocPhase.uploading || phase == DocPhase.processing || phase == DocPhase.retrying;
 
-  DocumentState copyWith({DocPhase? phase, double? progress, String? fileName, int? sizeBytes, DateTime? expiry, String? errorKey, bool clearError = false}) => DocumentState(
+  DocumentState copyWith({DocPhase? phase, double? progress, String? fileName, int? sizeBytes, DateTime? expiry, String? errorKey, bool clearError = false, DocumentOutcome? outcome, DateTime? uploadedAt, DocAction? action, bool clearOutcome = false}) => DocumentState(
         phase: phase ?? this.phase,
         progress: progress ?? this.progress,
         fileName: fileName ?? this.fileName,
         sizeBytes: sizeBytes ?? this.sizeBytes,
         expiry: expiry ?? this.expiry,
         errorKey: clearError ? null : (errorKey ?? this.errorKey),
+        outcome: clearOutcome ? null : (outcome ?? this.outcome),
+        uploadedAt: uploadedAt ?? this.uploadedAt,
+        action: action ?? this.action,
       );
+
+  /// The calm display state for this tile.
+  DocDisplay get display {
+    switch (phase) {
+      case DocPhase.selecting:
+      case DocPhase.uploading:
+      case DocPhase.retrying:
+        return DocDisplay.uploading;
+      case DocPhase.processing:
+        return DocDisplay.processing;
+      case DocPhase.failed:
+        return DocDisplay.failed;
+      case DocPhase.rejected:
+        return DocDisplay.needsUpdate;
+      case DocPhase.success:
+        if (expiryStatusOf(expiry) == ExpiryStatus.expired) return DocDisplay.expired;
+        return outcome == DocumentOutcome.accepted ? DocDisplay.verified : DocDisplay.underReview;
+      case DocPhase.idle:
+        return action == DocAction.replaceExpired ? DocDisplay.expired : (action == DocAction.uploadMissing ? DocDisplay.missing : DocDisplay.empty);
+    }
+  }
 }
 
 /// Chooses a file. Replaceable in tests.
@@ -96,6 +125,8 @@ class DocumentController extends StateNotifier<DocumentState> {
       return;
     }
     _buffer = file;
+    // Images only: a transient in-memory thumbnail for the preview sheet, never stored or sent anywhere.
+    if (_isImage(file.bytes)) ref.read(documentPreviewProvider(kind).notifier).state = file.bytes;
     state = state.copyWith(fileName: file.name, sizeBytes: file.sizeBytes);
     await _upload(retry: false);
   }
@@ -117,8 +148,8 @@ class DocumentController extends StateNotifier<DocumentState> {
         state = state.copyWith(phase: p >= 1 ? DocPhase.processing : DocPhase.uploading, progress: p);
       });
       if (!mounted) return;
-      _buffer = null; // drop the transient bytes
-      state = state.copyWith(phase: DocPhase.success, progress: 1);
+      _buffer = null; // drop the transient upload bytes
+      state = state.copyWith(phase: DocPhase.success, progress: 1, uploadedAt: DateTime.now(), outcome: DocumentOutcome.pendingReview, action: DocAction.none);
     } on ApiException catch (e) {
       if (mounted) state = state.copyWith(phase: DocPhase.failed, errorKey: e.code == ApiErrorCode.network ? 'common.networkError' : 'common.genericError');
     } catch (_) {
@@ -129,12 +160,18 @@ class DocumentController extends StateNotifier<DocumentState> {
 
 DocumentState initialFromStatus(DocumentStatus? s) {
   if (s == null) return const DocumentState();
+  final act = docActionOf(s);
   return switch (s.outcome) {
-    DocumentOutcome.notSubmitted => DocumentState(expiry: s.expiry),
-    DocumentOutcome.pendingReview || DocumentOutcome.accepted => DocumentState(phase: DocPhase.success, progress: 1, expiry: s.expiry),
-    DocumentOutcome.rejected => DocumentState(phase: DocPhase.rejected, expiry: s.expiry),
+    DocumentOutcome.notSubmitted => DocumentState(expiry: s.expiry, action: act),
+    DocumentOutcome.pendingReview || DocumentOutcome.accepted => DocumentState(phase: DocPhase.success, progress: 1, expiry: s.expiry, fileName: s.fileName, sizeBytes: s.sizeBytes, uploadedAt: s.uploadedAt, outcome: s.outcome, action: act),
+    DocumentOutcome.rejected => DocumentState(phase: DocPhase.rejected, expiry: s.expiry, fileName: s.fileName, sizeBytes: s.sizeBytes, uploadedAt: s.uploadedAt, outcome: s.outcome, action: act),
   };
 }
+
+bool _isImage(Uint8List b) => (b.length >= 3 && b[0] == 0xFF && b[1] == 0xD8 && b[2] == 0xFF) || (b.length >= 4 && b[0] == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47);
+
+/// Transient image bytes for the preview sheet only (memory, released with the tile).
+final documentPreviewProvider = StateProvider.autoDispose.family<Uint8List?, DocumentKind>((ref, kind) => null);
 
 /// Keyed per document so each tile owns its own state.
 final documentControllerProvider = StateNotifierProvider.autoDispose.family<DocumentController, DocumentState, DocumentKind>((ref, kind) => DocumentController(ref, kind, const DocumentState()));

@@ -11,7 +11,9 @@ import '../../core/auth/auth_repository.dart';
 import '../../core/domain/account_models.dart';
 import '../../core/localization/entry_strings.dart';
 import '../../core/localization/flow_strings.dart';
+import '../entry/models/signup_purpose.dart';
 import '../../data/api/account_api.dart';
+import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
 
 const _tabs = ['/app/home', '/app/explore', '/app/activity', '/app/account'];
@@ -85,7 +87,6 @@ class _TabPage extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AQSpacing.maxContent + AQSpacing.gutter * 2),
           child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x6, AQSpacing.gutter, 128),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Semantics(header: true, child: Text(title, style: AQTypography.of(context, AQText.displaySmall))),
@@ -146,8 +147,14 @@ class HomeTab extends StatelessWidget {
               const SizedBox(height: AQSpacing.x2),
               if (m.grant == GrantState.approved) _Body(f.t('home.verified')),
               AQTextButton(label: f.t('home.viewStatus'), trailingIcon: 'chevron-right', onPressed: () => context.go('/verification')),
-            ])
-          else
+            ]),
+          if (business && m.grant == GrantState.approved && m.purpose != null)
+            AQReviewSection(title: f.t('home.workspace'), children: [
+              Padding(padding: const EdgeInsets.only(top: AQSpacing.x2, bottom: AQSpacing.x1), child: Text(f.t('ws.t.${m.purpose!.name}'), style: AQTypography.of(context, AQText.titleSmall))),
+              if (m.purpose == SignupPurpose.realEstateAgent) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x1), child: Text(f.t('home.buyerAgent'), style: AQTypography.of(context, AQText.labelMedium, color: AQColors.of(context).accentDeep))),
+              for (final k in workspaceCaps(m.purpose!)) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(f.t(k), style: AQTypography.of(context, AQText.bodySmall, soft: true))),
+            ]),
+          if (!business)
             AQReviewSection(title: f.t('home.title'), children: [Padding(padding: const EdgeInsets.only(top: AQSpacing.x2), child: _Body(f.t('home.userBody')))]),
           _Body(f.t('home.soon')),
         ];

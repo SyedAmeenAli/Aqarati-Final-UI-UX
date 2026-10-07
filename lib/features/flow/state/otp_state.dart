@@ -64,6 +64,13 @@ class OtpController extends StateNotifier<OtpState> {
     }
   }
 
+  /// After the number changed: forget the old code's state and request one for the new number.
+  Future<void> restartForNewNumber() async {
+    _timer?.cancel();
+    state = const OtpState();
+    await send();
+  }
+
   Future<void> verify(String code) async {
     if (state.phase == OtpPhase.verifying || state.phase == OtpPhase.verified) return;
     state = state.copyWith(phase: OtpPhase.verifying, clearError: true);

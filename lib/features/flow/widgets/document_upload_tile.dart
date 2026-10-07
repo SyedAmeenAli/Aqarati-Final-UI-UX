@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/aq/aq_documents.dart';
 import '../../../core/aq/aq_primitives.dart';
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/domain/account_models.dart';
 import '../../../core/localization/flow_strings.dart';
 import '../state/document_state.dart';
+import 'document_preview.dart';
 
 String documentLabelKey(DocumentKind k) => 'doc.${k.name}';
 
-/// Per-document upload tile with independent state: idle, selecting, uploading,
-/// processing (scanning), success (received, pending review), failed (retry),
-/// retrying, rejected (replace). One tile failing never resets another.
-/// File bytes stay in a transient buffer and are never previewed or persisted.
+/// Per-document upload tile with independent state. One tile failing never resets another.
+/// Upload bytes stay in a transient buffer; only an image thumbnail is kept in memory for Preview.
 class DocumentUploadTile extends ConsumerStatefulWidget {
   final DocumentKind kind;
   final DocumentState? seed;
@@ -40,7 +40,8 @@ class _DocumentUploadTileState extends ConsumerState<DocumentUploadTile> {
 
   Future<void> _start() async {
     final st = ref.read(documentControllerProvider(widget.kind));
-    if (widget.kind.tracksExpiry && st.expiry == null) {
+    // An expired date must be replaced, not reused.
+    if (widget.kind.tracksExpiry && (st.expiry == null || expiryStatusOf(st.expiry) == ExpiryStatus.expired)) {
       final d = await _pickExpiry();
       if (d == null) return;
     }
@@ -56,23 +57,28 @@ class _DocumentUploadTileState extends ConsumerState<DocumentUploadTile> {
     final st = ref.watch(documentControllerProvider(widget.kind));
     final ctl = ref.read(documentControllerProvider(widget.kind).notifier);
     final label = f.t(documentLabelKey(widget.kind));
-    final done = st.phase == DocPhase.success;
-    final bad = st.phase == DocPhase.failed || st.phase == DocPhase.rejected;
-
-    final status = switch (st.phase) {
-      DocPhase.idle => f.t('docs.state.idle'),
-      DocPhase.selecting => f.t('docs.state.selecting'),
-      DocPhase.uploading => f.t('docs.state.uploading', {'p': (st.progress * 100).round().toString()}),
-      DocPhase.processing => f.t('docs.state.processing'),
-      DocPhase.success => f.t('docs.state.success'),
-      DocPhase.failed => f.t(st.errorKey ?? 'docs.state.failed'),
-      DocPhase.retrying => f.t('docs.state.retrying'),
-      DocPhase.rejected => f.t('docs.state.rejected'),
+    final display = st.display;
+    final v = aqDocVisual(display);
+    final color = aqDocToneColor(c, v.tone);
+    final attention = v.tone == AQDocTone.attention;
+    final loc = MaterialLocalizations.of(context);
+    final status = switch (display) {
+      DocDisplay.uploading => st.phase == DocPhase.retrying ? f.t('docs.state.retrying') : f.t('docs.state.uploading', {'p': (st.progress * 100).round().toString()}),
+      DocDisplay.failed => f.t(st.errorKey ?? 'docs.state.failed'),
+      _ => f.t(v.key),
     };
-    final color = done ? c.success : bad ? c.danger : c.inkSoft;
-    final icon = done ? 'check' : bad ? 'alert' : 'info';
-    final expiry = st.expiry == null ? null : MaterialLocalizations.of(context).formatMediumDate(st.expiry!);
+    final reason = switch (display) {
+      DocDisplay.needsUpdate when widget.rejectionReason != null => '${f.t('ver.reason')}: ${widget.rejectionReason}',
+      DocDisplay.expired => f.t('resub.reasonExpired'),
+      DocDisplay.missing when st.action == DocAction.uploadMissing => f.t('resub.reasonMissing'),
+      _ => null,
+    };
     final ex = expiryStatusOf(st.expiry);
+    final expiry = st.expiry == null ? null : loc.formatMediumDate(st.expiry!);
+    final busy = st.busy;
+    final haveFile = st.fileName != null;
+    final needsFix = display == DocDisplay.needsUpdate || display == DocDisplay.expired;
+    final onFile = display == DocDisplay.underReview || display == DocDisplay.verified;
 
     return Semantics(
       container: true,
@@ -84,12 +90,13 @@ class _DocumentUploadTileState extends ConsumerState<DocumentUploadTile> {
         decoration: BoxDecoration(
           color: c.surface,
           borderRadius: BorderRadius.circular(AQRadius.medium),
-          // Border only signals a state that needs attention.
-          border: Border.all(color: bad ? c.danger : Colors.transparent, width: 1.2),
+          // The ring only appears when something needs attention.
+          border: Border.all(color: attention ? c.danger.withValues(alpha: 0.7) : Colors.transparent, width: 1.2),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(child: Text(label, style: AQTypography.of(context, AQText.titleMedium))),
+            const SizedBox(width: AQSpacing.x2),
             _Pill(text: f.t('docs.required'), color: c.inkSoft),
           ]),
           const SizedBox(height: 2),
@@ -98,20 +105,20 @@ class _DocumentUploadTileState extends ConsumerState<DocumentUploadTile> {
           AnimatedSwitcher(
             duration: AQMotion.scaled(context, AQMotion.fast),
             child: Row(key: ValueKey(status), children: [
-              AQIcon(icon, size: AQIconSize.small, color: color),
+              AQIcon(v.icon, size: AQIconSize.small, color: color),
               const SizedBox(width: AQSpacing.x2),
               Expanded(child: Text(status, style: AQTypography.of(context, AQText.labelMedium, color: color))),
             ]),
           ),
-          if (widget.rejectionReason != null && st.phase == DocPhase.rejected) ...[
+          if (reason != null) ...[
             const SizedBox(height: AQSpacing.x2),
-            Text('${f.t('ver.reason')}: ${widget.rejectionReason}', style: AQTypography.of(context, AQText.bodySmall, color: c.danger)),
+            Text(reason, style: AQTypography.of(context, AQText.bodySmall, color: c.inkSoft)),
           ],
-          if (st.fileName != null) ...[
+          if (haveFile) ...[
             const SizedBox(height: 2),
             Text('${st.fileName}${st.sizeBytes == null ? '' : ' · ${(st.sizeBytes! / 1024).round()} KB'}', maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint)),
           ],
-          if (st.phase == DocPhase.uploading || st.phase == DocPhase.processing || st.phase == DocPhase.retrying) ...[
+          if (display == DocDisplay.uploading || display == DocDisplay.processing) ...[
             const SizedBox(height: AQSpacing.x3),
             ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: st.phase == DocPhase.uploading ? st.progress : null, minHeight: 3, color: c.accent, backgroundColor: c.hairline)),
           ],
@@ -120,15 +127,18 @@ class _DocumentUploadTileState extends ConsumerState<DocumentUploadTile> {
             AQTextButton(
               label: expiry == null ? f.t('docs.setExpiry') : '${f.t('docs.expiry')}: $expiry',
               color: ex == ExpiryStatus.expired ? c.danger : c.accent,
-              onPressed: st.busy ? null : _pickExpiry,
+              onPressed: busy ? null : _pickExpiry,
             ),
           ] else
             const SizedBox(height: AQSpacing.x2),
           Text(f.t('docs.rules'), style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint)),
           const SizedBox(height: AQSpacing.x3),
-          st.phase == DocPhase.failed
-              ? _TileButton(label: f.t('docs.retry'), primary: true, onTap: ctl.retry)
-              : _TileButton(label: (done || st.phase == DocPhase.rejected) ? f.t('docs.replace') : f.t('docs.choose'), primary: !done, onTap: st.busy ? null : _start),
+          Wrap(spacing: AQSpacing.x2, runSpacing: AQSpacing.x2, crossAxisAlignment: WrapCrossAlignment.center, children: [
+            display == DocDisplay.failed
+                ? _TileButton(label: f.t('docs.retry'), primary: true, onTap: ctl.retry)
+                : _TileButton(label: (onFile || needsFix) ? f.t('docs.replace') : f.t('docs.choose'), primary: !onFile, onTap: busy ? null : _start),
+            if (haveFile && !busy) _TileButton(label: f.t('docs.preview'), primary: false, onTap: () => showDocumentPreview(context, widget.kind)),
+          ]),
         ]),
       ),
     );
@@ -173,7 +183,7 @@ class _TileButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(AQRadius.medium - 4),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(label, style: AQTypography.of(context, AQText.titleSmall, color: fg)),
+            Flexible(child: Text(label, style: AQTypography.of(context, AQText.titleSmall, color: fg))),
           ]),
         ),
       ),

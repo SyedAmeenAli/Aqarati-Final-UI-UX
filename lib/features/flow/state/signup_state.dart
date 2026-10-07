@@ -12,9 +12,9 @@ const int kMinPasswordLength = 8;
 
 bool passwordMeetsPolicy(String p) => p.length >= kMinPasswordLength && RegExp(r'[A-Z]').hasMatch(p) && RegExp(r'\d').hasMatch(p);
 
-enum SignupStep { you, business, account }
+enum SignupStep { you, contact, business, account }
 
-List<SignupStep> stepsFor(RoleFormConfig cfg) => [SignupStep.you, if (cfg.hasBusinessStep) SignupStep.business, SignupStep.account];
+List<SignupStep> stepsFor(RoleFormConfig cfg) => [SignupStep.you, SignupStep.contact, if (cfg.hasBusinessStep) SignupStep.business, SignupStep.account];
 
 class SignupState {
   final SignupFormValues values;
@@ -40,6 +40,9 @@ final _emailRe = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
 // Oman mobile numbers: 8 digits starting 7 or 9 (landlines 2 are not valid for SMS OTP).
 final _omanMobileRe = RegExp(r'^[79]\d{7}$');
 
+bool isValidOmanMobile(String v) => _omanMobileRe.hasMatch(v.replaceAll(' ', ''));
+bool isValidEmail(String v) => _emailRe.hasMatch(v.trim());
+
 /// Pure validation so it can be unit-tested.
 Map<String, String> validateStep(RoleFormConfig cfg, SignupStep step, SignupFormValues v, {String password = '', String confirm = ''}) {
   final e = <String, String>{};
@@ -47,8 +50,9 @@ Map<String, String> validateStep(RoleFormConfig cfg, SignupStep step, SignupForm
     case SignupStep.you:
       if (v.firstName.trim().isEmpty) e['firstName'] = 'common.required';
       if (v.lastName.trim().isEmpty) e['lastName'] = 'common.required';
-      if (!_omanMobileRe.hasMatch(v.phone.replaceAll(' ', ''))) e['phone'] = 'err.phone';
-      if (!_emailRe.hasMatch(v.email.trim())) e['email'] = 'err.email';
+    case SignupStep.contact:
+      if (!isValidOmanMobile(v.phone)) e['phone'] = 'err.phone';
+      if (!isValidEmail(v.email)) e['email'] = 'err.email';
     case SignupStep.business:
       if (cfg.hasBusinessName && v.businessName.trim().isEmpty) e['businessName'] = 'common.required';
       if (cfg.hasAgencyName && v.agencyName.trim().isEmpty) e['agencyName'] = 'common.required';
@@ -129,6 +133,12 @@ class SignupController extends StateNotifier<SignupState> {
       ref.read(signupDraftStoreProvider).save(purpose, state.values, state.stepIndex);
     }
     return true;
+  }
+
+  /// Jump to a step (used by recovery surfaces, e.g. "Use another email").
+  void goToStep(SignupStep target) {
+    final i = stepsFor(cfg).indexOf(target);
+    if (i >= 0) state = state.copyWith(stepIndex: i, errors: const {}, clearBanner: true);
   }
 
   bool back() {

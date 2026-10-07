@@ -24,6 +24,8 @@ class DemoBackendState {
   final List<DateTime> otpSends = [];
   int wrongAttempts = 0;
   bool signedIn = false;
+  DateTime? emailVerifySentAt;
+  bool emailVerified = false;
   String? reason;
   String? businessName;
   String? reference;
@@ -50,6 +52,8 @@ class DemoAuthRepository implements AuthRepository {
   @override
   Future<void> createUserWithEmail(String email, String password) async {
     await Future<void>.delayed(const Duration(milliseconds: 600));
+    // An email that already belongs to an active account is a conflict (recovery UI), not a silent overwrite.
+    if (s.email != null && s.email!.toLowerCase() == email.trim().toLowerCase() && s.account == AccountState.active) throw const AuthException(AuthError.unknown);
     s.email = email.trim();
     s.password = password;
     s.signedIn = true;
@@ -70,6 +74,32 @@ class DemoAuthRepository implements AuthRepository {
 
   @override
   Future<String?> currentIdToken() async => s.signedIn ? 'demo-id-token' : null;
+
+  @override
+  Future<void> sendEmailVerification() async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    s.emailVerifySentAt = DateTime.now();
+  }
+
+  /// Demo: the link counts as opened a few seconds after it was "sent".
+  @override
+  Future<bool> isEmailVerified() async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    final sent = s.emailVerifySentAt;
+    if (sent != null && DateTime.now().difference(sent).inSeconds >= 6) s.emailVerified = true;
+    return s.emailVerified;
+  }
+
+  @override
+  Future<String?> currentEmail() async => s.email;
+
+  @override
+  Future<void> updateEmail(String email) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    s.email = email.trim();
+    s.emailVerified = false;
+    s.emailVerifySentAt = DateTime.now();
+  }
 }
 
 class DemoAccountApi implements AccountApi {
@@ -124,6 +154,14 @@ class DemoAccountApi implements AccountApi {
   }
 
   @override
+  Future<void> changePhone(String phone) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    s.phone = phone;
+    s.lastOtpAt = null; // the new number may be sent a code immediately (send counts still apply)
+    s.wrongAttempts = 0;
+  }
+
+  @override
   Future<MeSession> getMe() async {
     await Future<void>.delayed(const Duration(milliseconds: 250));
     if (!s.signedIn) throw const ApiException(ApiErrorCode.network);
@@ -138,7 +176,7 @@ class DemoAccountApi implements AccountApi {
       if (file.name.toLowerCase().contains('fail') && i == 3) throw const ApiException(ApiErrorCode.network);
     }
     await Future<void>.delayed(const Duration(milliseconds: 500)); // scanning
-    s.docs[kind] = DocumentStatus(kind: kind, outcome: DocumentOutcome.pendingReview, expiry: expiry, fileName: file.name, sizeBytes: file.sizeBytes);
+    s.docs[kind] = DocumentStatus(kind: kind, outcome: DocumentOutcome.pendingReview, expiry: expiry, fileName: file.name, sizeBytes: file.sizeBytes, uploadedAt: DateTime.now());
   }
 
   @override
@@ -175,7 +213,7 @@ class DemoAccountApi implements AccountApi {
     s.reason = null;
     s.submittedAt = DateTime.now();
     for (final e in s.docs.entries.toList()) {
-      if (e.value.outcome == DocumentOutcome.rejected) s.docs[e.key] = DocumentStatus(kind: e.key, outcome: DocumentOutcome.pendingReview, expiry: e.value.expiry, fileName: e.value.fileName, sizeBytes: e.value.sizeBytes);
+      if (e.value.outcome == DocumentOutcome.rejected) s.docs[e.key] = DocumentStatus(kind: e.key, outcome: DocumentOutcome.pendingReview, expiry: e.value.expiry, fileName: e.value.fileName, sizeBytes: e.value.sizeBytes, uploadedAt: DateTime.now());
     }
   }
 
@@ -188,14 +226,14 @@ class DemoAccountApi implements AccountApi {
     if (next == GrantState.resubmissionRequired && cfg != null) {
       final first = cfg.documents.first;
       final old = s.docs[first];
-      s.docs[first] = DocumentStatus(kind: first, outcome: DocumentOutcome.rejected, expiry: old?.expiry, rejectionReasonCode: 'DOC_UNREADABLE', fileName: old?.fileName, sizeBytes: old?.sizeBytes);
+      s.docs[first] = DocumentStatus(kind: first, outcome: DocumentOutcome.rejected, expiry: old?.expiry, rejectionReasonCode: 'DOC_UNREADABLE', fileName: old?.fileName, sizeBytes: old?.sizeBytes, uploadedAt: old?.uploadedAt);
       s.reason = 'DOC_UNREADABLE';
     }
     if (next == GrantState.rejected) s.reason = 'DOC_MISMATCH';
     if (next == GrantState.approved) {
       s.decidedAt = DateTime.now();
       for (final k in s.docs.keys.toList()) {
-        s.docs[k] = DocumentStatus(kind: k, outcome: DocumentOutcome.accepted, expiry: s.docs[k]?.expiry, fileName: s.docs[k]?.fileName, sizeBytes: s.docs[k]?.sizeBytes);
+        s.docs[k] = DocumentStatus(kind: k, outcome: DocumentOutcome.accepted, expiry: s.docs[k]?.expiry, fileName: s.docs[k]?.fileName, sizeBytes: s.docs[k]?.sizeBytes, uploadedAt: s.docs[k]?.uploadedAt);
       }
     }
   }
@@ -205,7 +243,7 @@ class DemoAccountApi implements AccountApi {
     final cfg = roleConfigs[s.purpose];
     if (cfg == null) return;
     for (final k in cfg.documents) {
-      s.docs[k] = DocumentStatus(kind: k, outcome: DocumentOutcome.pendingReview, expiry: k.tracksExpiry ? DateTime.now().add(const Duration(days: 400)) : null, fileName: '${k.name}.pdf', sizeBytes: 184320);
+      s.docs[k] = DocumentStatus(kind: k, outcome: DocumentOutcome.pendingReview, expiry: k.tracksExpiry ? DateTime.now().add(const Duration(days: 400)) : null, fileName: '${k.name}.pdf', sizeBytes: 184320, uploadedAt: DateTime.now());
     }
   }
 

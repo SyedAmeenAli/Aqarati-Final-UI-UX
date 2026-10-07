@@ -128,7 +128,7 @@ class AQChoiceTile extends StatelessWidget {
                 const SizedBox(height: AQSpacing.x3),
                 Text(title, style: AQTypography.of(context, AQText.titleSmall)),
                 const SizedBox(height: AQSpacing.x1),
-                Text(description, style: AQTypography.of(context, AQText.bodySmall, soft: true), maxLines: 3),
+                Text(description, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
               ]),
             ),
             AnimatedSlide(
@@ -235,6 +235,32 @@ class AQRoute {
               ),
             ),
           );
+        },
+      );
+
+  /// Reading / detail surfaces: rises from below like a sheet, leaves the same way.
+  static Page<T> sheet<T>({required LocalKey key, required Widget child}) => CustomTransitionPage<T>(
+        key: key,
+        child: child,
+        transitionDuration: AQMotion.slow,
+        reverseTransitionDuration: AQMotion.standard,
+        transitionsBuilder: (context, animation, secondary, child) {
+          if (AQMotion.reduced(context)) return FadeTransition(opacity: animation, child: child);
+          final curve = CurvedAnimation(parent: animation, curve: AQMotion.emphasized);
+          return FadeTransition(opacity: Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: animation, curve: const Interval(0, 0.6))), child: SlideTransition(position: Tween(begin: const Offset(0, 0.06), end: Offset.zero).animate(curve), child: child));
+        },
+      );
+
+  /// Milestones (approval, workspace): a calm opening-out, slightly more scale than [forward].
+  static Page<T> hero<T>({required LocalKey key, required Widget child}) => CustomTransitionPage<T>(
+        key: key,
+        child: child,
+        transitionDuration: const Duration(milliseconds: 480),
+        reverseTransitionDuration: AQMotion.standard,
+        transitionsBuilder: (context, animation, secondary, child) {
+          if (AQMotion.reduced(context)) return FadeTransition(opacity: animation, child: child);
+          final curve = CurvedAnimation(parent: animation, curve: AQMotion.emphasized);
+          return FadeTransition(opacity: curve, child: ScaleTransition(scale: Tween<double>(begin: 0.96, end: 1).animate(curve), child: child));
         },
       );
 

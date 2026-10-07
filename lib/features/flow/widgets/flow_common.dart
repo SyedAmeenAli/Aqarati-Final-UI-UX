@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/aq/aq_auth_scaffold.dart';
 import '../../../core/aq/aq_forms.dart';
 import '../../../core/aq/aq_primitives.dart';
-import '../../../core/aq/aq_scene.dart';
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/localization/entry_strings.dart';
 import '../../../core/localization/flow_strings.dart';
@@ -26,14 +25,14 @@ class AQSkeleton extends StatelessWidget {
 }
 
 /// Loading / error frames shared by verification screens.
-Widget aqLoadingFrame(BuildContext context, {String? title}) => AQAuthScaffold(showLogo: false, title: title ?? ' ', onBack: () => aqBack(context, '/entry'), children: const [AQSkeleton()]);
+Widget aqLoadingFrame(BuildContext context, {String? title}) => AQAuthScaffold(showLogo: false, title: title ?? ' ', showBack: false, children: const [AQSkeleton()]);
 
 Widget aqErrorFrame(BuildContext context, WidgetRef ref, {required String title, required VoidCallback onRetry}) {
   final f = FlowStrings.of(context);
   return AQAuthScaffold(
     showLogo: false,
     title: title,
-    onBack: () => aqBack(context, '/entry'),
+    showBack: false,
     children: [AQErrorBanner(text: f.t('ver.retryLoad'), action: AQTextButton(label: f.t('common.retry'), color: AQColors.of(context).accent, onPressed: onRetry))],
   );
 }

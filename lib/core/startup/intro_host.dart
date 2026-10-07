@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+import '../aq/aq_primitives.dart';
+import '../aq/aq_tokens.dart';
 import '../brand/brand_tokens.dart';
+import '../localization/entry_strings.dart';
 import 'aqarati_intro_preferences.dart';
 import 'intro_state.dart';
 import 'logo_handoff.dart';
@@ -98,6 +102,9 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
   bool _failed = false;
   bool _firstFrame = false;
   bool _handoff = false;
+  bool _skipped = false;
+  bool _showSkip = false;
+  Timer? _skipTimer;
 
   @override
   void initState() {
@@ -109,7 +116,19 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
       WidgetsBinding.instance.addPostFrameCallback((_) => _finish(persist: true, hold: Duration.zero));
     } else {
       _start();
+      // A quiet way out appears once the film is clearly underway.
+      _skipTimer = Timer(const Duration(milliseconds: 1400), () {
+        if (mounted && !_finishing) setState(() => _showSkip = true);
+      });
     }
+  }
+
+  /// The viewer chose to leave the film: pause, fade into Entry (no logo travel, the frame is not the logo yet).
+  void _skip() {
+    if (_finishing) return;
+    _skipped = true;
+    _video?.pause();
+    _finish(persist: true, hold: Duration.zero);
   }
 
   Future<void> _start() async {
@@ -159,7 +178,7 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
     // Swap the live video for its own last frame before moving anything: scaling and
     // fading a video texture is what made the handoff stutter; a still is cheap.
     final v = _video;
-    if (v != null && v.value.isInitialized && !_failed) {
+    if (v != null && v.value.isInitialized && !_failed && !_skipped) {
       await v.pause();
       if (!mounted) return;
       setState(() => _handoff = true);
@@ -167,7 +186,7 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
       if (!mounted) return;
     }
     widget.onReveal();
-    final simple = widget.reducedMotion || _failed;
+    final simple = widget.reducedMotion || _failed || _skipped;
     await _move.animateTo(1, duration: simple ? const Duration(milliseconds: 220) : _kHandoff);
     if (!mounted) return;
     widget.onDone(persist);
@@ -186,6 +205,7 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
 
   @override
   void dispose() {
+    _skipTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _video?.removeListener(_tick);
     _video?.dispose();
@@ -200,7 +220,7 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
     final mq = MediaQuery.of(context);
     final size = mq.size;
     final geo = LogoHandoff.compute(mq);
-    final simple = widget.reducedMotion || _failed;
+    final simple = widget.reducedMotion || _failed || _skipped;
 
     final film = Stack(
       fit: StackFit.expand,
@@ -220,7 +240,10 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
       ],
     );
 
-    return Semantics(
+    final strings = EntryStrings.of(context);
+    final c = AQColors.of(context);
+    final stage = Semantics(
+      container: true,
       label: 'AQARATI',
       child: AnimatedBuilder(
         animation: _move,
@@ -249,5 +272,14 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
         },
       ),
     );
+    return Stack(fit: StackFit.expand, children: [
+      stage,
+      if (_showSkip && !_finishing)
+        PositionedDirectional(
+          top: mq.padding.top + 4,
+          end: AQSpacing.x4,
+          child: Semantics(container: true, child: Material(type: MaterialType.transparency, child: AQTextButton(label: strings.skip, trailingIcon: 'chevron-right', color: c.inkSoft, onPressed: _skip))),
+        ),
+    ]);
   }
 }

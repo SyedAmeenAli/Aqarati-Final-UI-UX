@@ -6,7 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final localeProvider = StateProvider<Locale>((ref) => const Locale('en'));
 
 /// Always opens in light mode; dark is an explicit choice (Account > Appearance).
-final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
+// QA only: `--dart-define=AQ_THEME=dark` previews the dark system; the product default is always light.
+final themeModeProvider = StateProvider<ThemeMode>((ref) => const String.fromEnvironment('AQ_THEME') == 'dark' ? ThemeMode.dark : ThemeMode.light);
 
 /// Strings for the entry + purpose screens. Arabic copy is a draft and needs
 /// native review (same status as the brand site).

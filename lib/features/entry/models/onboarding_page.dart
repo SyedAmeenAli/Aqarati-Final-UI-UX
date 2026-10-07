@@ -4,8 +4,7 @@ class OnboardingPage {
   final String backgroundAsset;
   final String primaryRoute;
   final String loginRoute;
-  final String skipRoute;
-  const OnboardingPage({required this.backgroundAsset, required this.primaryRoute, required this.loginRoute, required this.skipRoute});
+  const OnboardingPage({required this.backgroundAsset, required this.primaryRoute, required this.loginRoute});
 }
 
 const onboardingPages = <OnboardingPage>[
@@ -13,6 +12,5 @@ const onboardingPages = <OnboardingPage>[
     backgroundAsset: 'assets/entry/entry_bg_01.jpg',
     primaryRoute: '/onboarding/purpose',
     loginRoute: '/login',
-    skipRoute: '/home',
   ),
 ];

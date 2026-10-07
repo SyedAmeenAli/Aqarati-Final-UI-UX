@@ -165,7 +165,7 @@ class AQTextButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x2),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(label, style: AQTypography.of(context, AQText.titleSmall, color: fg)),
+              Flexible(child: Text(label, style: AQTypography.of(context, AQText.titleSmall, color: fg))),
               if (trailingIcon != null) ...[const SizedBox(width: 2), AQIcon(trailingIcon!, size: AQIconSize.small, color: fg, directional: true)],
             ]),
           ),

@@ -26,6 +26,7 @@ class ApprovedScreen extends ConsumerStatefulWidget {
 
 class _ApprovedScreenState extends ConsumerState<ApprovedScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _seq = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
+  bool _felt = false;
 
   @override
   void initState() {
@@ -56,6 +57,11 @@ class _ApprovedScreenState extends ConsumerState<ApprovedScreen> with SingleTick
           WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/verification'));
           return const SizedBox.shrink();
         }
+        if (!_felt) {
+          _felt = true;
+          // One meaningful haptic, once, when the verified state appears.
+          WidgetsBinding.instance.addPostFrameCallback((_) => AQHaptics.success());
+        }
         Widget line(int i, String key) => AQReveal(
               animation: _seq,
               begin: 0.35 + i * 0.13,
@@ -80,9 +86,26 @@ class _ApprovedScreenState extends ConsumerState<ApprovedScreen> with SingleTick
           bottom: AQPrimaryButton(label: f.t('ver.action.continue'), onPressed: () => context.go('/verification/summary')),
           children: [
             const SizedBox(height: AQSpacing.x4),
-            const AQAnimatedCheck(size: 112),
-            const SizedBox(height: AQSpacing.x6),
-            MasterLogo(width: 112),
+            // Warm light blooms behind the check as it forms.
+            SizedBox(
+              height: 168,
+              child: Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
+                AnimatedBuilder(
+                  animation: _seq,
+                  builder: (context, _) => Opacity(
+                    opacity: Curves.easeOut.transform((_seq.value * 1.4).clamp(0.0, 1.0)),
+                    child: Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [c.accent.withValues(alpha: c.isDark ? 0.22 : 0.20), c.accent.withValues(alpha: 0)])),
+                    ),
+                  ),
+                ),
+                const AQAnimatedCheck(size: 112),
+              ]),
+            ),
+            const SizedBox(height: AQSpacing.x4),
+            AQReveal(animation: _seq, begin: 0.25, end: 0.6, dy: 6, child: MasterLogo(width: 128)),
             const SizedBox(height: AQSpacing.x6),
             Align(alignment: Alignment.center, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [line(0, 'ap.1'), line(1, 'ap.2'), line(2, 'ap.3'), line(3, 'ap.4')])),
           ],
@@ -130,15 +153,17 @@ class VerifiedSummaryScreen extends ConsumerWidget {
   }
 }
 
-/// Role-specific: only what the approved grant actually unlocks.
+/// Only what the approved role actually unlocks.
+List<String> workspaceCaps(SignupPurpose p) => switch (p) {
+      SignupPurpose.realEstateAgent => ['ws.cap.agent.1', 'ws.cap.agent.2', 'ws.cap.agent.3'],
+      SignupPurpose.propertyDevelopmentCompany => ['ws.cap.dev.1', 'ws.cap.dev.2'],
+      SignupPurpose.userToShop => const [],
+      _ => ['ws.cap.pro.1', 'ws.cap.pro.2'],
+    };
+
+/// Role-aware handoff: names the workspace for the approved role.
 class WorkspaceActivationScreen extends ConsumerWidget {
   const WorkspaceActivationScreen({super.key});
-
-  List<String> _caps(SignupPurpose p) => switch (p) {
-        SignupPurpose.realEstateAgent => ['ws.cap.agent.1', 'ws.cap.agent.2', 'ws.cap.agent.3'],
-        SignupPurpose.propertyDevelopmentCompany => ['ws.cap.dev.1', 'ws.cap.dev.2'],
-        _ => ['ws.cap.pro.1', 'ws.cap.pro.2'],
-      };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -155,7 +180,7 @@ class WorkspaceActivationScreen extends ConsumerWidget {
         }
         return AQAuthScaffold(
           showLogo: false,
-          title: f.t('ws.title'),
+          title: f.t('ws.t.${info.purpose.name}'),
           subtitle: '${roleTitle(context, info.purpose)} · ${f.t('ws.sub')}',
           onBack: () => context.go('/verification/summary'),
           backLabel: f.t('common.back'),
@@ -164,7 +189,7 @@ class WorkspaceActivationScreen extends ConsumerWidget {
             AQSurface(
               padding: const EdgeInsets.all(AQSpacing.x4),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                for (final k in _caps(info.purpose))
+                for (final k in workspaceCaps(info.purpose))
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 7),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

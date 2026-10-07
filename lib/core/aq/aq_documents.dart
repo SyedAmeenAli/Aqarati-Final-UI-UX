@@ -188,18 +188,18 @@ class AQKeyValue extends StatelessWidget {
 class AQDocumentRow extends StatelessWidget {
   final String title;
   final DocumentStatus status;
-  const AQDocumentRow({super.key, required this.title, required this.status});
+  /// Optional: tap the row to open the document preview.
+  final VoidCallback? onTap;
+  const AQDocumentRow({super.key, required this.title, required this.status, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final f = FlowStrings.of(context);
     final c = AQColors.of(context);
-    final (text, color, icon) = switch (status.outcome) {
-      DocumentOutcome.notSubmitted => (f.t('docs.state.idle'), c.inkFaint, 'info'),
-      DocumentOutcome.pendingReview => (f.t('docs.state.success'), c.accentDeep, 'activity'),
-      DocumentOutcome.accepted => (f.t('docs.state.accepted'), c.success, 'check'),
-      DocumentOutcome.rejected => (f.t('docs.state.rejected'), c.danger, 'alert'),
-    };
+    final visual = aqDocVisual(docDisplayOfStatus(status));
+    final text = f.t(visual.key);
+    final color = aqDocToneColor(c, visual.tone);
+    final icon = visual.icon;
     final ex = expiryStatusOf(status.expiry);
     final loc = MaterialLocalizations.of(context);
     final meta = <String>[
@@ -215,9 +215,13 @@ class AQDocumentRow extends StatelessWidget {
           };
     return Semantics(
       container: true,
+      button: onTap != null,
       label: '$title: $text${expiryLine == null ? '' : ', $expiryLine'}',
       excludeSemantics: true,
-      child: Padding(
+      child: AQPressable(
+        onTap: onTap,
+        pressedScale: 0.995,
+        child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AQSpacing.x2),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(padding: const EdgeInsets.only(top: 2), child: AQIcon(icon, size: AQIconSize.medium, color: color)),
@@ -230,8 +234,32 @@ class AQDocumentRow extends StatelessWidget {
               if (expiryLine != null) Text(expiryLine, style: AQTypography.of(context, AQText.bodySmall, color: ex == ExpiryStatus.expired ? c.danger : (ex == ExpiryStatus.expiringSoon ? c.accentDeep : c.inkSoft))),
             ]),
           ),
+          if (onTap != null) Padding(padding: const EdgeInsets.only(top: 2), child: AQIcon('chevron-right', size: AQIconSize.small, directional: true, color: c.inkFaint)),
         ]),
+      ),
       ),
     );
   }
 }
+
+/// Display vocabulary for one document: text key, icon and tone. Icon + text always, never colour alone.
+enum AQDocTone { quiet, neutral, good, attention }
+
+({String key, String icon, AQDocTone tone}) aqDocVisual(DocDisplay d) => switch (d) {
+      DocDisplay.empty => (key: 'docs.state.idle', icon: 'info', tone: AQDocTone.quiet),
+      DocDisplay.uploading => (key: 'docs.state.uploading', icon: 'activity', tone: AQDocTone.quiet),
+      DocDisplay.processing => (key: 'docs.state.processing', icon: 'activity', tone: AQDocTone.quiet),
+      DocDisplay.underReview => (key: 'docs.state.review', icon: 'activity', tone: AQDocTone.neutral),
+      DocDisplay.verified => (key: 'docs.state.accepted', icon: 'check', tone: AQDocTone.good),
+      DocDisplay.needsUpdate => (key: 'docs.state.rejected', icon: 'alert', tone: AQDocTone.attention),
+      DocDisplay.expired => (key: 'docs.state.expired', icon: 'alert', tone: AQDocTone.attention),
+      DocDisplay.missing => (key: 'docs.state.missing', icon: 'info', tone: AQDocTone.quiet),
+      DocDisplay.failed => (key: 'docs.state.failed', icon: 'alert', tone: AQDocTone.attention),
+    };
+
+Color aqDocToneColor(AQColors c, AQDocTone t) => switch (t) {
+      AQDocTone.quiet => c.inkSoft,
+      AQDocTone.neutral => c.accentDeep,
+      AQDocTone.good => c.success,
+      AQDocTone.attention => c.danger,
+    };

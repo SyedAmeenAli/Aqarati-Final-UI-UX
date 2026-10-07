@@ -143,7 +143,8 @@ class DocumentStatus {
   /// Metadata only (never content): shown in review and details.
   final String? fileName;
   final int? sizeBytes;
-  const DocumentStatus({required this.kind, required this.outcome, this.expiry, this.rejectionReasonCode, this.fileName, this.sizeBytes});
+  final DateTime? uploadedAt;
+  const DocumentStatus({required this.kind, required this.outcome, this.expiry, this.rejectionReasonCode, this.fileName, this.sizeBytes, this.uploadedAt});
 }
 
 /// GET /me/verification.
@@ -171,3 +172,34 @@ ExpiryStatus expiryStatusOf(DateTime? expiry, {DateTime? now}) {
   if (expiry.difference(n).inDays <= 30) return ExpiryStatus.expiringSoon;
   return ExpiryStatus.valid;
 }
+
+/// What the person must do about one document. Derived only from the model's own state.
+enum DocAction { none, fix, replaceExpired, uploadMissing }
+
+DocAction docActionOf(DocumentStatus d, {DateTime? now}) {
+  if (d.outcome == DocumentOutcome.rejected) return DocAction.fix;
+  if (d.outcome == DocumentOutcome.notSubmitted) return DocAction.uploadMissing;
+  if (expiryStatusOf(d.expiry, now: now) == ExpiryStatus.expired) return DocAction.replaceExpired;
+  return DocAction.none;
+}
+
+/// One calm display vocabulary for a document, used by tiles, rows and the preview sheet.
+enum DocDisplay { empty, uploading, processing, underReview, verified, needsUpdate, expired, missing, failed }
+
+DocDisplay docDisplayOfStatus(DocumentStatus d, {DateTime? now}) => switch (docActionOf(d, now: now)) {
+      DocAction.fix => DocDisplay.needsUpdate,
+      DocAction.uploadMissing => DocDisplay.missing,
+      DocAction.replaceExpired => DocDisplay.expired,
+      DocAction.none => d.outcome == DocumentOutcome.accepted ? DocDisplay.verified : DocDisplay.underReview,
+    };
+
+/// Documents the person must act on, straight from the model: rejected, expired or missing.
+Set<DocumentKind> resubmissionTargetsOf(Iterable<DocumentStatus> docs, {DateTime? now}) => {for (final d in docs) if (docActionOf(d, now: now) != DocAction.none) d.kind};
+
+/// How "Review changes" groups documents. Only what the model reports as accepted is "approved".
+({List<DocumentStatus> updated, List<DocumentStatus> approved, List<DocumentStatus> pending, List<DocumentStatus> stillNeeds}) groupForReview(Iterable<DocumentStatus> docs, Set<DocumentKind> targets, {DateTime? now}) => (
+      updated: [for (final d in docs) if (targets.contains(d.kind)) d],
+      approved: [for (final d in docs) if (!targets.contains(d.kind) && d.outcome == DocumentOutcome.accepted && docActionOf(d, now: now) == DocAction.none) d],
+      pending: [for (final d in docs) if (!targets.contains(d.kind) && d.outcome == DocumentOutcome.pendingReview && docActionOf(d, now: now) == DocAction.none) d],
+      stillNeeds: [for (final d in docs) if (!targets.contains(d.kind) && docActionOf(d, now: now) != DocAction.none) d],
+    );

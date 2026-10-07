@@ -99,7 +99,6 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
           SafeArea(
             child: LayoutBuilder(builder: (context, box) {
               return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: box.maxHeight),
                   child: Center(
@@ -112,7 +111,7 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              AQReveal(animation: _enter, begin: 0, end: 0.4, dy: 0, child: AQTopBar(actionLabel: s.skip, actionSemantics: s.skipLabel, onAction: () => context.go(_page.skipRoute))),
+                              const SizedBox(height: AQControl.tap),
                               SizedBox(height: LogoHandoff.topGap(box.maxHeight)),
                               Center(child: AQReveal(animation: _enter, begin: 0, end: 0.5, dy: 12, child: MasterLogo(width: LogoHandoff.entryWidth(w, hh)))),
                               SizedBox(height: box.maxHeight > 780 ? AQSpacing.x10 : (box.maxHeight > 650 ? AQSpacing.x5 : AQSpacing.x3)),
@@ -143,8 +142,12 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
                             ]),
                             const SizedBox(height: AQSpacing.x4),
                             Column(children: [
-                              AQReveal(animation: _enter, begin: 0.35, end: 0.8, dy: 6, child: _Pager(count: onboardingPages.length < 4 ? 4 : onboardingPages.length, index: widget.pageIndex, label: s.pageLabel)),
-                              SizedBox(height: compact ? AQSpacing.x3 : AQSpacing.x5),
+                              // A pager only exists when there is more than one real page.
+                              if (onboardingPages.length > 1) ...[
+                                AQReveal(animation: _enter, begin: 0.35, end: 0.8, dy: 6, child: _Pager(count: onboardingPages.length, index: widget.pageIndex, label: s.pageLabel)),
+                                SizedBox(height: compact ? AQSpacing.x3 : AQSpacing.x5),
+                              ] else
+                                SizedBox(height: compact ? AQSpacing.x1 : AQSpacing.x3),
                               AQReveal(
                                 animation: _enter,
                                 begin: 0.45,

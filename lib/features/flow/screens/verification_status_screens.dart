@@ -13,7 +13,9 @@ import '../../../core/localization/flow_strings.dart';
 import '../../../data/api/account_api.dart';
 import '../../../data/demo/demo_backend.dart';
 import '../state/document_state.dart';
+import '../widgets/document_preview.dart';
 import '../widgets/document_upload_tile.dart';
+import '../widgets/journey.dart';
 import '../widgets/flow_common.dart';
 
 String _reasonText(FlowStrings f, String? code) {
@@ -87,18 +89,22 @@ class _Status extends ConsumerWidget {
       showLogo: false,
       title: f.t(headKey),
       subtitle: f.t(bodyKey),
-      onBack: () => context.go('/entry'),
-      backLabel: f.t('common.back'),
-      progress: Align(alignment: AlignmentDirectional.centerStart, child: AQStatusBadge(grant: info.grant, stage: second ? info.stage : null)),
+      // Root of the authenticated onboarding area: Back would only lead to Welcome.
+      showBack: false,
+      progress: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        journeyProgress(context, info.purpose, JourneyAt.status),
+        const SizedBox(height: AQSpacing.x3),
+        AQStatusBadge(grant: info.grant, stage: second ? info.stage : null),
+      ]),
       bottom: Column(mainAxisSize: MainAxisSize.min, children: [
         if (action != null) AQPrimaryButton(label: action.$1, onPressed: () => context.go(action.$2)) else AQSecondaryButton(label: f.t('ver.action.refresh'), trailingChevron: false, onPressed: () => ref.invalidate(verificationProvider)),
         AQTextButton(label: f.t('ver.viewApplication'), onPressed: () => context.go('/verification/details')),
       ]),
       children: [
-        if (info.grant == GrantState.pendingVerification) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x5), child: Text(f.t('ver.nothingNeeded'), style: AQTypography.of(context, AQText.titleSmall, color: c.accentDeep))),
+        if (info.grant == GrantState.pendingVerification) AQReviewSection(title: f.t('ver.yourAction'), children: [Padding(padding: const EdgeInsets.only(top: AQSpacing.x2), child: Text(f.t('ver.nothingNeeded'), style: AQTypography.of(context, AQText.titleSmall, color: c.accentDeep)))]),
         if (showTimeline) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x4), child: AQVerificationTimeline(steps: steps, current: current)),
         if (info.grant == GrantState.approved && info.decidedAt != null) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x4), child: Text(f.t('ver.decided', {'d': loc.formatMediumDate(info.decidedAt!)}), style: AQTypography.of(context, AQText.bodySmall, soft: true))),
-        AQReviewSection(title: f.t('ver.documents'), children: [for (final d in info.documents) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d)]),
+        AQReviewSection(title: f.t('ver.documents'), children: [for (final d in info.documents) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d, onTap: d.fileName == null ? null : () => showDocumentPreview(context, d.kind, status: d))]),
         if (missing.isNotEmpty && info.grant != GrantState.approved) AQErrorBanner(tone: AQBannerTone.info, text: '${f.t('ver.missing')}: ${missing.map((d) => f.t(documentLabelKey(d.kind))).join(', ')}'),
         if (fix.isNotEmpty) AQErrorBanner(text: '${f.t('ver.correction')}: ${fix.map((d) => f.t(documentLabelKey(d.kind))).join(', ')}\n${f.t('ver.reason')}: ${_reasonText(f, fix.first.rejectionReasonCode ?? info.reasonCode)}'),
         if (info.grant == GrantState.rejected) AQErrorBanner(text: '${f.t('ver.reason')}: ${_reasonText(f, info.reasonCode)}${info.decidedAt == null ? '' : '\n${f.t('ver.decided', {'d': loc.formatMediumDate(info.decidedAt!)})}'}'),
@@ -136,7 +142,7 @@ class ApplicationDetailsScreen extends ConsumerWidget {
               if (info.businessName != null) AQKeyValue(f.t('det.company'), info.businessName!),
               AQKeyValue(f.t('det.status'), f.t(AQStatusBadge.labelKey(info.grant, info.stage))),
             ]),
-            AQReviewSection(title: f.t('ver.documents'), children: [for (final d in info.documents) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d)]),
+            AQReviewSection(title: f.t('ver.documents'), children: [for (final d in info.documents) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d, onTap: d.fileName == null ? null : () => showDocumentPreview(context, d.kind, status: d))]),
             if (reviewer) AQErrorBanner(text: '${f.t('ver.reason')}: ${_reasonText(f, info.reasonCode)}'),
             if (info.grant == GrantState.pendingVerification) AQErrorBanner(tone: AQBannerTone.info, text: f.t('det.locked')),
           ],
@@ -147,6 +153,11 @@ class ApplicationDetailsScreen extends ConsumerWidget {
 }
 
 /// Only affected documents are replaced; everything else stays as submitted.
+Map<DocumentKind, DocumentStatus> byKindPre(VerificationInfo info) => {for (final d in info.documents) d.kind: d};
+
+/// A target is resolved once its tile shows the document as received (under review) or verified.
+bool _resolved(DocumentState s) => s.display == DocDisplay.underReview || s.display == DocDisplay.verified;
+
 class ResubmissionScreen extends ConsumerWidget {
   const ResubmissionScreen({super.key});
 
@@ -160,7 +171,7 @@ class ResubmissionScreen extends ConsumerWidget {
       data: (info) {
         var targets = ref.watch(resubmissionTargetsProvider);
         if (targets.isEmpty) {
-          final found = info.documents.where((d) => d.outcome == DocumentOutcome.rejected).map((d) => d.kind).toSet();
+          final found = resubmissionTargetsOf(info.documents);
           if (found.isNotEmpty) {
             Future.microtask(() => ref.read(resubmissionTargetsProvider.notifier).state = found);
             targets = found;
@@ -176,8 +187,9 @@ class ResubmissionScreen extends ConsumerWidget {
             children: const [],
           );
         }
-        final allDone = targets.every((k) => ref.watch(documentControllerProvider(k)).phase == DocPhase.success);
+        final allDone = targets.every((k) => _resolved(ref.watch(documentControllerProvider(k))));
         final anyBusy = targets.any((k) => ref.watch(documentControllerProvider(k)).busy);
+        final anyFix = targets.any((k) => byKindPre(info)[k]?.outcome == DocumentOutcome.rejected);
         final byKind = {for (final d in info.documents) d.kind: d};
         return AQAuthScaffold(
           showLogo: false,
@@ -187,11 +199,11 @@ class ResubmissionScreen extends ConsumerWidget {
           backLabel: f.t('common.back'),
           bottom: AQPrimaryButton(label: f.t('resub.reviewCta'), onPressed: allDone && !anyBusy ? () => context.go('/verification/resubmit/review') : null),
           children: [
-            AQErrorBanner(text: '${f.t('resub.why')}: ${_reasonText(f, info.reasonCode ?? byKind[targets.first]?.rejectionReasonCode)}'),
+            if (anyFix) AQErrorBanner(text: '${f.t('resub.why')}: ${_reasonText(f, info.reasonCode ?? byKind[targets.first]?.rejectionReasonCode)}'),
             for (final k in targets)
-              DocumentUploadTile(key: ValueKey(k), kind: k, seed: DocumentState(phase: DocPhase.rejected, expiry: byKind[k]?.expiry), rejectionReason: _reasonText(f, byKind[k]?.rejectionReasonCode ?? info.reasonCode)),
+              DocumentUploadTile(key: ValueKey(k), kind: k, seed: initialFromStatus(byKind[k]), rejectionReason: _reasonText(f, byKind[k]?.rejectionReasonCode ?? info.reasonCode)),
             for (final d in info.documents.where((d) => !targets.contains(d.kind)))
-              Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x1), child: AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d)),
+              Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x1), child: AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d, onTap: d.fileName == null ? null : () => showDocumentPreview(context, d.kind, status: d))),
           ],
         );
       },
@@ -239,8 +251,10 @@ class _ResubmitReviewScreenState extends ConsumerState<ResubmitReviewScreen> {
       loading: () => aqLoadingFrame(context, title: f.t('rr.title')),
       error: (_, _) => aqErrorFrame(context, ref, title: f.t('rr.title'), onRetry: () => ref.invalidate(verificationProvider)),
       data: (info) {
-        final updated = info.documents.where((d) => targets.contains(d.kind)).toList();
-        final approved = info.documents.where((d) => !targets.contains(d.kind)).toList();
+        // Only a document the model reports as accepted is "already approved"; pending ones stay pending.
+        final g = groupForReview(info.documents, targets);
+        final updated = g.updated, approved = g.approved, pending = g.pending, stillNeeds = g.stillNeeds;
+        final canConfirm = targets.isNotEmpty ? targets.every((k) => _resolved(ref.watch(documentControllerProvider(k)))) : stillNeeds.isEmpty;
         return AQAuthScaffold(
           showLogo: false,
           title: f.t('rr.title'),
@@ -249,11 +263,13 @@ class _ResubmitReviewScreenState extends ConsumerState<ResubmitReviewScreen> {
           backLabel: f.t('common.back'),
           bottom: Column(mainAxisSize: MainAxisSize.min, children: [
             if (_bannerKey != null) AQErrorBanner(text: f.t(_bannerKey!)),
-            AQPrimaryButton(label: f.t('rr.confirm'), loading: _busy, onPressed: updated.isEmpty ? null : () => _confirm(targets)),
+            AQPrimaryButton(label: f.t('rr.confirm'), loading: _busy, onPressed: canConfirm ? () => _confirm(targets) : null),
           ]),
           children: [
             AQReviewSection(title: f.t('rr.updated'), editLabel: f.t('review.edit'), onEdit: () => context.go('/verification/resubmit'), children: updated.isEmpty ? [Text(f.t('rr.nothing'), style: AQTypography.of(context, AQText.bodySmall, soft: true))] : [for (final d in updated) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d)]),
             if (approved.isNotEmpty) AQReviewSection(title: f.t('rr.approved'), children: [for (final d in approved) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d)]),
+            if (pending.isNotEmpty) AQReviewSection(title: f.t('rr.pending'), children: [for (final d in pending) AQDocumentRow(title: f.t(documentLabelKey(d.kind)), status: d)]),
+            if (stillNeeds.isNotEmpty) AQErrorBanner(text: '${f.t('ver.correction')}: ${stillNeeds.map((d) => f.t(documentLabelKey(d.kind))).join(', ')}'),
           ],
         );
       },
@@ -280,7 +296,11 @@ class ResubmittedScreen extends ConsumerWidget {
       children: [
         const SizedBox(height: AQSpacing.x4),
         const AQAnimatedCheck(size: 96),
-        const SizedBox(height: AQSpacing.x6),
+        const SizedBox(height: AQSpacing.x5),
+        AQStatusBadge(grant: GrantState.pendingVerification, stage: ref.watch(verificationProvider).valueOrNull?.stage),
+        const SizedBox(height: AQSpacing.x4),
+        Text(f.t('submitted.nextBody'), textAlign: TextAlign.center, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+        const SizedBox(height: AQSpacing.x5),
         if (last != null) ...[
           Text(f.t('rd.at', {'d': '${loc.formatMediumDate(last.at)} · ${loc.formatTimeOfDay(TimeOfDay.fromDateTime(last.at))}'}), style: AQTypography.of(context, AQText.labelMedium, soft: true)),
           const SizedBox(height: AQSpacing.x4),

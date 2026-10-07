@@ -42,6 +42,15 @@ class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with Si
     super.dispose();
   }
 
+  Alignment _cropFor(SignupPurpose? p) => switch (p) {
+        SignupPurpose.realEstateAgent => const Alignment(-0.5, 1),
+        SignupPurpose.constructionCompany => const Alignment(0.5, 0.7),
+        SignupPurpose.propertyDevelopmentCompany => const Alignment(0.9, 0.9),
+        SignupPurpose.buildingArchitecture => const Alignment(0.2, 0.5),
+        SignupPurpose.interiorExteriorDesign => const Alignment(-0.9, 0.8),
+        _ => Alignment.bottomCenter,
+      };
+
   void _continue(EntryStrings s) {
     final selected = _selected;
     if (selected == null) return;
@@ -89,7 +98,13 @@ class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with Si
       child: Scaffold(
         backgroundColor: c.background,
         body: Stack(fit: StackFit.expand, children: [
-          const AQBackdrop(asset: 'assets/entry/oman_terrace_2k.jpg', alignment: Alignment.bottomCenter),
+          // The photograph re-frames very slightly for the chosen role; one scene, one language.
+          TweenAnimationBuilder<Alignment>(
+            tween: AlignmentTween(end: _cropFor(_selected)),
+            duration: AQMotion.scaled(context, AQMotion.slow),
+            curve: AQMotion.standardCurve,
+            builder: (context, a, _) => AQBackdrop(asset: 'assets/entry/oman_terrace_2k.jpg', alignment: a),
+          ),
           SafeArea(
             child: Center(
               child: ConstrainedBox(
@@ -97,11 +112,10 @@ class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with Si
                 child: Column(children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4),
-                    child: AQTopBar(onBack: () => aqBack(context, '/entry'), backLabel: s.back, actionLabel: s.skip, actionSemantics: s.skipLabel, onAction: () => context.go('/login')),
+                    child: AQTopBar(onBack: () => aqBack(context, '/entry'), backLabel: s.back),
                   ),
                   Expanded(
                     child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, 0, AQSpacing.gutter, AQSpacing.x4),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Center(child: AQReveal(animation: _enter, begin: 0, end: 0.45, dy: 10, child: MasterLogo(width: logoWidth))),
@@ -121,12 +135,28 @@ class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with Si
                       begin: 0.55,
                       end: 1,
                       dy: 6,
-                      child: AQPrimaryButton(
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        // Supportive line for the chosen role (reserved height so nothing jumps).
+                        SizedBox(
+                          height: compact ? 40 : 48,
+                          child: AnimatedSwitcher(
+                            duration: AQMotion.scaled(context, AQMotion.standard),
+                            child: selected == null
+                                ? const SizedBox.shrink(key: ValueKey('none'))
+                                : Align(
+                                    key: ValueKey(selected.id),
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: Text(selected.tagline(s), maxLines: 2, overflow: TextOverflow.fade, style: AQTypography.of(context, AQText.bodyMedium, color: c.accentDeep, italic: true)),
+                                  ),
+                          ),
+                        ),
+                      AQPrimaryButton(
                         compact: compact,
                         label: s.continueLabel,
                         semanticsLabel: selected == null ? s.continueLabel : s.continueWith(selected.title(s)),
                         onPressed: selected == null ? null : () => _continue(s),
                       ),
+                      ]),
                     ),
                   ),
                 ]),

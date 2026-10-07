@@ -42,6 +42,10 @@ abstract class AccountApi {
   /// POST /auth/verify-phone
   Future<OtpVerifyResult> verifyPhone(String code);
 
+  /// Replace the number a pending OTP was sent to. CONTRACT ASSUMPTION: the frontend needs this for the
+  /// "wrong number" path; confirm the matching endpoint with the API owners before wiring.
+  Future<void> changePhone(String phone);
+
   /// GET /me
   Future<MeSession> getMe();
 
@@ -68,6 +72,8 @@ class UnavailableAccountApi implements AccountApi {
   Future<OtpIssued> startPhoneVerification() async => _no();
   @override
   Future<OtpVerifyResult> verifyPhone(String code) async => _no();
+  @override
+  Future<void> changePhone(String phone) async => _no();
   @override
   Future<MeSession> getMe() async => _no();
   @override

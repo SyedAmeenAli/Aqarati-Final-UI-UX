@@ -53,7 +53,7 @@ class AQColors {
     surfaceSelected: Color(0xFFF6EADB),
     ink: Color(0xFF2D2823),
     inkSoft: Color(0xFF655C52),
-    inkFaint: Color(0xFF8E8377),
+    inkFaint: Color(0xFF766B60),
     hairline: Color(0x33655C52),
     accent: Color(0xFF825C3F),
     accentDeep: Color(0xFF674830),

@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/aq/aq_auth_scaffold.dart';
@@ -8,12 +10,14 @@ import '../../../core/aq/aq_scene.dart';
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/domain/account_models.dart';
+import '../../../core/localization/entry_strings.dart';
 import '../../../core/localization/flow_strings.dart';
 import '../../entry/models/signup_purpose.dart';
 import '../state/signup_state.dart';
+import '../widgets/journey.dart';
 
 /// ONE form for all six public sign-up paths, driven by [RoleFormConfig].
-/// Built only from AQ system components.
+/// Built only from AQ system components. Conversational steps over one data model.
 class SignupFormScreen extends ConsumerStatefulWidget {
   final SignupPurpose purpose;
   const SignupFormScreen({super.key, required this.purpose});
@@ -31,12 +35,23 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
   // Passwords live only in these controllers: never in state, drafts or logs.
   final _password = TextEditingController();
   final _confirm = TextEditingController();
+  final _linkTerms = TapGestureRecognizer();
+  final _linkPrivacy = TapGestureRecognizer();
   bool _seeded = false;
 
   RoleFormConfig get cfg => roleConfigs[widget.purpose]!;
 
   @override
+  void initState() {
+    super.initState();
+    _linkTerms.onTap = () => context.push('/legal/terms');
+    _linkPrivacy.onTap = () => context.push('/legal/privacy');
+  }
+
+  @override
   void dispose() {
+    _linkTerms.dispose();
+    _linkPrivacy.dispose();
     for (final c in [_first, _last, _phone, _email, _business, _agency, _password, _confirm]) {
       c.dispose();
     }
@@ -76,6 +91,12 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
     }
   }
 
+  String _businessQuestion() => switch (widget.purpose) {
+        SignupPurpose.realEstateAgent => 'signup.q.business.agent',
+        SignupPurpose.constructionCompany || SignupPurpose.propertyDevelopmentCompany => 'signup.q.business.company',
+        _ => 'signup.q.business.practice',
+      };
+
   @override
   Widget build(BuildContext context) {
     final f = FlowStrings.of(context);
@@ -83,10 +104,11 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
     final ctl = ref.read(signupControllerProvider(widget.purpose).notifier);
     if (st.loaded && !_seeded) _seed(st.values);
     final c = AQColors.of(context);
+    final option = signupPurposeOptions.firstWhere((o) => o.id == widget.purpose);
 
     if (!st.loaded) {
       return AQAuthScaffold(
-        title: f.t('signup.t.${widget.purpose.name}'),
+        title: f.t('signup.q.you'),
         children: [Center(child: Semantics(label: f.t('common.loading'), child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: c.accent))))],
       );
     }
@@ -94,61 +116,111 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
     final steps = stepsFor(cfg);
     final step = steps[st.stepIndex];
     String? err(String field) => st.errors[field] == null ? null : f.t(st.errors[field]!);
-    final stepName = switch (step) { SignupStep.you => 'signup.stepYou', SignupStep.business => 'signup.stepBusiness', SignupStep.account => 'signup.stepAccount' };
+    final v = st.values;
+    final title = switch (step) {
+      SignupStep.you => 'signup.q.you',
+      SignupStep.contact => 'signup.q.contact',
+      SignupStep.business => _businessQuestion(),
+      SignupStep.account => 'signup.q.account',
+    };
 
     final Widget body;
     switch (step) {
       case SignupStep.you:
         body = Column(children: [
-          AQTextField(label: f.t('field.firstName'), controller: _first, autofill: const [AutofillHints.givenName], error: err('firstName'), onChanged: (_) => _push()),
-          AQTextField(label: f.t('field.lastName'), controller: _last, autofill: const [AutofillHints.familyName], error: err('lastName'), onChanged: (_) => _push()),
-          AQPhoneField(label: f.t('field.phone'), hint: f.t('field.phoneHint'), controller: _phone, error: err('phone'), onChanged: (_) => _push()),
-          AQTextField(label: f.t('field.email'), controller: _email, keyboardType: TextInputType.emailAddress, autofill: const [AutofillHints.email], error: err('email'), action: TextInputAction.done, onChanged: (_) => _push()),
+          AQTextField(label: f.t('field.firstName'), controller: _first, autofill: const [AutofillHints.givenName], valid: v.firstName.trim().isNotEmpty, error: err('firstName'), onChanged: (_) => _push()),
+          AQTextField(label: f.t('field.lastName'), controller: _last, autofill: const [AutofillHints.familyName], valid: v.lastName.trim().isNotEmpty, error: err('lastName'), action: TextInputAction.done, onChanged: (_) => _push()),
+        ]);
+      case SignupStep.contact:
+        body = Column(children: [
+          AQTextField(label: f.t('field.email'), controller: _email, keyboardType: TextInputType.emailAddress, autofill: const [AutofillHints.email], valid: isValidEmail(v.email), error: err('email'), onChanged: (_) => _push()),
+          AQPhoneField(label: f.t('field.phone'), hint: f.t('field.phoneHint'), controller: _phone, valid: isValidOmanMobile(v.phone), error: err('phone'), onChanged: (_) => _push()),
         ]);
       case SignupStep.business:
         body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          if (cfg.hasAgencyName) AQTextField(label: f.t('field.agencyName'), controller: _agency, error: err('agencyName'), onChanged: (_) => _push()),
-          if (cfg.hasBusinessName) AQTextField(label: f.t('field.businessName'), controller: _business, error: err('businessName'), onChanged: (_) => _push()),
+          if (cfg.hasAgencyName) AQTextField(label: f.t('field.agencyName'), controller: _agency, valid: v.agencyName.trim().isNotEmpty, error: err('agencyName'), onChanged: (_) => _push()),
+          if (cfg.hasBusinessName) AQTextField(label: f.t('field.businessName'), controller: _business, valid: v.businessName.trim().isNotEmpty, error: err('businessName'), onChanged: (_) => _push()),
           if (cfg.hasServiceType)
             AQSegmented<InteriorExteriorServiceType>(
               label: f.t('field.serviceType'),
               selected: st.values.serviceType,
               error: err('serviceType'),
               options: [for (final t in InteriorExteriorServiceType.values) (value: t, label: f.t('service.${t.name}'))],
-              onChanged: (v) => ctl.update(st.values.copyWith(serviceType: v)),
+              onChanged: (x) => ctl.update(st.values.copyWith(serviceType: x)),
             ),
           if (cfg.needsDocuments) AQErrorBanner(tone: AQBannerTone.info, text: f.t('signup.docsLater')),
         ]);
       case SignupStep.account:
         body = ListenableBuilder(
-          listenable: _password,
+          listenable: Listenable.merge([_password, _confirm]),
           builder: (context, _) {
             final p = _password.text;
+            final policy = passwordMeetsPolicy(p);
+            final linkStyle = AQTypography.of(context, AQText.bodyMedium, color: c.accent).copyWith(decoration: TextDecoration.underline, decorationColor: c.accent);
+            final baseStyle = AQTypography.of(context, AQText.bodyMedium, soft: true);
             return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               AQPasswordField(label: f.t('field.password'), controller: _password, showLabel: f.t('field.show'), hideLabel: f.t('field.hide'), newPassword: true, error: err('password')),
-              AQRequirementList(items: [
-                (label: f.t('pw.req.length'), met: p.length >= kMinPasswordLength),
-                (label: f.t('pw.req.upper'), met: RegExp(r'[A-Z]').hasMatch(p)),
-                (label: f.t('pw.req.number'), met: RegExp(r'\d').hasMatch(p)),
-              ]),
+              // Requirements guide while the password is being written, then fold into one calm line.
+              AnimatedSize(
+                duration: AQMotion.scaled(context, AQMotion.standard),
+                curve: AQMotion.standardCurve,
+                alignment: Alignment.topCenter,
+                child: policy
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: AQSpacing.x4, left: AQSpacing.x1),
+                        child: Row(children: [
+                          AQIcon('check', size: AQIconSize.small, color: c.success),
+                          const SizedBox(width: AQSpacing.x2),
+                          Expanded(child: Text(f.t('pw.ok'), style: AQTypography.of(context, AQText.bodySmall, color: c.success))),
+                        ]),
+                      )
+                    : AQRequirementList(items: [
+                        (label: f.t('pw.req.length'), met: p.length >= kMinPasswordLength),
+                        (label: f.t('pw.req.upper'), met: RegExp(r'[A-Z]').hasMatch(p)),
+                        (label: f.t('pw.req.number'), met: RegExp(r'\d').hasMatch(p)),
+                      ]),
+              ),
               AQPasswordField(label: f.t('field.confirmPassword'), controller: _confirm, showLabel: f.t('field.show'), hideLabel: f.t('field.hide'), action: TextInputAction.done, error: err('confirm')),
-              AQCheckRow(value: st.values.consent, label: f.t('signup.consent'), error: err('consent'), onChanged: (v) => ctl.update(st.values.copyWith(consent: v))),
+              AQCheckRow(
+                value: st.values.consent,
+                label: f.t('signup.consent'),
+                error: err('consent'),
+                onChanged: (x) => ctl.update(st.values.copyWith(consent: x)),
+                actions: {
+                  CustomSemanticsAction(label: f.t('legal.terms')): () => context.push('/legal/terms'),
+                  CustomSemanticsAction(label: f.t('legal.privacy')): () => context.push('/legal/privacy'),
+                },
+                richLabel: Text.rich(
+                  TextSpan(style: baseStyle, children: [
+                    TextSpan(text: f.t('signup.consent.pre')),
+                    TextSpan(text: f.t('legal.terms'), style: linkStyle, recognizer: _linkTerms),
+                    TextSpan(text: f.t('signup.consent.and')),
+                    TextSpan(text: f.t('legal.privacy'), style: linkStyle, recognizer: _linkPrivacy),
+                    TextSpan(text: f.t('signup.consent.post')),
+                  ]),
+                ),
+              ),
               AQErrorBanner(tone: AQBannerTone.info, text: cfg.needsDocuments ? f.t('signup.docsLater') : f.t('signup.noDocs')),
             ]);
           },
         );
     }
 
+    final conflict = st.bannerKey == 'signup.conflict';
+
     return AQAuthScaffold(
-      title: f.t('signup.t.${widget.purpose.name}'),
+      title: f.t(title),
+      subtitle: st.stepIndex == 0 ? option.tagline(EntryStrings.of(context)) : null,
       onBack: () {
         if (!ctl.back()) aqBack(context, '/onboarding/purpose');
       },
       backLabel: f.t('common.back'),
-      progress: AQProgressStepper(step: st.stepIndex + 1, total: steps.length, label: '${f.t('signup.step', {'a': '${st.stepIndex + 1}', 'b': '${steps.length}'})} · ${f.t(stepName)}'),
-      children: [body],
+      progress: journeyProgress(context, widget.purpose, JourneyAt.signup, step: step),
       bottom: Column(mainAxisSize: MainAxisSize.min, children: [
-        if (st.bannerKey != null) AQErrorBanner(text: f.t(st.bannerKey!)),
+        if (conflict)
+          _ConflictCard(onOtherEmail: () => ctl.goToStep(SignupStep.contact))
+        else if (st.bannerKey != null)
+          AQErrorBanner(text: f.t(st.bannerKey!)),
         AQPrimaryButton(label: ctl.isLast ? f.t('signup.create') : f.t('common.next'), loading: st.submitting, onPressed: _primary),
         const SizedBox(height: AQSpacing.x2),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -157,6 +229,41 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
           Flexible(child: Text(f.t('signup.draftSaved'), textAlign: TextAlign.center, style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint).copyWith(fontSize: 11.5))),
         ]),
       ]),
+      children: [body],
+    );
+  }
+}
+
+/// Recovery surface for an account conflict: never a dead-end banner.
+/// Wording stays within the safe error contract (no account details are revealed).
+class _ConflictCard extends StatelessWidget {
+  final VoidCallback onOtherEmail;
+  const _ConflictCard({required this.onOtherEmail});
+
+  @override
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
+    final c = AQColors.of(context);
+    return Semantics(
+      liveRegion: true,
+      container: true,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: AQSpacing.x3),
+        padding: const EdgeInsets.all(AQSpacing.x4),
+        decoration: BoxDecoration(color: c.surfaceSelected, borderRadius: BorderRadius.circular(AQRadius.medium)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(f.t('conflict.title'), style: AQTypography.of(context, AQText.titleMedium)),
+          const SizedBox(height: 2),
+          Text(f.t('conflict.body'), style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+          const SizedBox(height: AQSpacing.x2),
+          Wrap(spacing: AQSpacing.x1, children: [
+            AQTextButton(label: f.t('conflict.signin'), color: c.accent, onPressed: () => context.push('/login')),
+            AQTextButton(label: f.t('conflict.forgot'), color: c.accent, onPressed: () => context.push('/forgot-password')),
+            AQTextButton(label: f.t('conflict.other'), color: c.accent, onPressed: onOtherEmail),
+          ]),
+        ]),
+      ),
     );
   }
 }
