@@ -42,41 +42,43 @@ class _MyViewingsScreenState extends ConsumerState<MyViewingsScreen> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    Widget body() => async.when(
-          loading: () => const Column(children: [AQViewingSkeleton(height: 108), AQViewingSkeleton(height: 108), AQViewingSkeleton(height: 108)]),
-          error: (_, _) => AQErrorBanner(text: v.t('vw.my.error'), action: AQTextButton(label: v.t('vw.retry'), color: c.accent, onPressed: () => ref.invalidate(viewingsProvider))),
-          data: (all) {
-            if (all.isEmpty) {
-              return Padding(
-                padding: const EdgeInsets.only(top: AQSpacing.x4),
-                child: AQEmptyViewingState(
-                  title: v.t('vw.empty.title'),
-                  body: v.t('vw.empty.sub'),
-                  action: AQPrimaryButton(label: v.t('vw.browse'), leadingIcon: 'search', trailingChevron: false, onPressed: () => context.push('/search')),
-                ),
-              );
-            }
-            final shown = all.where(_filter.matches).toList()..sort((a, b) => _filter == ViewingFilter.past || _filter == ViewingFilter.cancelled ? b.slot.start.compareTo(a.slot.start) : a.slot.start.compareTo(b.slot.start));
-            if (shown.isEmpty) {
-              final key = switch (_filter) { ViewingFilter.upcoming => 'vw.empty.upcoming', ViewingFilter.past => 'vw.empty.past', ViewingFilter.cancelled => 'vw.empty.cancelled', ViewingFilter.all => 'vw.empty.title' };
-              return Padding(padding: const EdgeInsets.only(top: AQSpacing.x4), child: AQNoticeCard(icon: 'calendar', title: v.t(key), body: ''));
-            }
-            final grouped = shown.length > 3 && _filter != ViewingFilter.cancelled;
-            String? last;
-            return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              for (final x in shown) ...[
-                if (grouped && _group(today, x) != last) ...[
-                  Padding(
-                    padding: EdgeInsets.only(top: last == null ? 0 : AQSpacing.x4, bottom: AQSpacing.x2),
-                    child: Semantics(header: true, child: Text(v.t(last = _group(today, x)), style: AQTypography.of(context, AQText.labelMedium, color: c.inkFaint))),
-                  ),
-                ],
-                _Row(viewing: x),
-                const SizedBox(height: AQSpacing.x3),
-              ],
-            ]);
-          },
-        );
+    // Non-list states render as one block; the list itself is built lazily by a sliver.
+    final rows = <Widget Function()>[];
+    Widget? block;
+    async.when(
+      loading: () => block = const Column(children: [AQViewingSkeleton(height: 108), AQViewingSkeleton(height: 108), AQViewingSkeleton(height: 108)]),
+      error: (_, _) => block = AQErrorBanner(text: v.t('vw.my.error'), action: AQTextButton(label: v.t('vw.retry'), color: c.accent, onPressed: () => ref.invalidate(viewingsProvider))),
+      data: (all) {
+        if (all.isEmpty) {
+          block = Padding(
+            padding: const EdgeInsets.only(top: AQSpacing.x4),
+            child: AQEmptyViewingState(
+              title: v.t('vw.empty.title'),
+              body: v.t('vw.empty.sub'),
+              action: AQPrimaryButton(label: v.t('vw.browse'), leadingIcon: 'search', trailingChevron: false, onPressed: () => context.push('/search')),
+            ),
+          );
+          return;
+        }
+        final shown = all.where(_filter.matches).toList()..sort((a, b) => _filter == ViewingFilter.past || _filter == ViewingFilter.cancelled ? b.slot.start.compareTo(a.slot.start) : a.slot.start.compareTo(b.slot.start));
+        if (shown.isEmpty) {
+          final key = switch (_filter) { ViewingFilter.upcoming => 'vw.empty.upcoming', ViewingFilter.past => 'vw.empty.past', ViewingFilter.cancelled => 'vw.empty.cancelled', ViewingFilter.all => 'vw.empty.title' };
+          block = Padding(padding: const EdgeInsets.only(top: AQSpacing.x4), child: AQNoticeCard(icon: 'calendar', title: v.t(key), body: ''));
+          return;
+        }
+        final grouped = shown.length > 3 && _filter != ViewingFilter.cancelled;
+        String? last;
+        for (final x in shown) {
+          final g = _group(today, x);
+          if (grouped && g != last) {
+            final first = last == null;
+            rows.add(() => Padding(padding: EdgeInsets.only(top: first ? 0 : AQSpacing.x4, bottom: AQSpacing.x2), child: Semantics(header: true, child: Text(v.t(g), style: AQTypography.of(context, AQText.labelMedium, color: c.inkFaint)))));
+            last = g;
+          }
+          rows.add(() => Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: _Row(viewing: x)));
+        }
+      },
+    );
 
     final counts = async.valueOrNull;
     int count(ViewingFilter f) => counts == null ? 0 : counts.where(f.matches).length;
@@ -87,19 +89,27 @@ class _MyViewingsScreenState extends ConsumerState<MyViewingsScreen> {
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AQSpacing.maxContent + AQSpacing.gutter * 2),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x6, AQSpacing.gutter, 128),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Semantics(header: true, child: Text(v.t('vw.my.title'), style: AQTypography.of(context, AQText.displaySmall))),
-              const SizedBox(height: AQSpacing.x2),
-              Text(v.t('vw.my.sub'), style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
-              const SizedBox(height: AQSpacing.x5),
-              Wrap(spacing: AQSpacing.x2, runSpacing: AQSpacing.x2, children: [
-                for (final f in ViewingFilter.values) _FilterChip(label: '${v.t('vw.f.${f.name}')} (${VFmt.n(context, count(f))})', selected: f == _filter, onTap: () => setState(() => _filter = f)),
-              ]),
-              const SizedBox(height: AQSpacing.x4),
-              AnimatedSwitcher(duration: AQMotion.scaled(context, AQMotion.standard), child: KeyedSubtree(key: ValueKey('${_filter.name}-${async.isLoading}-${async.hasError}'), child: body())),
-            ]),
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x6, AQSpacing.gutter, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    Semantics(header: true, child: Text(v.t('vw.my.title'), style: AQTypography.of(context, AQText.displaySmall))),
+                    const SizedBox(height: AQSpacing.x2),
+                    Text(v.t('vw.my.sub'), style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
+                    const SizedBox(height: AQSpacing.x5),
+                    Wrap(spacing: AQSpacing.x2, runSpacing: AQSpacing.x2, children: [
+                      for (final f in ViewingFilter.values) _FilterChip(label: '${v.t('vw.f.${f.name}')} (${VFmt.n(context, count(f))})', selected: f == _filter, onTap: () => setState(() => _filter = f)),
+                    ]),
+                    const SizedBox(height: AQSpacing.x4),
+                    if (block != null) AnimatedSwitcher(duration: AQMotion.scaled(context, AQMotion.standard), child: KeyedSubtree(key: ValueKey('${_filter.name}-${async.isLoading}-${async.hasError}'), child: block!)),
+                  ]),
+                ),
+              ),
+              if (rows.isNotEmpty) SliverPadding(padding: const EdgeInsets.symmetric(horizontal: AQSpacing.gutter), sliver: SliverList.builder(itemCount: rows.length, itemBuilder: (context, i) => rows[i]())),
+              const SliverToBoxAdapter(child: SizedBox(height: 128)),
+            ],
           ),
         ),
       ),

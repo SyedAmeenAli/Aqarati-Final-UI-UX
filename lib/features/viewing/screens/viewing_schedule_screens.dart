@@ -353,6 +353,8 @@ class ViewingReviewScreen extends ConsumerStatefulWidget {
 class _ViewingReviewScreenState extends ConsumerState<ViewingReviewScreen> {
   bool _sending = false;
   bool _failed = false;
+  /// Set once the request succeeded: clearing the draft must not trigger the empty-draft redirect.
+  bool _leaving = false;
 
   Future<void> _send(ViewingSlot slot) async {
     if (_sending) return;
@@ -366,10 +368,11 @@ class _ViewingReviewScreenState extends ConsumerState<ViewingReviewScreen> {
       final viewing = await repo.request(propertyId: id, slot: slot);
       ref.invalidate(viewingsProvider);
       ref.invalidate(viewingAvailabilityProvider(id));
-      ref.read(viewingDraftProvider(id).notifier).clear();
       if (!mounted) return;
+      _leaving = true;
       AQHaptics.success();
       context.go('/viewings/${viewing.id}/requested');
+      ref.read(viewingDraftProvider(id).notifier).clear();
     } on SlotTakenException {
       ref.read(viewingDraftProvider(id).notifier).markTaken(slot);
       ref.invalidate(viewingAvailabilityProvider(id));
@@ -391,9 +394,12 @@ class _ViewingReviewScreenState extends ConsumerState<ViewingReviewScreen> {
     final draft = ref.watch(viewingDraftProvider(id));
     final slot = draft.slot;
     if (slot == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.go(_flow(id));
-      });
+      // A slot cleared by a conflict is handled by the conflict route, not by this guard.
+      if (draft.takenSlot == null && !_leaving) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) context.go(_flow(id));
+        });
+      }
       return viewingLoadingFrame(context, title: v.t('vw.review.title'), onBack: () => aqBack(context, _flow(id, 'slot')));
     }
     final p = property.valueOrNull;
