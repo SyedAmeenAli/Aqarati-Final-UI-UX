@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/aq/aq_documents.dart';
-import '../../core/aq/aq_forms.dart';
 import '../../core/aq/aq_primitives.dart';
 import '../../core/aq/aq_scene.dart';
 import '../../core/aq/aq_tokens.dart';
@@ -11,10 +10,10 @@ import '../../core/auth/auth_repository.dart';
 import '../../core/domain/account_models.dart';
 import '../../core/localization/entry_strings.dart';
 import '../../core/localization/flow_strings.dart';
-import '../entry/models/signup_purpose.dart';
 import '../../data/api/account_api.dart';
 import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
+import 'aq_discover.dart';
 
 const _tabs = ['/app/home', '/app/explore', '/app/activity', '/app/account'];
 
@@ -107,59 +106,55 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) => Text(text, style: AQTypography.of(context, AQText.bodyMedium, soft: true));
 }
 
-/// Wraps a tab that needs the session; shows the shared loading/error frames.
-class _SessionTab extends ConsumerWidget {
-  final String titleKey;
-  final List<Widget> Function(BuildContext, WidgetRef, MeSession) body;
-  const _SessionTab({required this.titleKey, required this.body});
+/// Role and verification cards for a signed-in session.
+List<Widget> _sessionSections(BuildContext context, MeSession m) {
+  final f = FlowStrings.of(context);
+  final cfg = m.purpose == null ? null : roleConfigs[m.purpose];
+  final business = cfg != null && cfg.needsDocuments && m.grant != null;
+  return [
+    if (business)
+      AQReviewSection(title: f.t('home.verification'), children: [
+        const SizedBox(height: AQSpacing.x2),
+        Align(alignment: AlignmentDirectional.centerStart, child: AQStatusBadge(grant: m.grant!, stage: m.stage)),
+        const SizedBox(height: AQSpacing.x2),
+        if (m.grant == GrantState.approved) _Body(f.t('home.verified')),
+        AQTextButton(label: f.t('home.viewStatus'), trailingIcon: 'chevron-right', onPressed: () => context.go('/verification')),
+      ]),
+    if (business && m.grant == GrantState.approved && m.purpose != null)
+      AQReviewSection(title: f.t('home.workspace'), children: [
+        Padding(padding: const EdgeInsets.only(top: AQSpacing.x2, bottom: AQSpacing.x1), child: Text(f.t('ws.t.${m.purpose!.name}'), style: AQTypography.of(context, AQText.titleSmall))),
+        for (final k in workspaceCaps(m.purpose!)) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(f.t(k), style: AQTypography.of(context, AQText.bodySmall, soft: true))),
+      ]),
+  ];
+}
+
+Widget _guestCard(BuildContext context) {
+  final f = FlowStrings.of(context);
+  return AQReviewSection(title: f.t('guest.title'), children: [
+    const SizedBox(height: AQSpacing.x2),
+    _Body(f.t('guest.body')),
+    const SizedBox(height: AQSpacing.x4),
+    AQPrimaryButton(label: f.t('guest.create'), onPressed: () => context.push('/onboarding/purpose')),
+    const SizedBox(height: AQSpacing.x2),
+    AQSecondaryButton(label: f.t('guest.login'), trailingChevron: false, onPressed: () => context.push('/login')),
+    const SizedBox(height: AQSpacing.x1),
+  ]);
+}
+
+class HomeTab extends ConsumerWidget {
+  const HomeTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final f = FlowStrings.of(context);
-    return ref.watch(meProvider).when(
-          loading: () => _TabPage(title: f.t(titleKey), children: const [AQSkeleton()]),
-          error: (e, _) => _TabPage(title: f.t(titleKey), children: [
-            AQErrorBanner(text: f.t(apiErrorKey(e))),
-            AQTextButton(label: f.t('common.retry'), onPressed: () => ref.invalidate(meProvider)),
-          ]),
-          data: (m) => _TabPage(title: f.t(titleKey), children: body(context, ref, m)),
-        );
-  }
-}
-
-class HomeTab extends StatelessWidget {
-  const HomeTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final f = FlowStrings.of(context);
-    return _SessionTab(
-      titleKey: 'home.title',
-      body: (context, ref, m) {
-        final cfg = m.purpose == null ? null : roleConfigs[m.purpose];
-        final business = cfg != null && cfg.needsDocuments && m.grant != null;
-        return [
-          if (m.purpose != null) AQReviewSection(title: f.t('account.role'), children: [Padding(padding: const EdgeInsets.only(top: AQSpacing.x2), child: Text(roleTitle(context, m.purpose!), style: AQTypography.of(context, AQText.titleMedium)))]),
-          if (business)
-            AQReviewSection(title: f.t('home.verification'), children: [
-              const SizedBox(height: AQSpacing.x2),
-              Align(alignment: AlignmentDirectional.centerStart, child: AQStatusBadge(grant: m.grant!, stage: m.stage)),
-              const SizedBox(height: AQSpacing.x2),
-              if (m.grant == GrantState.approved) _Body(f.t('home.verified')),
-              AQTextButton(label: f.t('home.viewStatus'), trailingIcon: 'chevron-right', onPressed: () => context.go('/verification')),
-            ]),
-          if (business && m.grant == GrantState.approved && m.purpose != null)
-            AQReviewSection(title: f.t('home.workspace'), children: [
-              Padding(padding: const EdgeInsets.only(top: AQSpacing.x2, bottom: AQSpacing.x1), child: Text(f.t('ws.t.${m.purpose!.name}'), style: AQTypography.of(context, AQText.titleSmall))),
-              if (m.purpose == SignupPurpose.realEstateAgent) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x1), child: Text(f.t('home.buyerAgent'), style: AQTypography.of(context, AQText.labelMedium, color: AQColors.of(context).accentDeep))),
-              for (final k in workspaceCaps(m.purpose!)) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(f.t(k), style: AQTypography.of(context, AQText.bodySmall, soft: true))),
-            ]),
-          if (!business)
-            AQReviewSection(title: f.t('home.title'), children: [Padding(padding: const EdgeInsets.only(top: AQSpacing.x2), child: _Body(f.t('home.userBody')))]),
-          _Body(f.t('home.soon')),
-        ];
-      },
-    );
+    final me = ref.watch(meProvider);
+    return _TabPage(title: f.t('disc.home.title'), children: [
+      _Body(f.t('disc.home.sub')),
+      const SizedBox(height: AQSpacing.x5),
+      if (me.valueOrNull != null) ..._sessionSections(context, me.valueOrNull!) else if (me.hasError) _guestCard(context),
+      Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: Semantics(header: true, child: Text(f.t('disc.featured'), style: AQTypography.of(context, AQText.headlineSmall)))),
+      const AQPropertyBrowser(featuredOnly: true),
+    ]);
   }
 }
 
@@ -168,46 +163,51 @@ class ExploreTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final f = FlowStrings.of(context);
-    return _TabPage(title: f.t('explore.title'), children: [_Body(f.t('home.soon'))]);
+    return _TabPage(title: f.t('explore.title'), children: [
+      _Body(f.t('disc.explore.sub')),
+      const SizedBox(height: AQSpacing.x4),
+      const AQPropertyBrowser(),
+    ]);
   }
 }
 
-class AccountTab extends StatelessWidget {
+class AccountTab extends ConsumerWidget {
   const AccountTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final f = FlowStrings.of(context);
-    return _SessionTab(
-      titleKey: 'account.title',
-      body: (context, ref, m) {
-        final current = ref.watch(localeProvider).languageCode;
-        return [
-          AQReviewSection(title: f.t('account.title'), children: [
-            if (m.purpose != null) AQKeyValue(f.t('account.role'), roleTitle(context, m.purpose!)),
-            if (m.phoneLast4 != null) AQKeyValue(f.t('account.phone'), '•••• ${m.phoneLast4}'),
-          ]),
-          AQReviewSection(title: f.t('account.language'), children: [
-            _LangRow(title: 'English', selected: current == 'en', onTap: () => ref.read(localeProvider.notifier).state = const Locale('en')),
-            _LangRow(title: 'العربية', selected: current == 'ar', onTap: () => ref.read(localeProvider.notifier).state = const Locale('ar')),
-          ]),
-          AQReviewSection(title: f.t('account.appearance'), children: [
-            _LangRow(title: f.t('account.light'), selected: ref.watch(themeModeProvider) == ThemeMode.light, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light),
-            _LangRow(title: f.t('account.dark'), selected: ref.watch(themeModeProvider) == ThemeMode.dark, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark),
-          ]),
-          AQSecondaryButton(
-            label: f.t('account.signOut'),
-            trailingChevron: false,
-            onPressed: () async {
-              await ref.read(authRepositoryProvider).signOut();
-              ref.invalidate(meProvider);
-              ref.invalidate(verificationProvider);
-              if (context.mounted) context.go('/entry');
-            },
-          ),
-        ];
-      },
-    );
+    final me = ref.watch(meProvider);
+    final current = ref.watch(localeProvider).languageCode;
+    final m = me.valueOrNull;
+    return _TabPage(title: f.t('account.title'), children: [
+      if (me.isLoading && m == null) const AQSkeleton(),
+      if (m == null && me.hasError) _guestCard(context),
+      if (m != null)
+        AQReviewSection(title: f.t('account.title'), children: [
+          if (m.purpose != null) AQKeyValue(f.t('account.role'), roleTitle(context, m.purpose!)),
+          if (m.phoneLast4 != null) AQKeyValue(f.t('account.phone'), '•••• ${m.phoneLast4}'),
+        ]),
+      AQReviewSection(title: f.t('account.language'), children: [
+        _LangRow(title: 'English', selected: current == 'en', onTap: () => ref.read(localeProvider.notifier).state = const Locale('en')),
+        _LangRow(title: 'العربية', selected: current == 'ar', onTap: () => ref.read(localeProvider.notifier).state = const Locale('ar')),
+      ]),
+      AQReviewSection(title: f.t('account.appearance'), children: [
+        _LangRow(title: f.t('account.light'), selected: ref.watch(themeModeProvider) == ThemeMode.light, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light),
+        _LangRow(title: f.t('account.dark'), selected: ref.watch(themeModeProvider) == ThemeMode.dark, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark),
+      ]),
+      if (m != null)
+        AQSecondaryButton(
+          label: f.t('account.signOut'),
+          trailingChevron: false,
+          onPressed: () async {
+            await ref.read(authRepositoryProvider).signOut();
+            ref.invalidate(meProvider);
+            ref.invalidate(verificationProvider);
+            if (context.mounted) context.go('/entry');
+          },
+        ),
+    ]);
   }
 }
 

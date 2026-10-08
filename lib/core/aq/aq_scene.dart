@@ -345,13 +345,21 @@ class AQGlassNav extends StatelessWidget {
                                   AQHaptics.selection();
                                   onSelected(i);
                                 },
-                                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                  AQIcon(items[i].icon, size: AQIconSize.medium, color: i == index ? c.accent : c.inkSoft),
-                                  if (!compact) ...[
-                                    const SizedBox(height: 3),
-                                    Text(items[i].label, style: AQTypography.of(context, AQText.labelMedium, color: i == index ? c.accent : c.inkSoft).copyWith(fontSize: 11)),
-                                  ],
-                                ]),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+                                  child: AnimatedContainer(
+                                    duration: AQMotion.scaled(context, AQMotion.fast),
+                                    curve: AQMotion.standardCurve,
+                                    decoration: BoxDecoration(color: i == index ? c.accent.withValues(alpha: c.isDark ? 0.32 : 0.24) : Colors.transparent, borderRadius: BorderRadius.circular(compact ? 20 : 20)),
+                                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                      AQIcon(items[i].icon, size: AQIconSize.medium, color: i == index ? c.accentDeep : c.inkSoft),
+                                      if (!compact) ...[
+                                        const SizedBox(height: 3),
+                                        FittedBox(fit: BoxFit.scaleDown, child: Text(items[i].label, maxLines: 1, style: AQTypography.of(context, AQText.labelMedium, color: i == index ? c.accentDeep : c.inkSoft).copyWith(fontSize: 11, fontWeight: i == index ? FontWeight.w700 : FontWeight.w500))),
+                                      ],
+                                    ]),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
