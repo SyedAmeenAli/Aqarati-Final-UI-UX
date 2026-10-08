@@ -13,7 +13,7 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/api/account_api.dart';
 import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
-import 'aq_discover.dart';
+import 'aq_home.dart';
 
 const _tabs = ['/app/home', '/app/explore', '/app/activity', '/app/account'];
 
@@ -141,34 +141,16 @@ Widget _guestCard(BuildContext context) {
   ]);
 }
 
-class HomeTab extends ConsumerWidget {
+class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final f = FlowStrings.of(context);
-    final me = ref.watch(meProvider);
-    return _TabPage(title: f.t('disc.home.title'), children: [
-      _Body(f.t('disc.home.sub')),
-      const SizedBox(height: AQSpacing.x5),
-      if (me.valueOrNull != null) ..._sessionSections(context, me.valueOrNull!) else if (me.hasError) _guestCard(context),
-      Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: Semantics(header: true, child: Text(f.t('disc.featured'), style: AQTypography.of(context, AQText.headlineSmall)))),
-      const AQPropertyBrowser(featuredOnly: true),
-    ]);
-  }
+  Widget build(BuildContext context) => const AQHomeScreen();
 }
 
 class ExploreTab extends StatelessWidget {
   const ExploreTab({super.key});
   @override
-  Widget build(BuildContext context) {
-    final f = FlowStrings.of(context);
-    return _TabPage(title: f.t('explore.title'), children: [
-      _Body(f.t('disc.explore.sub')),
-      const SizedBox(height: AQSpacing.x4),
-      const AQPropertyBrowser(),
-    ]);
-  }
+  Widget build(BuildContext context) => const AQExploreScreen();
 }
 
 class AccountTab extends ConsumerWidget {
@@ -183,6 +165,7 @@ class AccountTab extends ConsumerWidget {
     return _TabPage(title: f.t('account.title'), children: [
       if (me.isLoading && m == null) const AQSkeleton(),
       if (m == null && me.hasError) _guestCard(context),
+      if (m != null) ..._sessionSections(context, m),
       if (m != null)
         AQReviewSection(title: f.t('account.title'), children: [
           if (m.purpose != null) AQKeyValue(f.t('account.role'), roleTitle(context, m.purpose!)),

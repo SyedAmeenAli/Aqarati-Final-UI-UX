@@ -26,6 +26,8 @@ import '../../features/viewing/screens/my_viewings_screen.dart';
 import '../../features/viewing/screens/viewing_detail_screen.dart';
 import '../../features/viewing/screens/viewing_schedule_screens.dart';
 import '../../features/viewing/screens/viewing_status_screens.dart';
+import '../../features/workspace/aq_home.dart' show AQPropertiesScreen;
+import '../../features/calculators/calculators_list_screen.dart';
 import '../aq/aq_scene.dart' show AQRoute;
 import '../../features/workspace/aq_app_shell.dart';
 import 'app_shell.dart';
@@ -81,6 +83,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/viewings/:id/cancelled', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingCancelledScreen(id: state.pathParameters['id']!))),
     GoRoute(path: '/viewings/:id/completed', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingCompletedScreen(id: state.pathParameters['id']!))),
     GoRoute(path: '/viewings/:id/review', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: ViewingReviewEntryScreen(id: state.pathParameters['id']!, rating: int.tryParse(state.uri.queryParameters['rating'] ?? '')))),
+    GoRoute(path: '/properties', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQPropertiesScreen(category: state.uri.queryParameters['cat'], tx: state.uri.queryParameters['tx']))),
+    GoRoute(path: '/calculators', builder: (context, state) => const CalculatorsListScreen()),
     GoRoute(path: '/saved', builder: (context, state) => const SavedScreen()),
     GoRoute(
       path: '/search',
