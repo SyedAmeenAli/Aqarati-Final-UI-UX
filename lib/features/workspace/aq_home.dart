@@ -775,179 +775,187 @@ class _FeaturedState extends ConsumerState<_Featured> {
               ];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Semantics(
-                  button: true,
-                  label: '${p.title}, ${p.locationLabel}, ${p.priceLabel}',
-                  excludeSemantics: true,
-                  child: AQPressable(
-                    onTap: () => context.push('/property/${p.id}'),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AQRadius.large),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          p.imageUrls.isEmpty
-                              ? const ColoredBox(color: Color(0x33000000))
-                              : aqImg(p.imageUrls.first, cacheWidth: 1000),
-                          const DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0x00000000),
-                                  Color(0x00000000),
-                                  Color(0xCC1A1613),
-                                ],
-                                stops: [0, 0.4, 1],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: AQSpacing.x4,
-                            top: AQSpacing.x4,
-                            child: _Badge(f.t('home.featuredBadge')),
-                          ),
-                          PositionedDirectional(
-                            end: AQSpacing.x3,
-                            top: AQSpacing.x3,
-                            child: Semantics(
-                              button: true,
-                              selected: isSaved,
-                              label: isSaved
-                                  ? f.t('home.unsave')
-                                  : f.t('home.save'),
-                              excludeSemantics: true,
-                              child: AQPressable(
-                                onTap: () {
-                                  AQHaptics.confirm();
-                                  final next = {...saved};
-                                  isSaved ? next.remove(p.id) : next.add(p.id);
-                                  ref
-                                          .read(
-                                            savedPropertiesProvider.notifier,
-                                          )
-                                          .state =
-                                      next;
-                                },
-                                pressedScale: 0.9,
-                                child: Container(
-                                  width: 48,
-                                  height: 48,
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0x66000000),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      isSaved
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      size: 22,
-                                      color: isSaved
-                                          ? const Color(0xFFE08A78)
-                                          : Colors.white,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Semantics(
+                        button: true,
+                        label:
+                            '${p.title}, ${p.locationLabel}, ${p.priceLabel}',
+                        excludeSemantics: true,
+                        child: AQPressable(
+                          onTap: () => context.push('/property/${p.id}'),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(AQRadius.large),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                p.imageUrls.isEmpty
+                                    ? const ColoredBox(color: Color(0x33000000))
+                                    : aqImg(
+                                        p.imageUrls.first,
+                                        cacheWidth: 1000,
+                                      ),
+                                const DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Color(0x00000000),
+                                        Color(0x00000000),
+                                        Color(0xCC1A1613),
+                                      ],
+                                      stops: [0, 0.4, 1],
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: AQSpacing.x4,
-                            right: AQSpacing.x4,
-                            bottom: AQSpacing.x4,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
+                                Positioned(
+                                  left: AQSpacing.x4,
+                                  top: AQSpacing.x4,
+                                  child: _Badge(f.t('home.featuredBadge')),
+                                ),
+                                Positioned(
+                                  left: AQSpacing.x4,
+                                  right: AQSpacing.x4,
+                                  bottom: AQSpacing.x4,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        VFmt.iso(p.title),
-                                        style: AQTypography.of(
-                                          context,
-                                          AQText.headlineMedium,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Row(
-                                        children: [
-                                          const AQIcon(
-                                            'pin',
-                                            size: 14,
-                                            color: Color(0xFFEBDDCB),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Flexible(
-                                            child: Text(
-                                              VFmt.iso(
-                                                p.locationLabel
-                                                    .split(',')
-                                                    .take(2)
-                                                    .join(',')
-                                                    .trim(),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              VFmt.iso(p.title),
+                                              style: AQTypography.of(
+                                                context,
+                                                AQText.headlineMedium,
+                                                color: Colors.white,
                                               ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                const AQIcon(
+                                                  'pin',
+                                                  size: 14,
+                                                  color: Color(0xFFEBDDCB),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text(
+                                                    VFmt.iso(
+                                                      p.locationLabel
+                                                          .split(',')
+                                                          .take(2)
+                                                          .join(',')
+                                                          .trim(),
+                                                    ),
+                                                    style: AQTypography.of(
+                                                      context,
+                                                      AQText.bodySmall,
+                                                      color: const Color(
+                                                        0xFFEBDDCB,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: AQSpacing.x1,
+                                            ),
+                                            Text(
+                                              p.priceLabel,
+                                              style: AQTypography.of(
+                                                context,
+                                                AQText.titleLarge,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Text(
+                                              facts.join('  ·  '),
                                               style: AQTypography.of(
                                                 context,
                                                 AQText.bodySmall,
                                                 color: const Color(0xFFEBDDCB),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: AQSpacing.x1),
-                                      Text(
-                                        p.priceLabel,
-                                        style: AQTypography.of(
-                                          context,
-                                          AQText.titleLarge,
-                                          color: Colors.white,
+                                          ],
                                         ),
                                       ),
-                                      Text(
-                                        facts.join('  ·  '),
-                                        style: AQTypography.of(
-                                          context,
-                                          AQText.bodySmall,
-                                          color: const Color(0xFFEBDDCB),
+                                      const SizedBox(width: AQSpacing.x3),
+                                      Container(
+                                        width: 44,
+                                        height: 44,
+                                        decoration: BoxDecoration(
+                                          color: AQColors.light.accent,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Center(
+                                          child: AQIcon(
+                                            'chevron-right',
+                                            size: 22,
+                                            color: Colors.white,
+                                            directional: true,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: AQSpacing.x3),
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: AQColors.light.accent,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Center(
-                                    child: AQIcon(
-                                      'chevron-right',
-                                      size: 22,
-                                      color: Colors.white,
-                                      directional: true,
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                    PositionedDirectional(
+                      end: AQSpacing.x3,
+                      top: AQSpacing.x3,
+                      child: Semantics(
+                        button: true,
+                        selected: isSaved,
+                        label: isSaved ? f.t('home.unsave') : f.t('home.save'),
+                        excludeSemantics: true,
+                        child: AQPressable(
+                          onTap: () {
+                            AQHaptics.confirm();
+                            final next = {...saved};
+                            isSaved ? next.remove(p.id) : next.add(p.id);
+                            ref.read(savedPropertiesProvider.notifier).state =
+                                next;
+                          },
+                          pressedScale: 0.9,
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            alignment: Alignment.center,
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                color: Color(0x66000000),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isSaved
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                size: 22,
+                                color: isSaved
+                                    ? const Color(0xFFE08A78)
+                                    : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -1712,7 +1720,9 @@ class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
 
 class AQResultCard extends ConsumerWidget {
   final Property property;
-  const AQResultCard({super.key, required this.property});
+  /// Extra room at the trailing edge when something is overlaid there (e.g. a compare mark).
+  final double trailingInset;
+  const AQResultCard({super.key, required this.property, this.trailingInset = 0});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1730,7 +1740,7 @@ class AQResultCard extends ConsumerWidget {
         '${VFmt.n(context, p.bathrooms!)} ${f.t('home.baths')}',
       '${VFmt.n(context, p.areaSqm.round())} m²',
     ].join(' · ');
-    return Semantics(
+    final card = Semantics(
       button: true,
       label: '${p.title}, ${p.locationLabel}, $tx, $facts, ${p.priceLabel}',
       excludeSemantics: true,
@@ -1753,7 +1763,7 @@ class AQResultCard extends ConsumerWidget {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 132),
                     child: Padding(
-                      padding: const EdgeInsets.all(AQSpacing.x3),
+                      padding: EdgeInsetsDirectional.fromSTEB(AQSpacing.x3, AQSpacing.x3, AQSpacing.x3 + trailingInset, AQSpacing.x3),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -1830,51 +1840,6 @@ class AQResultCard extends ConsumerWidget {
                       p.imageUrls.isEmpty
                           ? ColoredBox(color: c.surfaceSelected)
                           : aqImg(p.imageUrls.first, cacheWidth: 400),
-                      PositionedDirectional(
-                        start: 0,
-                        top: 0,
-                        child: Semantics(
-                          button: true,
-                          selected: saved,
-                          label: saved ? f.t('home.unsave') : f.t('home.save'),
-                          excludeSemantics: true,
-                          child: AQPressable(
-                            onTap: () {
-                              AQHaptics.confirm();
-                              final cur = ref.read(savedPropertiesProvider);
-                              ref
-                                  .read(savedPropertiesProvider.notifier)
-                                  .state = saved
-                                  ? ({...cur}..remove(p.id))
-                                  : {...cur, p.id};
-                            },
-                            pressedScale: 0.9,
-                            child: SizedBox(
-                              width: 48,
-                              height: 48,
-                              child: Center(
-                                child: Container(
-                                  width: 34,
-                                  height: 34,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0x66000000),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    saved
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    size: 18,
-                                    color: saved
-                                        ? const Color(0xFFE08A78)
-                                        : Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -1883,6 +1848,50 @@ class AQResultCard extends ConsumerWidget {
           ),
         ),
       ),
+    );
+    return Stack(
+      children: [
+        card,
+        PositionedDirectional(
+          start: 0,
+          top: 0,
+          child: Semantics(
+            button: true,
+            selected: saved,
+            label: saved ? f.t('home.unsave') : f.t('home.save'),
+            excludeSemantics: true,
+            child: AQPressable(
+              onTap: () {
+                AQHaptics.confirm();
+                final cur = ref.read(savedPropertiesProvider);
+                ref.read(savedPropertiesProvider.notifier).state = saved
+                    ? ({...cur}..remove(p.id))
+                    : {...cur, p.id};
+              },
+              pressedScale: 0.9,
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: Center(
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: Color(0x66000000),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      saved ? Icons.favorite : Icons.favorite_border,
+                      size: 18,
+                      color: saved ? const Color(0xFFE08A78) : Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:aqarati_app/data/models/enums.dart';
+import 'package:aqarati_app/data/repositories/app_state_providers.dart';
 import 'package:aqarati_app/data/repositories/providers.dart';
 import 'package:aqarati_app/features/search/aq_filters.dart';
 import 'package:aqarati_app/features/business/aq_business_profile.dart';
 import 'package:aqarati_app/features/business/aq_professionals.dart';
+import 'package:aqarati_app/features/saved/saved_screen.dart';
 import 'package:aqarati_app/features/search/aq_map.dart';
 import 'package:aqarati_app/features/search/aq_search.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
@@ -112,6 +114,23 @@ void main() {
       await t.pump(const Duration(seconds: 2));
       expect(t.takeException(), isNull);
       expect(find.textContaining('Namaa'), findsWidgets);
+    });
+
+    testWidgets('Saved builds with saved items at text scale $scale', (t) async {
+      await t.binding.setSurfaceSize(const Size(393, 852));
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(savedPropertyIdsProvider.notifier).state = {'p1', 'p2', 'p3'};
+      await t.pumpWidget(UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+          home: MediaQuery(data: MediaQueryData(size: const Size(393, 852), textScaler: TextScaler.linear(scale)), child: const SavedScreen()),
+        ),
+      ));
+      await t.pump(const Duration(seconds: 1));
+      await t.pump(const Duration(seconds: 2));
+      expect(t.takeException(), isNull);
     });
   }
 }

@@ -10,6 +10,8 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/models/enums.dart';
 import '../../data/models/property.dart';
 import '../../data/repositories/app_state_providers.dart';
+import '../../data/repositories/app_state_providers.dart' show savedSearchesProvider;
+import '../saved/saved_screen.dart' show aqSaveSearch;
 import '../viewing/widgets/viewing_format.dart';
 import '../viewing/widgets/viewing_scaffold.dart';
 import '../workspace/aq_home.dart';
@@ -429,7 +431,20 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
         }),
         const SizedBox(height: AQSpacing.x3),
         AQSlideSwitch(labels: [f.t('disc.all'), f.t('home.buy'), f.t('home.rent')], index: txIndex, onChanged: (i) => setState(() => _f.tx = i == 0 ? null : (i == 1 ? TransactionType.buy : TransactionType.rent))),
-        const SizedBox(height: AQSpacing.x4),
+        const SizedBox(height: AQSpacing.x2),
+        Builder(builder: (context) {
+          final label = q.isEmpty ? f.t('saved.s.all') : _ctl.text.trim();
+          final saved = ref.watch(savedSearchesProvider).any((x) => x.label.toLowerCase() == label.toLowerCase());
+          return Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: AQTextButton(
+              label: saved ? f.t('saved.s.saved') : f.t('saved.s.save'),
+              color: c.accentDeep,
+              onPressed: saved ? null : () => setState(() => aqSaveSearch(ref, label, q)),
+            ),
+          );
+        }),
+        const SizedBox(height: AQSpacing.x2),
         async.when(
           loading: () => const Column(children: [AQSkeletonBox(height: 150), SizedBox(height: AQSpacing.x3), AQSkeletonBox(height: 150)]),
           error: (_, _) => AQErrorBanner(text: f.t('disc.loadError'), action: AQTextButton(label: f.t('common.retry'), color: c.accent, onPressed: () => ref.invalidate(aqAllPropertiesProvider))),

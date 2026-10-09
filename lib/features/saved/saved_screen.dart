@@ -1,200 +1,186 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
-import '../../core/widgets/property_card.dart';
-import '../../core/widgets/states.dart';
-import '../../data/models/property.dart';
+import '../../core/aq/aq_forms.dart';
+import '../../core/aq/aq_primitives.dart';
+import '../../core/aq/aq_scene.dart';
+import '../../core/aq/aq_tokens.dart';
+import '../../core/aq/aq_typography.dart';
+import '../../core/localization/flow_strings.dart';
 import '../../data/models/saved.dart';
 import '../../data/repositories/app_state_providers.dart';
-import '../../data/repositories/providers.dart';
 import '../compare/compare_screen.dart';
+import '../viewing/widgets/viewing_format.dart';
+import '../viewing/widgets/viewing_scaffold.dart';
+import '../workspace/aq_home.dart' show AQResultCard, AQSkeletonBox, AQSlideSwitch, aqAllPropertiesProvider;
 
+/// Saved properties (with compare) and saved searches.
 class SavedScreen extends ConsumerStatefulWidget {
   const SavedScreen({super.key});
-
   @override
   ConsumerState<SavedScreen> createState() => _SavedScreenState();
 }
 
-class _SavedScreenState extends ConsumerState<SavedScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabController = TabController(length: 2, vsync: this);
-  final Set<String> _selectedForCompare = {};
+class _SavedScreenState extends ConsumerState<SavedScreen> {
+  int _tab = 0;
+  final _compare = <String>[];
+  static const _maxCompare = 3;
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final savedIds = ref.watch(savedPropertyIdsProvider);
-    final savedSearches = ref.watch(savedSearchesProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Saved'),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.slate,
-          indicatorColor: AppColors.primary,
-          tabs: const [Tab(text: 'Properties'), Tab(text: 'Searches')],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildProperties(savedIds),
-          _buildSearches(savedSearches),
-        ],
-      ),
-      floatingActionButton: _selectedForCompare.length >= 2
-          ? FloatingActionButton.extended(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CompareScreen(propertyIds: _selectedForCompare.toList()),
-                ),
-              ),
-              backgroundColor: AppColors.primary,
-              icon: const Icon(Icons.compare_arrows_rounded, color: Colors.white),
-              label: Text('Compare (${_selectedForCompare.length})', style: const TextStyle(color: Colors.white)),
-            )
-          : null,
+  Widget _empty(BuildContext context, {required String icon, required String title, required String body, required String cta, required VoidCallback onTap}) {
+    final c = AQColors.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AQSpacing.x8),
+      child: Column(children: [
+        Container(width: 72, height: 72, decoration: BoxDecoration(color: c.surfaceSelected, shape: BoxShape.circle), child: Center(child: AQIcon(icon, size: 32, color: c.accent))),
+        const SizedBox(height: AQSpacing.x4),
+        Text(title, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.headlineSmall)),
+        const SizedBox(height: AQSpacing.x2),
+        Text(body, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
+        const SizedBox(height: AQSpacing.x5),
+        AQPrimaryButton(label: cta, trailingChevron: false, onPressed: onTap),
+      ]),
     );
   }
 
-  Widget _buildProperties(Set<String> savedIds) {
-    if (savedIds.isEmpty) {
-      return AqaratiEmptyState(
-        icon: Icons.favorite_border_rounded,
-        title: 'Save properties you want to revisit',
-        message: 'Your saved properties will appear here.',
-        ctaLabel: 'Explore properties',
-        onCta: () => context.go('/home'),
-      );
+  Widget _properties(BuildContext context, FlowStrings f) {
+    final c = AQColors.of(context);
+    final ids = ref.watch(savedPropertyIdsProvider);
+    if (ids.isEmpty) {
+      return _empty(context, icon: 'star', title: f.t('saved.empty.t'), body: f.t('saved.empty.b'), cta: f.t('saved.empty.cta'), onTap: () => context.go('/app/explore'));
     }
-    final propertyRepo = ref.watch(propertyRepositoryProvider);
-    return FutureBuilder<List<Property>>(
-      future: propertyRepo.search(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const AqaratiLoadingLine(label: 'Loading saved properties...');
-        }
-        final properties = snapshot.data!.where((p) => savedIds.contains(p.id)).toList();
-        return Column(
-          children: [
-            if (properties.length > 1)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Select up to 3 to compare',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-              ),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                itemCount: properties.length,
-                separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-                itemBuilder: (context, i) {
-                  final property = properties[i];
-                  final selected = _selectedForCompare.contains(property.id);
-                  return Stack(
-                    children: [
-                      PropertyCard(
-                        property: property,
-                        isSaved: true,
-                        onTap: () => context.push('/property/${property.id}'),
-                        onSaveToggle: () {
-                          ref.read(savedPropertyIdsProvider.notifier).update((state) {
-                            final next = {...state}..remove(property.id);
-                            return next;
-                          });
-                          _selectedForCompare.remove(property.id);
-                        },
-                      ),
-                      Positioned(
-                        top: AppSpacing.sm,
-                        right: AppSpacing.sm + 40,
-                        child: GestureDetector(
-                          onTap: () => setState(() {
-                            if (selected) {
-                              _selectedForCompare.remove(property.id);
-                            } else if (_selectedForCompare.length < 3) {
-                              _selectedForCompare.add(property.id);
+    final async = ref.watch(aqAllPropertiesProvider);
+    return async.when(
+      loading: () => const Column(children: [AQSkeletonBox(height: 140), SizedBox(height: AQSpacing.x3), AQSkeletonBox(height: 140)]),
+      error: (_, _) => AQErrorBanner(text: f.t('disc.loadError'), action: AQTextButton(label: f.t('common.retry'), color: c.accent, onPressed: () => ref.invalidate(aqAllPropertiesProvider))),
+      data: (all) {
+        final saved = [for (final p in all) if (ids.contains(p.id)) p];
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+            child: Text(saved.length > 1 ? f.t('saved.count.compare', {'n': VFmt.n(context, saved.length), 'm': VFmt.n(context, _maxCompare)}) : f.t('saved.count', {'n': VFmt.n(context, saved.length)}), style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
+          ),
+          for (final p in saved)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+              child: Stack(children: [
+                AQResultCard(property: p, trailingInset: saved.length > 1 ? 40 : 0),
+                if (saved.length > 1)
+                  PositionedDirectional(
+                    end: 6,
+                    top: 6,
+                    child: Semantics(
+                      button: true,
+                      selected: _compare.contains(p.id),
+                      label: f.t('saved.select', {'t': p.title}),
+                      excludeSemantics: true,
+                      child: AQPressable(
+                        onTap: () {
+                          AQHaptics.selection();
+                          setState(() {
+                            if (_compare.contains(p.id)) {
+                              _compare.remove(p.id);
+                            } else if (_compare.length < _maxCompare) {
+                              _compare.add(p.id);
                             }
-                          }),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                              size: 18,
-                              color: selected ? AppColors.primary : AppColors.charcoal,
+                          });
+                        },
+                        pressedScale: 0.9,
+                        child: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: Center(
+                            child: AnimatedContainer(
+                              duration: AQMotion.scaled(context, AQMotion.fast),
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(color: _compare.contains(p.id) ? c.accent : c.surfaceRaised, shape: BoxShape.circle, border: Border.all(color: _compare.contains(p.id) ? c.accent : c.hairline, width: 1.5)),
+                              child: _compare.contains(p.id) ? Center(child: AQIcon('check', size: 16, color: c.onAccent)) : null,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  );
-                },
-              ),
+                    ),
+                  ),
+              ]),
             ),
-          ],
-        );
+        ]);
       },
     );
   }
 
-  Widget _buildSearches(List<SavedSearch> savedSearches) {
-    if (savedSearches.isEmpty) {
-      return AqaratiEmptyState(
-        icon: Icons.search_outlined,
-        title: 'Save a search',
-        message: 'Save your filters from Search Results to get notified of new matches.',
-        ctaLabel: 'Start searching',
-        onCta: () => context.push('/search'),
-      );
+  Widget _searches(BuildContext context, FlowStrings f) {
+    final c = AQColors.of(context);
+    final list = ref.watch(savedSearchesProvider);
+    if (list.isEmpty) {
+      return _empty(context, icon: 'search', title: f.t('saved.s.empty.t'), body: f.t('saved.s.empty.b'), cta: f.t('saved.s.empty.cta'), onTap: () => context.push('/search/start'));
     }
-    return ListView.separated(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      itemCount: savedSearches.length,
-      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-      itemBuilder: (context, i) {
-        final search = savedSearches[i];
-        return Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.line),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.notifications_active_outlined, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.md),
+    return Column(children: [
+      for (final s in list)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+          child: Container(
+            decoration: BoxDecoration(color: c.surfaceRaised, borderRadius: BorderRadius.circular(AQRadius.large), border: Border.all(color: c.hairline)),
+            child: Row(children: [
               Expanded(
-                child: Text(search.label, style: Theme.of(context).textTheme.titleSmall),
-              ),
-              IconButton(
-                onPressed: () => ref.read(savedSearchesProvider.notifier).update(
-                      (state) => state.where((s) => s.id != search.id).toList(),
+                child: Semantics(
+                  button: true,
+                  label: f.t('saved.s.open', {'q': s.label}),
+                  excludeSemantics: true,
+                  child: AQPressable(
+                    onTap: () => context.push('/search?q=${Uri.encodeQueryComponent(s.filters['q'] ?? '')}'),
+                    pressedScale: 0.99,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 72),
+                      padding: const EdgeInsets.all(AQSpacing.x4),
+                      child: Row(children: [
+                        AQIcon('search', size: 22, color: c.accent),
+                        const SizedBox(width: AQSpacing.x3),
+                        Expanded(child: Text(VFmt.iso(s.label), maxLines: 2, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.titleMedium))),
+                      ]),
                     ),
-                icon: const Icon(Icons.delete_outline_rounded, color: AppColors.mist),
+                  ),
+                ),
               ),
-            ],
+              AQIconButton(icon: 'close', directional: false, semanticsLabel: f.t('saved.s.remove', {'q': s.label}), onPressed: () => ref.read(savedSearchesProvider.notifier).update((x) => x.where((e) => e.id != s.id).toList())),
+            ]),
           ),
-        );
-      },
+        ),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
+    // Drop selections for properties that were un-saved elsewhere.
+    final ids = ref.watch(savedPropertyIdsProvider);
+    _compare.removeWhere((id) => !ids.contains(id));
+    return AQViewingScaffold(
+      title: f.t('saved.title'),
+      subtitle: f.t('saved.sub'),
+      backLabel: f.t('common.back'),
+      onBack: () => aqBack(context, '/app/account'),
+      bottom: _tab == 0 && _compare.length >= 2
+          ? AQBottomActionBar(
+              primary: AQPrimaryButton(
+                label: f.t('saved.compare', {'n': VFmt.n(context, _compare.length)}),
+                trailingChevron: false,
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CompareScreen(propertyIds: List.of(_compare)))),
+              ),
+            )
+          : null,
+      children: [
+        AQSlideSwitch(labels: [f.t('saved.tab.props'), f.t('saved.tab.searches')], index: _tab, onChanged: (i) => setState(() => _tab = i)),
+        const SizedBox(height: AQSpacing.x4),
+        AnimatedSwitcher(duration: AQMotion.scaled(context, AQMotion.standard), child: KeyedSubtree(key: ValueKey(_tab), child: _tab == 0 ? _properties(context, f) : _searches(context, f))),
+      ],
     );
   }
+}
+
+/// Adds the current search to the saved list unless it is already there.
+bool aqSaveSearch(WidgetRef ref, String label, String query) {
+  final list = ref.read(savedSearchesProvider);
+  if (list.any((s) => s.label.toLowerCase() == label.toLowerCase())) return false;
+  ref.read(savedSearchesProvider.notifier).state = [SavedSearch(id: DateTime.now().microsecondsSinceEpoch.toString(), label: label, filters: {'q': query}, createdAt: DateTime.now()), ...list];
+  return true;
 }

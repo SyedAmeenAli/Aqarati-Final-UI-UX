@@ -171,6 +171,14 @@ class AccountTab extends ConsumerWidget {
           if (m.purpose != null) AQKeyValue(f.t('account.role'), roleTitle(context, m.purpose!)),
           if (m.phoneLast4 != null) AQKeyValue(f.t('account.phone'), '•••• ${m.phoneLast4}'),
         ]),
+      Padding(
+        padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+        child: AQSecondaryButton(label: f.t('account.saved'), leadingIcon: 'star', trailingChevron: false, onPressed: () => context.push('/saved')),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+        child: AQSecondaryButton(label: f.t('account.tools'), leadingIcon: 'calendar', trailingChevron: false, onPressed: () => context.push('/calculators')),
+      ),
       AQReviewSection(title: f.t('account.language'), children: [
         _LangRow(title: 'English', selected: current == 'en', onTap: () => ref.read(localeProvider.notifier).state = const Locale('en')),
         _LangRow(title: 'العربية', selected: current == 'ar', onTap: () => ref.read(localeProvider.notifier).state = const Locale('ar')),
