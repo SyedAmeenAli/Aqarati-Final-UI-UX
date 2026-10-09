@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart' show ValueKey;
 import 'package:go_router/go_router.dart';
-import '../../features/business/business_profile_screen.dart';
+import '../../features/business/aq_business_profile.dart';
 import '../../features/business/aq_professionals.dart';
 import '../../features/explore/explore_screen.dart';
 import '../../features/home/home_screen.dart';
@@ -102,7 +102,7 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/business/:id',
-      builder: (context, state) => BusinessProfileScreen(businessId: state.pathParameters['id']!),
+      builder: (context, state) => AQBusinessProfileScreen(businessId: state.pathParameters['id']!),
     ),
     ShellRoute(
       builder: (context, state, child) => AppShell(child: child),
