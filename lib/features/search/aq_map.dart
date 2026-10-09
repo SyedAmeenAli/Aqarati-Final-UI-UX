@@ -55,11 +55,9 @@ class AQViewToggle extends StatelessWidget {
                 borderRadius: BorderRadius.circular(22),
               ),
               child: Center(
-                child: AQIcon(
-                  icon,
-                  size: 22,
-                  color: on ? c.onAccent : c.inkSoft,
-                ),
+                child: icon == 'list'
+                    ? Icon(Icons.view_agenda_outlined, size: 22, color: on ? c.onAccent : c.inkSoft)
+                    : AQIcon(icon, size: 22, color: on ? c.onAccent : c.inkSoft),
               ),
             ),
           ),
@@ -74,7 +72,7 @@ class AQViewToggle extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          seg('activity', f.t('map.list'), !map, onList),
+          seg('list', f.t('map.list'), !map, onList),
           seg('pin', f.t('map.map'), map, onMap),
         ],
       ),
@@ -395,7 +393,7 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
       ),
     );
 
-    final bottomH = 320.0;
+    final bottomH = 292.0;
     final sheetBody = <Widget>[
       const SizedBox(height: AQSpacing.x3),
       Center(child: Container(width: 36, height: 4, decoration: BoxDecoration(color: c.hairline, borderRadius: BorderRadius.circular(2)))),
