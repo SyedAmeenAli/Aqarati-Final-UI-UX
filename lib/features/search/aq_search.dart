@@ -44,29 +44,42 @@ void _remember(WidgetRef ref, String term) {
   ref.read(recentSearchesProvider.notifier).update((s) => [t, ...s.where((x) => x.toLowerCase() != t.toLowerCase())].take(6).toList());
 }
 
+/// Directory category a non-property term points at.
+String? _categoryOf(String term) {
+  final s = term.toLowerCase();
+  if (RegExp(r'architect').hasMatch(s)) return 'architecture';
+  if (RegExp(r'interior|designer').hasMatch(s)) return 'interiorDesign';
+  if (RegExp(r'\b(ac|plumb\w*|pool|repair|maintenance|cleaning|paint\w*|electric\w*|kitchen)\b').hasMatch(s)) return 'maintenance';
+  if (RegExp(r'contractor|construction|builder|engineer').hasMatch(s)) return 'construction';
+  if (RegExp(r'developer').hasMatch(s)) return 'propertyDevelopment';
+  if (RegExp(r'agent|broker').hasMatch(s)) return 'realEstateAgent';
+  return null;
+}
+
 /// Runs a term: properties open the results list, everything else the directory.
 void _run(BuildContext context, WidgetRef ref, String term) {
   _remember(ref, term);
   if (_kindOf(term) == _Kind.property) {
     context.push('/search?q=${Uri.encodeQueryComponent(term.trim())}');
   } else {
-    context.push('/professionals');
+    final cat = _categoryOf(term);
+    context.push(cat == null ? '/professionals?q=${Uri.encodeQueryComponent(term.trim())}' : '/professionals?cat=$cat');
   }
 }
 
 // ---------------------------------------------------------------- query field
 
-class _QueryField extends StatefulWidget {
+class AQQueryField extends StatefulWidget {
   final TextEditingController controller;
   final String hint;
   final bool autofocus;
   final ValueChanged<String> onChanged, onSubmitted;
-  const _QueryField({required this.controller, required this.hint, this.autofocus = false, required this.onChanged, required this.onSubmitted});
+  const AQQueryField({required this.controller, required this.hint, this.autofocus = false, required this.onChanged, required this.onSubmitted});
   @override
-  State<_QueryField> createState() => _QueryFieldState();
+  State<AQQueryField> createState() => AQQueryFieldState();
 }
 
-class _QueryFieldState extends State<_QueryField> {
+class AQQueryFieldState extends State<AQQueryField> {
   final _focus = FocusNode();
 
   @override
@@ -276,7 +289,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final tiles = [
       _tile(context, icon: 'home', title: f.t('srch.tile.props'), body: f.t('srch.tile.props.s'), primary: true, onTap: () => context.push('/properties')),
       _tile(context, icon: 'agent', title: f.t('srch.tile.pros'), body: f.t('srch.tile.pros.s'), primary: false, onTap: () => context.push('/professionals')),
-      _tile(context, icon: 'construction', title: f.t('srch.tile.maint'), body: f.t('srch.tile.maint.s'), primary: false, onTap: () => context.push('/professionals')),
+      _tile(context, icon: 'construction', title: f.t('srch.tile.maint'), body: f.t('srch.tile.maint.s'), primary: false, onTap: () => context.push('/professionals?cat=maintenance')),
     ];
 
     final List<Widget> body;
@@ -323,14 +336,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 const SizedBox(height: AQSpacing.x2),
                 _quick(context, 'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg', f.t('srch.tile.pros'), () => context.push('/professionals')),
                 const SizedBox(height: AQSpacing.x2),
-                _quick(context, 'assets/businesses/b4/05_Technician_servicing_air_conditi.jpg', f.t('srch.tile.maint'), () => context.push('/professionals')),
+                _quick(context, 'assets/businesses/b4/05_Technician_servicing_air_conditi.jpg', f.t('srch.tile.maint'), () => context.push('/professionals?cat=maintenance')),
               ])
             : Row(children: [
                 Expanded(child: _quick(context, PropCategory.residential.image, f.t('srch.tile.props'), () => context.push('/properties'))),
                 const SizedBox(width: AQSpacing.x2),
                 Expanded(child: _quick(context, 'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg', f.t('srch.tile.pros'), () => context.push('/professionals'))),
                 const SizedBox(width: AQSpacing.x2),
-                Expanded(child: _quick(context, 'assets/businesses/b4/05_Technician_servicing_air_conditi.jpg', f.t('srch.tile.maint'), () => context.push('/professionals'))),
+                Expanded(child: _quick(context, 'assets/businesses/b4/05_Technician_servicing_air_conditi.jpg', f.t('srch.tile.maint'), () => context.push('/professionals?cat=maintenance'))),
               ]),
       ];
     }
@@ -348,7 +361,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, 0, AQSpacing.gutter, 48),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  _QueryField(controller: _ctl, hint: f.t('srch.hint'), autofocus: false, onChanged: (v) => setState(() => _q = v), onSubmitted: (v) => v.trim().isEmpty ? null : _run(context, ref, v)),
+                  AQQueryField(controller: _ctl, hint: f.t('srch.hint'), autofocus: false, onChanged: (v) => setState(() => _q = v), onSubmitted: (v) => v.trim().isEmpty ? null : _run(context, ref, v)),
                   ...body,
                 ]),
               ),
@@ -410,7 +423,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
       backLabel: f.t('common.back'),
       onBack: () => aqBack(context, '/search/start'),
       children: [
-        _QueryField(controller: _ctl, hint: f.t('srch.hint'), onChanged: (_) => setState(() {}), onSubmitted: (v) {
+        AQQueryField(controller: _ctl, hint: f.t('srch.hint'), onChanged: (_) => setState(() {}), onSubmitted: (v) {
           _remember(ref, v);
           setState(() {});
         }),

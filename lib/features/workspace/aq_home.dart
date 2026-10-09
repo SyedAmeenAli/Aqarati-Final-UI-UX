@@ -1003,22 +1003,22 @@ List<Widget> _developmentSection(BuildContext context) {
       (
         'assets/businesses/b1/05_Contemporary_architectural_facad.jpg',
         f.t('pro.developers'),
-        go,
+        () => context.push('/professionals?cat=propertyDevelopment'),
       ),
       (
         'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg',
         f.t('pro.construction'),
-        go,
+        () => context.push('/professionals?cat=construction'),
       ),
       (
         'assets/businesses/b1/08_Doubleheight_atrium_architectur.jpg',
         f.t('pro.architecture'),
-        go,
+        () => context.push('/professionals?cat=architecture'),
       ),
       (
         'assets/businesses/b3/06_Styled_bedroom_interior_photography.jpg',
         f.t('pro.interior'),
-        go,
+        () => context.push('/professionals?cat=interiorDesign'),
       ),
     ]),
   ];
@@ -1038,22 +1038,22 @@ List<Widget> _maintenanceSection(BuildContext context) {
       (
         'assets/businesses/b4/03_Plumbing_maintenance_under_sink.jpg',
         f.t('maint.plumber'),
-        go,
+        () => context.push('/professionals?cat=maintenance'),
       ),
       (
         'assets/properties/p1/02_Infinity_pool_overlooking_marina.jpg',
         f.t('maint.pool'),
-        go,
+        () => context.push('/professionals?cat=maintenance'),
       ),
       (
         'assets/businesses/b4/05_Technician_servicing_air_conditi.jpg',
         f.t('maint.ac'),
-        go,
+        () => context.push('/professionals?cat=maintenance'),
       ),
       (
         'assets/properties/p1/16_Contemporary_kitchen_interior_ar.jpg',
         f.t('maint.kitchen'),
-        go,
+        () => context.push('/professionals?cat=maintenance'),
       ),
     ]),
   ];

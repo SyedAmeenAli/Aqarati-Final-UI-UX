@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart' show ValueKey;
 import 'package:go_router/go_router.dart';
 import '../../features/business/business_profile_screen.dart';
-import '../../features/business/professional_discovery_screen.dart';
+import '../../features/business/aq_professionals.dart';
 import '../../features/explore/explore_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/messages/messages_screen.dart';
@@ -98,7 +98,7 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/professionals',
-      builder: (context, state) => const ProfessionalDiscoveryScreen(),
+      builder: (context, state) => AQProfessionalsScreen(key: ValueKey(state.uri.toString()), query: state.uri.queryParameters['q'], category: state.uri.queryParameters['cat']),
     ),
     GoRoute(
       path: '/business/:id',
