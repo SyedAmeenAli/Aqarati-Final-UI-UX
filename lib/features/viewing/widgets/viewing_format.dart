@@ -25,6 +25,8 @@ class VFmt {
   static String range(BuildContext c, ViewingSlot s) => '${time(c, s.start)} – ${time(c, s.end)}';
   static String dateTime(BuildContext c, ViewingSlot s) => '${shortDate(c, s.start)} · ${time(c, s.start)}';
   static String n(BuildContext c, int v) => NumberFormat.decimalPattern(_l(c)).format(v);
+  /// Decimal number with up to [digits] fraction digits, in the reader's numerals.
+  static String dec(BuildContext c, double v, {int digits = 2}) => (NumberFormat.decimalPattern(_l(c))..maximumFractionDigits = digits).format(v);
 }
 
 bool aqLargeText(BuildContext c) => MediaQuery.textScalerOf(c).scale(14) > 18.5;

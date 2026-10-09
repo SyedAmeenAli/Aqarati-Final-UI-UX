@@ -1,71 +1,69 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/aq/aq_primitives.dart';
+import '../../core/aq/aq_scene.dart';
+import '../../core/aq/aq_tokens.dart';
+import '../../core/aq/aq_typography.dart';
+import '../../core/localization/flow_strings.dart';
+import '../viewing/widgets/viewing_scaffold.dart';
 import 'calculator_models.dart';
-import 'calculator_screen.dart';
+
+String _icon(CalculatorType t) => switch (t) {
+      CalculatorType.emi => 'calendar',
+      CalculatorType.affordability => 'home',
+      CalculatorType.downPayment => 'shield',
+      CalculatorType.rentalYield => 'explore',
+      CalculatorType.roi => 'star',
+      CalculatorType.rentVsBuy => 'refresh',
+      CalculatorType.appreciation => 'sunrise',
+      CalculatorType.constructionCost => 'construction',
+    };
 
 class CalculatorsListScreen extends StatelessWidget {
   const CalculatorsListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Property Tools')),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          Text(
-            'Make better property decisions.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          ...CalculatorType.values.map((type) => _ToolTile(type: type)),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToolTile extends StatelessWidget {
-  final CalculatorType type;
-
-  const _ToolTile({required this.type});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: InkWell(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => CalculatorScreen(type: type)),
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.line),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.calculate_outlined, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(type.title, style: theme.textTheme.titleSmall),
-                    Text(type.description, style: theme.textTheme.bodySmall),
-                  ],
+    final f = FlowStrings.of(context);
+    final c = AQColors.of(context);
+    return AQViewingScaffold(
+      title: f.t('calc.title'),
+      subtitle: f.t('calc.sub'),
+      backLabel: f.t('common.back'),
+      onBack: () => aqBack(context, '/app/explore'),
+      children: [
+        for (final t in CalculatorType.values)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+            child: Semantics(
+              button: true,
+              label: '${f.t('calc.t.${t.name}')}. ${f.t('calc.d.${t.name}')}',
+              excludeSemantics: true,
+              child: AQPressable(
+                onTap: () {
+                  AQHaptics.selection();
+                  context.push('/calculators/${t.name}');
+                },
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 76),
+                  padding: const EdgeInsets.all(AQSpacing.x4),
+                  decoration: BoxDecoration(color: c.surfaceRaised, borderRadius: BorderRadius.circular(AQRadius.large), border: Border.all(color: c.hairline)),
+                  child: Row(children: [
+                    Container(width: 44, height: 44, decoration: BoxDecoration(color: c.surfaceSelected, shape: BoxShape.circle), child: Center(child: AQIcon(_icon(t), size: 22, color: c.accent))),
+                    const SizedBox(width: AQSpacing.x3),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(f.t('calc.t.${t.name}'), style: AQTypography.of(context, AQText.titleMedium)),
+                        Text(f.t('calc.d.${t.name}'), style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+                      ]),
+                    ),
+                    AQIcon('chevron-right', size: 20, color: c.inkSoft, directional: true),
+                  ]),
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: AppColors.mist),
-            ],
+            ),
           ),
-        ),
-      ),
+      ],
     );
   }
 }

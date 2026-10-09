@@ -27,6 +27,8 @@ import '../../features/viewing/screens/viewing_detail_screen.dart';
 import '../../features/viewing/screens/viewing_schedule_screens.dart';
 import '../../features/viewing/screens/viewing_status_screens.dart';
 import '../../features/workspace/aq_home.dart' show AQPropertiesScreen;
+import '../../features/calculators/calculator_models.dart';
+import '../../features/calculators/calculator_screen.dart';
 import '../../features/calculators/calculators_list_screen.dart';
 import '../aq/aq_scene.dart' show AQRoute;
 import '../../features/workspace/aq_app_shell.dart';
@@ -86,6 +88,13 @@ final appRouter = GoRouter(
     GoRoute(path: '/properties', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQPropertiesScreen(category: state.uri.queryParameters['cat'], tx: state.uri.queryParameters['tx']))),
     GoRoute(path: '/map', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQMapScreen(tx: state.uri.queryParameters['tx']))),
     GoRoute(path: '/calculators', builder: (context, state) => const CalculatorsListScreen()),
+    GoRoute(
+      path: '/calculators/:id',
+      builder: (context, state) {
+        final type = CalculatorType.values.where((t) => t.name == state.pathParameters['id']).firstOrNull;
+        return type == null ? const CalculatorsListScreen() : CalculatorScreen(type: type);
+      },
+    ),
     GoRoute(path: '/saved', builder: (context, state) => const SavedScreen()),
     GoRoute(
       path: '/search',
