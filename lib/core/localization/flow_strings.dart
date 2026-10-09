@@ -565,4 +565,10 @@ const Map<String, (String, String)> _s = {
   'srch.noMatch': ('No properties match “{q}”.', 'لا توجد عقارات تطابق «{q}».'),
   'srch.results': ('Search results', 'نتائج البحث'),
   'srch.resultsFor': ('Showing results for “{q}”', 'نتائج «{q}»'),
+  'map.list': ('List view', 'عرض القائمة'),
+  'map.map': ('Map view', 'عرض الخريطة'),
+  'map.count': ('{n} Properties', '{n} عقار'),
+  'map.sub': ('Villas, apartments and land in {area}', 'فلل وشقق وأراضٍ في {area}'),
+  'map.search': ('Search in this area…', 'ابحث في هذه المنطقة…'),
+  'map.noLocation': ('{n} not shown: no map location yet.', '{n} غير ظاهر: لا يوجد موقع على الخريطة بعد.'),
 };

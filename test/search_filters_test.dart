@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:aqarati_app/data/models/enums.dart';
 import 'package:aqarati_app/data/repositories/providers.dart';
 import 'package:aqarati_app/features/search/aq_filters.dart';
+import 'package:aqarati_app/features/search/aq_map.dart';
 import 'package:aqarati_app/features/search/aq_search.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
 
@@ -82,6 +83,14 @@ void main() {
       await t.pumpWidget(_app(const AQPropertiesScreen(), scale: scale));
       await t.pump(const Duration(seconds: 1));
       await t.pump(const Duration(seconds: 1));
+      expect(t.takeException(), isNull);
+    });
+
+    testWidgets('Map screen builds at text scale $scale', (t) async {
+      await t.binding.setSurfaceSize(const Size(393, 852));
+      await t.pumpWidget(_app(const AQMapScreen(), scale: scale));
+      await t.pump(const Duration(seconds: 1));
+      await t.pump(const Duration(seconds: 2));
       expect(t.takeException(), isNull);
     });
   }
