@@ -9,48 +9,36 @@ import '../../core/aq/aq_typography.dart';
 import '../../core/localization/flow_strings.dart';
 import '../../data/models/enums.dart';
 import '../../data/models/property.dart';
+import '../../data/repositories/app_state_providers.dart' show savedPropertyIdsProvider;
 import '../../data/repositories/providers.dart';
 import '../entry/widgets/entry_common.dart' show MasterLogo;
+import '../search/aq_filter_sheet.dart';
+import '../search/aq_filters.dart';
 import '../viewing/widgets/viewing_format.dart';
 import '../viewing/widgets/viewing_scaffold.dart';
 
+export '../search/aq_filters.dart' show PropCategory, PropCategoryX;
+
 // ---------------------------------------------------------------- state
-
-enum PropCategory { residential, commercial, agriculture, industrial }
-
-extension PropCategoryX on PropCategory {
-  String get key => 'cat.$name';
-  bool matches(PropertyType t) => switch (this) {
-        PropCategory.residential => const {PropertyType.apartment, PropertyType.villa, PropertyType.house, PropertyType.townhouse, PropertyType.penthouse, PropertyType.building, PropertyType.residentialLand, PropertyType.chalet, PropertyType.guesthouse}.contains(t),
-        PropCategory.commercial => const {PropertyType.office, PropertyType.shop, PropertyType.showroom, PropertyType.commercialBuilding, PropertyType.hotel, PropertyType.resort, PropertyType.mixedUse}.contains(t),
-        PropCategory.agriculture => const {PropertyType.agriculturalLand, PropertyType.farm}.contains(t),
-        PropCategory.industrial => const {PropertyType.industrial, PropertyType.warehouse}.contains(t),
-      };
-  String get image => switch (this) {
-        PropCategory.residential => 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
-        PropCategory.commercial => 'assets/properties/p6/04_Modern_commercial_building_exterior.jpg',
-        PropCategory.agriculture => 'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
-        PropCategory.industrial => 'assets/properties/p6/05_Rear_utility_area_of_shop.jpg',
-      };
-}
 
 /// null = all of Oman.
 final homeAreaProvider = StateProvider<String?>((ref) => null);
 final homeTxProvider = StateProvider<TransactionType>((ref) => TransactionType.buy);
-final savedPropertiesProvider = StateProvider<Set<String>>((ref) => <String>{});
-final _allPropsProvider = FutureProvider.autoDispose<List<Property>>((ref) => ref.watch(propertyRepositoryProvider).search());
+final savedPropertiesProvider = savedPropertyIdsProvider;
+final aqAllPropertiesProvider = FutureProvider.autoDispose<List<Property>>((ref) => ref.watch(propertyRepositoryProvider).search());
 
 // ---------------------------------------------------------------- shared pieces
 
-Widget _img(String asset, {int cacheWidth = 500, Alignment alignment = Alignment.center}) => Image.asset(asset, fit: BoxFit.cover, alignment: alignment, cacheWidth: cacheWidth, filterQuality: FilterQuality.medium, errorBuilder: (_, _, _) => const ColoredBox(color: Color(0x22000000)));
+Widget aqImg(String asset, {int cacheWidth = 500, Alignment alignment = Alignment.center}) => Image.asset(asset, fit: BoxFit.cover, alignment: alignment, cacheWidth: cacheWidth, filterQuality: FilterQuality.medium, errorBuilder: (_, _, _) => const ColoredBox(color: Color(0x22000000)));
 
 /// Top of Home / Explore: a photograph that fades into the page, brand row, title, search.
-class _Hero extends StatelessWidget {
+class AQHero extends StatelessWidget {
   final String image;
   final String? eyebrow;
   final String title;
   final String sub;
-  const _Hero({required this.image, this.eyebrow, required this.title, required this.sub});
+  final VoidCallback? onBack;
+  const AQHero({super.key, required this.image, this.eyebrow, required this.title, required this.sub, this.onBack});
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +49,7 @@ class _Hero extends StatelessWidget {
       Positioned.fill(
         child: ExcludeSemantics(
           child: Stack(fit: StackFit.expand, children: [
-            Opacity(opacity: c.isDark ? 0.75 : 1, child: _img(image, cacheWidth: 1000, alignment: Alignment.topCenter)),
+            Opacity(opacity: c.isDark ? 0.75 : 1, child: aqImg(image, cacheWidth: 1000, alignment: Alignment.topCenter)),
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [bg.withValues(alpha: 0.94), bg.withValues(alpha: 0.6), bg.withValues(alpha: 0.05)], stops: const [0.0, 0.5, 1.0]))),
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [bg.withValues(alpha: 0), bg.withValues(alpha: 0), bg], stops: const [0, 0.62, 1]))),
           ]),
@@ -73,7 +61,10 @@ class _Hero extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x2, AQSpacing.gutter, AQSpacing.x6),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              SizedBox(height: 46, child: FittedBox(fit: BoxFit.contain, child: MasterLogo(width: 80))),
+              if (onBack != null)
+                AQIconButton(icon: 'chevron-left', semanticsLabel: f.t('common.back'), onPressed: onBack)
+              else
+                SizedBox(height: 46, child: FittedBox(fit: BoxFit.contain, child: MasterLogo(width: 80))),
               const Spacer(),
               const _LocationPill(),
               const SizedBox(width: AQSpacing.x2),
@@ -152,9 +143,9 @@ Future<void> _pickArea(BuildContext context, WidgetRef ref) async {
   );
 }
 
-class _SearchField extends StatelessWidget {
+class AQSearchEntry extends StatelessWidget {
   final String hint;
-  const _SearchField({required this.hint});
+  const AQSearchEntry({super.key, required this.hint});
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +226,7 @@ class _TileRow extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AQRadius.medium),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      AspectRatio(aspectRatio: 1.1, child: ExcludeSemantics(child: _img(t.$1, cacheWidth: 360))),
+                      AspectRatio(aspectRatio: 1.1, child: ExcludeSemantics(child: aqImg(t.$1, cacheWidth: 360))),
                       Padding(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: AQSpacing.x2), child: aqLargeText(context) ? Text(t.$2, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.labelMedium)) : FittedBox(fit: BoxFit.scaleDown, child: Text(t.$2, maxLines: 1, style: AQTypography.of(context, AQText.labelMedium)))),
                     ]),
                   ),
@@ -249,11 +240,11 @@ class _TileRow extends StatelessWidget {
 }
 
 /// Wide photographic banner with a title, line of copy and one pill action.
-class _Banner extends StatelessWidget {
+class AQBanner extends StatelessWidget {
   final String image;
   final String eyebrow, title, body, cta;
   final VoidCallback onTap;
-  const _Banner({required this.image, this.eyebrow = '', required this.title, required this.body, required this.cta, required this.onTap});
+  const AQBanner({super.key, required this.image, this.eyebrow = '', required this.title, required this.body, required this.cta, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +253,7 @@ class _Banner extends StatelessWidget {
       borderRadius: BorderRadius.circular(AQRadius.large),
       child: Stack(children: [
         Positioned.fill(child: ExcludeSemantics(child: Stack(fit: StackFit.expand, children: [
-          _img(image, cacheWidth: 900),
+          aqImg(image, cacheWidth: 900),
           DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: AlignmentDirectional.centerStart, end: AlignmentDirectional.centerEnd, colors: [c.background.withValues(alpha: 0.95), c.background.withValues(alpha: 0.7), c.background.withValues(alpha: 0.0)], stops: const [0, 0.5, 1]))),
         ]))),
         Padding(
@@ -284,7 +275,7 @@ class _Banner extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4),
                   decoration: BoxDecoration(color: c.accent, borderRadius: BorderRadius.circular(AQControl.tap)),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(cta, style: AQTypography.of(context, AQText.labelMedium, color: c.onAccent)),
+                    Flexible(child: Text(cta, maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.labelMedium, color: c.onAccent))),
                     const SizedBox(width: 6),
                     AQIcon('chevron-right', size: 16, color: c.onAccent, directional: true),
                   ]),
@@ -313,11 +304,11 @@ class _Dots extends StatelessWidget {
   }
 }
 
-class _Segmented extends StatelessWidget {
+class AQSlideSwitch extends StatelessWidget {
   final List<String> labels;
   final int index;
   final ValueChanged<int> onChanged;
-  const _Segmented({required this.labels, required this.index, required this.onChanged});
+  const AQSlideSwitch({super.key, required this.labels, required this.index, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -404,7 +395,7 @@ class _FeaturedState extends ConsumerState<_Featured> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AQRadius.large),
                     child: Stack(fit: StackFit.expand, children: [
-                      p.imageUrls.isEmpty ? const ColoredBox(color: Color(0x33000000)) : _img(p.imageUrls.first, cacheWidth: 1000),
+                      p.imageUrls.isEmpty ? const ColoredBox(color: Color(0x33000000)) : aqImg(p.imageUrls.first, cacheWidth: 1000),
                       const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0x00000000), Color(0xCC1A1613)], stops: [0, 0.4, 1]))),
                       Positioned(left: AQSpacing.x4, top: AQSpacing.x4, child: _Badge(f.t('home.featuredBadge'))),
                       PositionedDirectional(
@@ -515,7 +506,7 @@ Widget _brokerLoan(BuildContext context) {
               constraints: const BoxConstraints(minHeight: 130),
               decoration: BoxDecoration(color: c.surfaceRaised, border: Border.all(color: c.hairline), borderRadius: BorderRadius.circular(AQRadius.medium)),
               child: Stack(children: [
-                Positioned.fill(child: ExcludeSemantics(child: Stack(fit: StackFit.expand, children: [Opacity(opacity: c.isDark ? 0.5 : 0.8, child: _img(image, cacheWidth: 500)), DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: AlignmentDirectional.centerStart, end: AlignmentDirectional.centerEnd, colors: [c.surfaceRaised, c.surfaceRaised.withValues(alpha: 0.7), c.surfaceRaised.withValues(alpha: 0.1)])))]))),
+                Positioned.fill(child: ExcludeSemantics(child: Stack(fit: StackFit.expand, children: [Opacity(opacity: c.isDark ? 0.5 : 0.8, child: aqImg(image, cacheWidth: 500)), DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: AlignmentDirectional.centerStart, end: AlignmentDirectional.centerEnd, colors: [c.surfaceRaised, c.surfaceRaised.withValues(alpha: 0.7), c.surfaceRaised.withValues(alpha: 0.1)])))]))),
                 Padding(
                   padding: const EdgeInsets.all(AQSpacing.x3 + 2),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -570,20 +561,20 @@ class AQHomeScreen extends ConsumerWidget {
     final c = AQColors.of(context);
     final tx = ref.watch(homeTxProvider);
     final area = ref.watch(homeAreaProvider);
-    final async = ref.watch(_allPropsProvider);
+    final async = ref.watch(aqAllPropertiesProvider);
     return _page(
       context,
-      hero: _Hero(image: 'assets/location/11_Muscat_skyline_and_mountains.jpg', eyebrow: _greeting(f), title: f.t('home.lead'), sub: ''),
+      hero: AQHero(image: 'assets/location/11_Muscat_skyline_and_mountains.jpg', eyebrow: _greeting(f), title: f.t('home.lead'), sub: ''),
       children: [
-        _SearchField(hint: f.t('home.search.hint')),
+        AQSearchEntry(hint: f.t('home.search.hint')),
         _SectionHeader(f.t('home.browse'), action: f.t('home.seeAll'), onAction: () => context.push('/properties')),
         _TileRow([for (final k in PropCategory.values) (k.image, f.t(k.key), () => context.push('/properties?cat=${k.name}'))]),
         const SizedBox(height: AQSpacing.x5),
-        _Segmented(labels: [f.t('home.buy'), f.t('home.rent')], index: tx == TransactionType.buy ? 0 : 1, onChanged: (i) => ref.read(homeTxProvider.notifier).state = i == 0 ? TransactionType.buy : TransactionType.rent),
+        AQSlideSwitch(labels: [f.t('home.buy'), f.t('home.rent')], index: tx == TransactionType.buy ? 0 : 1, onChanged: (i) => ref.read(homeTxProvider.notifier).state = i == 0 ? TransactionType.buy : TransactionType.rent),
         const SizedBox(height: AQSpacing.x4),
         async.when(
           loading: () => const AQSkeletonBox(height: 320),
-          error: (_, _) => AQErrorBanner(text: f.t('disc.loadError'), action: AQTextButton(label: f.t('common.retry'), color: c.accent, onPressed: () => ref.invalidate(_allPropsProvider))),
+          error: (_, _) => AQErrorBanner(text: f.t('disc.loadError'), action: AQTextButton(label: f.t('common.retry'), color: c.accent, onPressed: () => ref.invalidate(aqAllPropertiesProvider))),
           data: (all) {
             final items = all.where((p) => p.transactionType == tx && (area == null || p.area == area) && p.verification.isVerified).toList();
             if (items.isEmpty) return AQNoticeLine(text: f.t('disc.none'));
@@ -644,9 +635,9 @@ class _AQExploreScreenState extends ConsumerState<AQExploreScreen> {
     ];
     return _page(
       context,
-      hero: _Hero(image: 'assets/location/13_Old_Muscat_architectural_view.jpg', eyebrow: f.t('explore.eyebrow'), title: f.t('explore.hero'), sub: f.t('explore.hero.sub')),
+      hero: AQHero(image: 'assets/location/13_Old_Muscat_architectural_view.jpg', eyebrow: f.t('explore.eyebrow'), title: f.t('explore.hero'), sub: f.t('explore.hero.sub')),
       children: [
-        _SearchField(hint: f.t('home.search.hint')),
+        AQSearchEntry(hint: f.t('home.search.hint')),
         const SizedBox(height: AQSpacing.x5),
         SizedBox(
           height: 266 + 380 * (MediaQuery.textScalerOf(context).scale(1) - 1).clamp(0.0, 1.5),
@@ -654,7 +645,7 @@ class _AQExploreScreenState extends ConsumerState<AQExploreScreen> {
             controller: _ctl,
             itemCount: banners.length,
             onPageChanged: (i) => setState(() => _i = i),
-            itemBuilder: (context, i) => Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: _Banner(image: banners[i].$1, eyebrow: i == 0 ? f.t('explore.eyebrow') : '', title: f.t(banners[i].$2), body: f.t(banners[i].$3), cta: f.t('explore.banner.cta'), onTap: banners[i].$4)),
+            itemBuilder: (context, i) => Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: AQBanner(image: banners[i].$1, eyebrow: i == 0 ? f.t('explore.eyebrow') : '', title: f.t(banners[i].$2), body: f.t(banners[i].$3), cta: f.t('explore.banner.cta'), onTap: banners[i].$4)),
           ),
         ),
         const SizedBox(height: AQSpacing.x3),
@@ -729,22 +720,47 @@ class AQPropertiesScreen extends ConsumerStatefulWidget {
 }
 
 class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
-  PropCategory? _cat;
-  TransactionType? _tx;
+  late final AQFilters _f = AQFilters(
+    category: PropCategory.values.where((c) => c.name == widget.category).firstOrNull,
+    tx: switch (widget.tx) { 'buy' => TransactionType.buy, 'rent' => TransactionType.rent, _ => null },
+  );
 
   @override
   void initState() {
     super.initState();
-    _cat = PropCategory.values.where((c) => c.name == widget.category).firstOrNull;
-    _tx = switch (widget.tx) { 'buy' => TransactionType.buy, 'rent' => TransactionType.rent, _ => null };
+    final area = ref.read(homeAreaProvider);
+    if (area != null) _f.areas.add(area);
+  }
+
+  Future<void> _openFilters(List<Property> all) async {
+    final next = await showAQFilterSheet(context, all: all, initial: _f);
+    if (next == null || !mounted) return;
+    setState(() {
+      _f.tx = next.tx;
+      _f.category = next.category;
+      _f.types..clear()..addAll(next.types);
+      _f.areas..clear()..addAll(next.areas);
+      _f.amenities..clear()..addAll(next.amenities);
+      _f.minPrice = next.minPrice;
+      _f.maxPrice = next.maxPrice;
+      _f.beds = next.beds;
+      _f.baths = next.baths;
+      _f.minArea = next.minArea;
+      _f.verifiedOnly = next.verifiedOnly;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final f = FlowStrings.of(context);
     final c = AQColors.of(context);
-    final area = ref.watch(homeAreaProvider);
-    final async = ref.watch(_allPropsProvider);
+    // The location pill in the corner drives the same area filter.
+    ref.listen<String?>(homeAreaProvider, (_, area) => setState(() {
+          _f.areas.clear();
+          if (area != null) _f.areas.add(area);
+        }));
+    final async = ref.watch(aqAllPropertiesProvider);
+    final txIndex = _f.tx == null ? 0 : (_f.tx == TransactionType.buy ? 1 : 2);
     return AQViewingScaffold(
       title: f.t('props.title'),
       subtitle: f.t('props.sub'),
@@ -752,23 +768,29 @@ class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
       onBack: () => aqBack(context, '/app/explore'),
       trailing: const _LocationPill(),
       children: [
-        _SearchField(hint: f.t('props.search')),
+        AQSearchEntry(hint: f.t('props.search')),
         const SizedBox(height: AQSpacing.x4),
         Wrap(spacing: AQSpacing.x2, runSpacing: AQSpacing.x2, children: [
-          _Pill(label: f.t('disc.all'), selected: _cat == null, onTap: () => setState(() => _cat = null)),
-          for (final k in PropCategory.values) _Pill(label: f.t(k.key), selected: _cat == k, onTap: () => setState(() => _cat = k)),
+          AQChoicePill(label: f.t('disc.all'), selected: _f.category == null, onTap: () => setState(() => _f.category = null)),
+          for (final k in PropCategory.values) AQChoicePill(label: f.t(k.key), selected: _f.category == k, onTap: () => setState(() => _f.category = k)),
         ]),
         const SizedBox(height: AQSpacing.x3),
-        _Segmented(labels: [f.t('disc.all'), f.t('home.buy'), f.t('home.rent')], index: _tx == null ? 0 : (_tx == TransactionType.buy ? 1 : 2), onChanged: (i) => setState(() => _tx = i == 0 ? null : (i == 1 ? TransactionType.buy : TransactionType.rent))),
+        AQSlideSwitch(labels: [f.t('disc.all'), f.t('home.buy'), f.t('home.rent')], index: txIndex, onChanged: (i) => setState(() => _f.tx = i == 0 ? null : (i == 1 ? TransactionType.buy : TransactionType.rent))),
         const SizedBox(height: AQSpacing.x4),
         async.when(
           loading: () => const Column(children: [AQSkeletonBox(height: 150), SizedBox(height: AQSpacing.x3), AQSkeletonBox(height: 150)]),
-          error: (_, _) => AQErrorBanner(text: f.t('disc.loadError'), action: AQTextButton(label: f.t('common.retry'), color: c.accent, onPressed: () => ref.invalidate(_allPropsProvider))),
+          error: (_, _) => AQErrorBanner(text: f.t('disc.loadError'), action: AQTextButton(label: f.t('common.retry'), color: c.accent, onPressed: () => ref.invalidate(aqAllPropertiesProvider))),
           data: (all) {
-            final shown = all.where((p) => (_cat == null || _cat!.matches(p.type)) && (_tx == null || p.transactionType == _tx) && (area == null || p.area == area)).toList();
+            final shown = _f.apply(all);
             return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: Semantics(liveRegion: true, child: Text(f.t('props.count', {'n': VFmt.n(context, shown.length)}), style: AQTypography.of(context, AQText.titleMedium)))),
-              if (shown.isEmpty) AQNoticeLine(text: f.t('props.empty')) else for (final p in shown) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: _ResultCard(property: p)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+                child: AQResultsBar(count: shown.length, activeFilters: _f.activeCount, onFilters: () => _openFilters(all), onSort: () => showAQSortSheet(context, _f, () => setState(() {}))),
+              ),
+              if (shown.isEmpty)
+                Column(children: [AQNoticeLine(text: f.t('props.empty')), if (_f.activeCount > 0 || _f.tx != null) AQSecondaryButton(label: f.t('flt.clear'), trailingChevron: false, onPressed: () => setState(_f.reset))])
+              else
+                for (final p in shown) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: AQResultCard(property: p)),
             ]);
           },
         ),
@@ -777,39 +799,9 @@ class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
   }
 }
 
-class _Pill extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  const _Pill({required this.label, required this.selected, required this.onTap});
-  @override
-  Widget build(BuildContext context) {
-    final c = AQColors.of(context);
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: label,
-      excludeSemantics: true,
-      child: AQPressable(
-        onTap: () {
-          AQHaptics.selection();
-          onTap();
-        },
-        child: AnimatedContainer(
-          duration: AQMotion.scaled(context, AQMotion.fast),
-          constraints: const BoxConstraints(minHeight: AQControl.tap - 4),
-          padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4),
-          decoration: BoxDecoration(color: selected ? c.accent : c.surface, borderRadius: BorderRadius.circular(AQControl.tap), border: Border.all(color: selected ? c.accent : c.hairline)),
-          child: Center(widthFactor: 1, child: Text(label, style: AQTypography.of(context, AQText.labelMedium, color: selected ? c.onAccent : c.inkSoft))),
-        ),
-      ),
-    );
-  }
-}
-
-class _ResultCard extends ConsumerWidget {
+class AQResultCard extends ConsumerWidget {
   final Property property;
-  const _ResultCard({required this.property});
+  const AQResultCard({super.key, required this.property});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -834,7 +826,7 @@ class _ResultCard extends ConsumerWidget {
                 SizedBox(
                   width: aqLargeText(context) ? 100 : 132,
                   child: Stack(fit: StackFit.expand, children: [
-                    p.imageUrls.isEmpty ? ColoredBox(color: c.surfaceSelected) : _img(p.imageUrls.first, cacheWidth: 400),
+                    p.imageUrls.isEmpty ? ColoredBox(color: c.surfaceSelected) : aqImg(p.imageUrls.first, cacheWidth: 400),
                     PositionedDirectional(
                       start: 0,
                       top: 0,
