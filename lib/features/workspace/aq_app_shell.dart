@@ -13,6 +13,7 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/api/account_api.dart';
 import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
+import 'aq_explore.dart';
 import 'aq_home.dart';
 
 const _tabs = ['/app/home', '/app/explore', '/app/activity', '/app/account'];

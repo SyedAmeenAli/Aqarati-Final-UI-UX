@@ -8,7 +8,9 @@ import 'package:aqarati_app/data/repositories/providers.dart';
 import 'package:aqarati_app/features/search/aq_filters.dart';
 import 'package:aqarati_app/features/business/aq_business_profile.dart';
 import 'package:aqarati_app/features/business/aq_professionals.dart';
+import 'package:aqarati_app/features/property/property_detail_screen.dart';
 import 'package:aqarati_app/features/saved/saved_screen.dart';
+import 'package:aqarati_app/features/search/aq_property_types.dart';
 import 'package:aqarati_app/features/search/aq_map.dart';
 import 'package:aqarati_app/features/search/aq_search.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
@@ -130,6 +132,23 @@ void main() {
       ));
       await t.pump(const Duration(seconds: 1));
       await t.pump(const Duration(seconds: 2));
+      expect(t.takeException(), isNull);
+    });
+
+    testWidgets('Property detail builds at text scale $scale', (t) async {
+      await t.binding.setSurfaceSize(const Size(393, 852));
+      await t.pumpWidget(_app(const PropertyDetailScreen(propertyId: 'p1'), scale: scale));
+      await t.pump(const Duration(seconds: 1));
+      await t.pump(const Duration(seconds: 2));
+      expect(t.takeException(), isNull);
+      expect(find.textContaining('Al Mouj'), findsWidgets);
+    });
+
+    testWidgets('Property type chooser builds at text scale $scale', (t) async {
+      await t.binding.setSurfaceSize(const Size(393, 852));
+      await t.pumpWidget(_app(const AQPropertyTypesScreen(), scale: scale));
+      await t.pump(const Duration(seconds: 1));
+      await t.pump(const Duration(seconds: 1));
       expect(t.takeException(), isNull);
     });
   }

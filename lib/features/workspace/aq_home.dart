@@ -355,12 +355,12 @@ class AQSearchEntry extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
+class AQSectionHeader extends StatelessWidget {
   final String title;
   final String? sub;
   final String? action;
   final VoidCallback? onAction;
-  const _SectionHeader(this.title, {this.sub, this.action, this.onAction});
+  const AQSectionHeader(this.title, {this.sub, this.action, this.onAction});
 
   @override
   Widget build(BuildContext context) {
@@ -1001,7 +1001,7 @@ List<Widget> _developmentSection(BuildContext context) {
   final f = FlowStrings.of(context);
   void go() => context.push('/professionals');
   return [
-    _SectionHeader(
+    AQSectionHeader(
       f.t('home.dev'),
       sub: f.t('home.dev.sub'),
       action: f.t('explore.exploreAll'),
@@ -1036,7 +1036,7 @@ List<Widget> _maintenanceSection(BuildContext context) {
   final f = FlowStrings.of(context);
   void go() => context.push('/professionals');
   return [
-    _SectionHeader(
+    AQSectionHeader(
       f.t('home.maint'),
       sub: f.t('home.maint.sub'),
       action: f.t('explore.exploreAll'),
@@ -1194,7 +1194,7 @@ Widget _brokerLoan(BuildContext context) {
   );
 }
 
-Widget _page(
+Widget aqPage(
   BuildContext context, {
   required Widget hero,
   required List<Widget> children,
@@ -1250,7 +1250,7 @@ class AQHomeScreen extends ConsumerWidget {
     final tx = ref.watch(homeTxProvider);
     final area = ref.watch(homeAreaProvider);
     final async = ref.watch(aqAllPropertiesProvider);
-    return _page(
+    return aqPage(
       context,
       hero: AQHero(
         image: 'assets/location/11_Muscat_skyline_and_mountains.jpg',
@@ -1260,7 +1260,7 @@ class AQHomeScreen extends ConsumerWidget {
       ),
       children: [
         AQSearchEntry(hint: f.t('home.search.hint')),
-        _SectionHeader(
+        AQSectionHeader(
           f.t('home.browse'),
           action: f.t('home.seeAll'),
           onAction: () => context.push('/properties'),
@@ -1353,153 +1353,6 @@ class AQNoticeLine extends StatelessWidget {
 
 // ---------------------------------------------------------------- Explore
 
-class AQExploreScreen extends ConsumerStatefulWidget {
-  const AQExploreScreen({super.key});
-  @override
-  ConsumerState<AQExploreScreen> createState() => _AQExploreScreenState();
-}
-
-class _AQExploreScreenState extends ConsumerState<AQExploreScreen> {
-  final _ctl = PageController();
-  int _i = 0;
-
-  @override
-  void dispose() {
-    _ctl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final f = FlowStrings.of(context);
-    final c = AQColors.of(context);
-    final banners = [
-      (
-        'assets/location/12_Nizwa_Fort_and_mountains_landscape.jpg',
-        'explore.b1.t',
-        'explore.b1.s',
-        () => context.push('/properties'),
-      ),
-      (
-        'assets/location/03_Coastal_view_of_Sur_Oman.jpg',
-        'explore.b2.t',
-        'explore.b2.s',
-        () => context.push('/properties?tx=rent'),
-      ),
-      (
-        'assets/location/10_Muscat_corniche_at_warm_evening.jpg',
-        'explore.b3.t',
-        'explore.b3.s',
-        () => context.push('/professionals'),
-      ),
-    ];
-    return _page(
-      context,
-      hero: AQHero(
-        image: 'assets/location/13_Old_Muscat_architectural_view.jpg',
-        eyebrow: f.t('explore.eyebrow'),
-        title: f.t('explore.hero'),
-        sub: f.t('explore.hero.sub'),
-      ),
-      children: [
-        AQSearchEntry(hint: f.t('home.search.hint')),
-        const SizedBox(height: AQSpacing.x5),
-        SizedBox(
-          height:
-              266 +
-              380 *
-                  (MediaQuery.textScalerOf(context).scale(1) - 1).clamp(
-                    0.0,
-                    1.5,
-                  ),
-          child: PageView.builder(
-            controller: _ctl,
-            itemCount: banners.length,
-            onPageChanged: (i) => setState(() => _i = i),
-            itemBuilder: (context, i) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: AQBanner(
-                image: banners[i].$1,
-                eyebrow: i == 0 ? f.t('explore.eyebrow') : '',
-                title: f.t(banners[i].$2),
-                body: f.t(banners[i].$3),
-                cta: f.t('explore.banner.cta'),
-                onTap: banners[i].$4,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AQSpacing.x3),
-        _Dots(count: banners.length, index: _i),
-        _SectionHeader(
-          f.t('home.props'),
-          sub: f.t('explore.props.sub'),
-          action: f.t('explore.exploreAll'),
-          onAction: () => context.push('/properties'),
-        ),
-        _TileRow([
-          for (final k in PropCategory.values)
-            (
-              k.image,
-              f.t(k.key),
-              () => context.push('/properties?cat=${k.name}'),
-            ),
-        ]),
-        const SizedBox(height: AQSpacing.x5),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: c.surfaceRaised,
-            borderRadius: BorderRadius.circular(AQRadius.large),
-            border: Border.all(color: c.hairline),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AQSpacing.x4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Semantics(
-                  header: true,
-                  child: Text(
-                    f.t('explore.todo'),
-                    style: AQTypography.of(context, AQText.headlineSmall),
-                  ),
-                ),
-                Text(
-                  f.t('explore.todo.sub'),
-                  style: AQTypography.of(context, AQText.bodySmall, soft: true),
-                ),
-                const SizedBox(height: AQSpacing.x3),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _Action(
-                        icon: 'home',
-                        label: f.t('home.buy'),
-                        onTap: () => context.push('/properties?tx=buy'),
-                      ),
-                    ),
-                    const SizedBox(width: AQSpacing.x2),
-                    Expanded(
-                      child: _Action(
-                        icon: 'calendar',
-                        label: f.t('home.rent'),
-                        onTap: () => context.push('/properties?tx=rent'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        ..._developmentSection(context),
-        ..._maintenanceSection(context),
-        _brokerLoan(context),
-      ],
-    );
-  }
-}
-
 class _Action extends StatelessWidget {
   final String icon, label;
   final VoidCallback onTap;
@@ -1556,7 +1409,8 @@ class _Action extends StatelessWidget {
 class AQPropertiesScreen extends ConsumerStatefulWidget {
   final String? category;
   final String? tx;
-  const AQPropertiesScreen({super.key, this.category, this.tx});
+  final String? types;
+  const AQPropertiesScreen({super.key, this.category, this.tx, this.types});
   @override
   ConsumerState<AQPropertiesScreen> createState() => _AQPropertiesScreenState();
 }
@@ -1566,6 +1420,7 @@ class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
     category: PropCategory.values
         .where((c) => c.name == widget.category)
         .firstOrNull,
+    types: {for (final n in (widget.types ?? '').split(',')) ...PropertyType.values.where((t) => t.name == n)},
     tx: switch (widget.tx) {
       'buy' => TransactionType.buy,
       'rent' => TransactionType.rent,

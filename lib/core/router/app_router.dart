@@ -9,6 +9,7 @@ import '../../features/profile/profile_screen.dart';
 import '../../features/property/property_detail_screen.dart';
 import '../../features/saved/saved_screen.dart';
 import '../../features/search/aq_map.dart';
+import '../../features/search/aq_property_types.dart';
 import '../../features/search/aq_search.dart';
 import '../../features/entry/screens/onboarding_entry_screen.dart';
 import '../../features/entry/models/signup_purpose.dart';
@@ -85,7 +86,12 @@ final appRouter = GoRouter(
     GoRoute(path: '/viewings/:id/cancelled', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingCancelledScreen(id: state.pathParameters['id']!))),
     GoRoute(path: '/viewings/:id/completed', pageBuilder: (context, state) => AQRoute.hero(key: state.pageKey, child: ViewingCompletedScreen(id: state.pathParameters['id']!))),
     GoRoute(path: '/viewings/:id/review', pageBuilder: (context, state) => AQRoute.sheet(key: state.pageKey, child: ViewingReviewEntryScreen(id: state.pathParameters['id']!, rating: int.tryParse(state.uri.queryParameters['rating'] ?? '')))),
-    GoRoute(path: '/properties', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQPropertiesScreen(category: state.uri.queryParameters['cat'], tx: state.uri.queryParameters['tx']))),
+    GoRoute(path: '/properties', pageBuilder: (context, state) {
+      final q = state.uri.queryParameters;
+      final plain = q['cat'] == null && q['tx'] == null && q['types'] == null;
+      return AQRoute.forward(key: state.pageKey, child: plain ? const AQPropertyTypesScreen() : AQPropertiesScreen(category: state.uri.queryParameters['cat'], tx: state.uri.queryParameters['tx'], types: state.uri.queryParameters['types']));
+    }),
+    GoRoute(path: '/properties/all', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQPropertiesScreen(category: state.uri.queryParameters['cat'], tx: state.uri.queryParameters['tx'], types: state.uri.queryParameters['types']))),
     GoRoute(path: '/map', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQMapScreen(tx: state.uri.queryParameters['tx']))),
     GoRoute(path: '/calculators', builder: (context, state) => const CalculatorsListScreen()),
     GoRoute(

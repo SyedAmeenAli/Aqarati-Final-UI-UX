@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:aqarati_app/features/workspace/aq_explore.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
 
 Widget _app(Widget child, {double scale = 1}) => ProviderScope(

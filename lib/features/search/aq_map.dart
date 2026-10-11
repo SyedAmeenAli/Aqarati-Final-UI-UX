@@ -270,7 +270,7 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
                   AQIconButton(
                     icon: 'chevron-left',
                     semanticsLabel: f.t('common.back'),
-                    onPressed: () => aqBack(context, '/properties'),
+                    onPressed: () => aqBack(context, '/properties/all'),
                   ),
                   Expanded(
                     child: Text(
@@ -283,7 +283,7 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
                   AQViewToggle(
                     map: true,
                     onMap: () {},
-                    onList: () => aqBack(context, '/properties'),
+                    onList: () => aqBack(context, '/properties/all'),
                   ),
                 ],
               ),
