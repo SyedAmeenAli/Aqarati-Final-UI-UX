@@ -11,6 +11,7 @@ import '../../core/domain/account_models.dart';
 import '../../core/localization/entry_strings.dart';
 import '../../core/localization/flow_strings.dart';
 import '../../data/api/account_api.dart';
+import '../devbuild/db_models.dart' show proTypeOfPurpose;
 import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
 import 'aq_explore.dart';
@@ -125,6 +126,7 @@ List<Widget> _sessionSections(BuildContext context, MeSession m) {
       AQReviewSection(title: f.t('home.workspace'), children: [
         Padding(padding: const EdgeInsets.only(top: AQSpacing.x2, bottom: AQSpacing.x1), child: Text(f.t('ws.t.${m.purpose!.name}'), style: AQTypography.of(context, AQText.titleSmall))),
         for (final k in workspaceCaps(m.purpose!)) Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(f.t(k), style: AQTypography.of(context, AQText.bodySmall, soft: true))),
+        if (proTypeOfPurpose(m.purpose) != null) Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: AQPrimaryButton(label: f.t('db.ws.open'), trailingChevron: false, onPressed: () => context.push('/app/account/workspace'))),
       ]),
   ];
 }
