@@ -110,12 +110,16 @@ class _DbHomeScreenState extends ConsumerState<DbHomeScreen> {
                                   AQIcon(t.icon, size: 20, color: c.accent),
                                   const SizedBox(height: 4),
                                   Text(
-                                    f.t('${t.key}.short'),
+                                    f.t('${t.key}.tile'),
                                     textAlign: TextAlign.center,
-                                    style: AQTypography.of(
-                                      context,
-                                      AQText.labelSmall,
-                                    ),
+                                    style:
+                                        AQTypography.of(
+                                          context,
+                                          AQText.bodySmall,
+                                        ).copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0,
+                                        ),
                                   ),
                                   const SizedBox(height: 4),
                                   AQIcon(
@@ -625,7 +629,7 @@ class _DbResultsScreenState extends ConsumerState<DbResultsScreen> {
             ),
             for (final t in ProType.values)
               (
-                f.t('${t.key}.short'),
+                f.t('${t.key}.tile'),
                 type == t,
                 () => _set(
                   _q.copyWith(

@@ -3,6 +3,8 @@ import 'package:aqarati_app/features/entry/models/signup_purpose.dart';
 import 'package:aqarati_app/core/domain/account_models.dart';
 import 'package:aqarati_app/data/models/enums.dart';
 import 'package:aqarati_app/features/devbuild/db_models.dart';
+import 'package:aqarati_app/features/devbuild/db_projects.dart'
+    show dbNewIdempotencyKey;
 import 'package:aqarati_app/features/devbuild/db_repository.dart';
 import 'package:aqarati_app/features/devbuild/db_routes.dart';
 import 'package:flutter/material.dart';
@@ -159,6 +161,53 @@ void main() {
       final land = d.toPayload();
       expect(land['land_sqm'], 400);
       expect(land.containsKey('bedrooms'), isFalse);
+    });
+
+    test(
+      'a draft with no location has an empty label, never a stray comma',
+      () {
+        final p = DbProject(
+          id: 'x',
+          orgId: 'o',
+          name: 'Draft',
+          propertyType: PropertyType.villa,
+          governorate: '',
+          wilayat: '',
+          status: ProjectStatus.draft,
+          rawStatus: 'draft',
+          updatedAt: DateTime(2026, 1, 1),
+        );
+        expect(p.locationLabel, isEmpty);
+        final q = DbProject(
+          id: 'y',
+          orgId: 'o',
+          name: 'Placed',
+          propertyType: PropertyType.villa,
+          governorate: 'Muscat',
+          wilayat: 'As Seeb',
+          area: 'Al Mouj',
+          status: ProjectStatus.draft,
+          rawStatus: 'draft',
+          updatedAt: DateTime(2026, 1, 1),
+        );
+        expect(q.locationLabel, 'Al Mouj, As Seeb, Muscat');
+      },
+    );
+
+    test('coordinates must be a complete pair inside Oman', () {
+      final d = ProjectDraft(governorate: 'Muscat', wilayat: 'As Seeb');
+      expect(d.validate(ProjectStep.location), isEmpty);
+      d.latitude = 23.6;
+      expect(d.validate(ProjectStep.location)['coords'], 'db.err.coordsPair');
+      d.longitude = 58.3;
+      expect(d.validate(ProjectStep.location), isEmpty);
+      d.latitude = 40;
+      expect(d.validate(ProjectStep.location)['coords'], 'db.err.coordsRange');
+    });
+
+    test('idempotency keys are unique and never throw', () {
+      final keys = {for (var i = 0; i < 200; i++) dbNewIdempotencyKey()};
+      expect(keys.length, 200);
     });
 
     test('every governorate has wilayats and an Arabic name', () {

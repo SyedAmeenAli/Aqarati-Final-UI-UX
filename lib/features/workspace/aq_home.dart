@@ -1011,22 +1011,22 @@ List<Widget> _developmentSection(BuildContext context) {
       (
         'assets/businesses/b1/05_Contemporary_architectural_facad.jpg',
         f.t('pro.developers'),
-        () => context.push('/professionals?cat=propertyDevelopment'),
+        () => context.push('/app/explore/build/results?cat=developer'),
       ),
       (
         'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg',
         f.t('pro.construction'),
-        () => context.push('/professionals?cat=construction'),
+        () => context.push('/app/explore/build/results?cat=construction'),
       ),
       (
         'assets/businesses/b1/08_Doubleheight_atrium_architectur.jpg',
         f.t('pro.architecture'),
-        () => context.push('/professionals?cat=architecture'),
+        () => context.push('/app/explore/build/results?cat=architecture'),
       ),
       (
         'assets/businesses/b3/06_Styled_bedroom_interior_photography.jpg',
         f.t('pro.interior'),
-        () => context.push('/professionals?cat=interiorDesign'),
+        () => context.push('/app/explore/build/results?cat=interiorExterior'),
       ),
     ]),
   ];

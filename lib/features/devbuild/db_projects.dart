@@ -21,7 +21,7 @@ import 'db_workspace.dart';
 
 /// One idempotency key per submission attempt. Reused if the same attempt is retried.
 String dbNewIdempotencyKey() =>
-    'ik-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(1 << 32)}';
+    'ik-${DateTime.now().microsecondsSinceEpoch}-${Random().nextInt(0x7fffffff)}';
 
 // ----------------------------------------------------- #69 / #76 My Projects
 
@@ -126,6 +126,7 @@ class _DbMyProjectsScreenState extends ConsumerState<DbMyProjectsScreen> {
             ),
             const SizedBox(height: AQSpacing.x3),
             DbPillRow(
+              scroll: true,
               pills: [
                 (
                   f.t('flt.all'),
@@ -184,9 +185,7 @@ class _DbMyProjectsScreenState extends ConsumerState<DbMyProjectsScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: AQSpacing.x3),
                         child: Text(
-                          f.t('db.projectsN', {
-                            'n': VFmt.n(context, shown.length),
-                          }),
+                          dbProjectsCount(context, f, shown.length),
                           style: AQTypography.of(context, AQText.titleSmall),
                         ),
                       ),
@@ -304,8 +303,8 @@ class _DbProjectStatusScreenState extends ConsumerState<DbProjectStatusScreen> {
       _busy = true;
       _error = null;
     });
-    _key ??= dbNewIdempotencyKey();
     try {
+      _key ??= dbNewIdempotencyKey();
       await ref
           .read(devBuildRepositoryProvider)
           .resubmitProject(p.id, idempotencyKey: _key!);
@@ -383,7 +382,7 @@ class _DbProjectStatusScreenState extends ConsumerState<DbProjectStatusScreen> {
             final fb = p.reviewerFeedback;
             return AQViewingScaffold(
               title: VFmt.iso(p.name),
-              subtitle: p.locationLabel,
+              subtitle: p.locationLabel.isEmpty ? null : p.locationLabel,
               backLabel: f.t('common.back'),
               onBack: back,
               bottom: p.status.canEdit || p.status.canResubmit
@@ -468,11 +467,11 @@ class _DbProjectStatusScreenState extends ConsumerState<DbProjectStatusScreen> {
                   dbTypeLabel(f, p.propertyType),
                 ),
                 if (p.bedrooms != null)
-                  _row(context, f.t('disc.beds'), VFmt.n(context, p.bedrooms!)),
+                  _row(context, f.t('db.f.beds'), VFmt.n(context, p.bedrooms!)),
                 if (p.bathrooms != null)
                   _row(
                     context,
-                    f.t('home.baths'),
+                    f.t('db.f.baths'),
                     VFmt.n(context, p.bathrooms!),
                   ),
                 if (p.areaSqm != null)
@@ -487,7 +486,8 @@ class _DbProjectStatusScreenState extends ConsumerState<DbProjectStatusScreen> {
                     f.t('db.fact.land'),
                     '${VFmt.n(context, p.landSqm!.round())} m²',
                   ),
-                _row(context, f.t('db.location'), p.locationLabel),
+                if (p.locationLabel.isNotEmpty)
+                  _row(context, f.t('db.location'), p.locationLabel),
                 if (p.status == ProjectStatus.changesRequested ||
                     p.status == ProjectStatus.underReview) ...[
                   const SizedBox(height: AQSpacing.x5),
@@ -622,14 +622,15 @@ class DbSubmittedScreen extends ConsumerWidget {
                         VFmt.iso(p.name),
                         style: AQTypography.of(context, AQText.headlineSmall),
                       ),
-                      Text(
-                        p.locationLabel,
-                        style: AQTypography.of(
-                          context,
-                          AQText.bodySmall,
-                          soft: true,
+                      if (p.locationLabel.isNotEmpty)
+                        Text(
+                          p.locationLabel,
+                          style: AQTypography.of(
+                            context,
+                            AQText.bodySmall,
+                            soft: true,
+                          ),
                         ),
-                      ),
                       const SizedBox(height: AQSpacing.x3),
                       DbStatusChip(status: p.status, rawStatus: p.rawStatus),
                     ],

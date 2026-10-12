@@ -65,7 +65,21 @@ void _run(BuildContext context, WidgetRef ref, String term) {
     context.push('/search?q=${Uri.encodeQueryComponent(term.trim())}');
   } else {
     final cat = _categoryOf(term);
-    context.push(cat == null ? '/professionals?q=${Uri.encodeQueryComponent(term.trim())}' : '/professionals?cat=$cat');
+    // The four Development & Building categories have their own directory; brokers and maintenance stay here.
+    final build = switch (cat) {
+      'propertyDevelopment' => 'developer',
+      'construction' => 'construction',
+      'architecture' => 'architecture',
+      'interiorDesign' || 'exteriorDesign' => 'interiorExterior',
+      _ => null,
+    };
+    context.push(
+      build != null
+          ? '/app/explore/build/results?cat=$build'
+          : cat == null
+              ? '/professionals?q=${Uri.encodeQueryComponent(term.trim())}'
+              : '/professionals?cat=$cat',
+    );
   }
 }
 

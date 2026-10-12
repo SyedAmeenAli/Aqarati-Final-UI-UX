@@ -200,8 +200,8 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
       _busy = true;
       _failure = null;
     });
-    _key ??= dbNewIdempotencyKey();
     try {
+      _key ??= dbNewIdempotencyKey();
       final saved = await ref
           .read(devBuildRepositoryProvider)
           .saveProject(_draft, submit: submit, idempotencyKey: _key!);
@@ -781,6 +781,7 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
         onBack: _back,
         bottom: ready
             ? AQBottomActionBar(
+                stack: last,
                 primary: last
                     ? AQPrimaryButton(
                         label: f.t(submitKey),
@@ -790,6 +791,7 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
                       )
                     : AQPrimaryButton(
                         label: f.t('db.wiz.next'),
+                        trailingChevron: false,
                         onPressed: _busy ? null : _next,
                       ),
                 secondary: AQBarSecondaryButton(

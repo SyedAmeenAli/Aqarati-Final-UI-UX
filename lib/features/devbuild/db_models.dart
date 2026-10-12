@@ -205,7 +205,7 @@ class DbProject {
   });
 
   String get locationLabel =>
-      [if (area.isNotEmpty) area, wilayat, governorate].join(', ');
+      [area, wilayat, governorate].where((e) => e.trim().isNotEmpty).join(', ');
 
   DbProject copyWith({
     ProjectStatus? status,

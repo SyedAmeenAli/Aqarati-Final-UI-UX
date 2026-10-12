@@ -118,6 +118,7 @@ const Map<String, (String, String)> dbStrings = {
     'لا توجد شركات موثّقة مطابقة. جرّب فئة أو موقعاً أو بحثاً آخر.',
   ),
   'db.loadMore': ('Show more', 'عرض المزيد'),
+  'db.projects1': ('1 project', 'مشروع واحد'),
   'db.projectsN': ('{n} projects', '{n} مشروع'),
   'db.map.label': ('Map showing {n} locations', 'خريطة تعرض {n} موقعاً'),
   'db.map.none': (
@@ -172,6 +173,10 @@ const Map<String, (String, String)> dbStrings = {
   'db.contact.call': ('Call', 'اتصال'),
   'db.contact.whatsapp': ('WhatsApp', 'واتساب'),
   'db.contact.copy': ('Copy number', 'نسخ الرقم'),
+  'db.contact.copyFailed': (
+    "Couldn't copy the number. Select it and copy it manually.",
+    'تعذّر نسخ الرقم. حدّده وانسخه يدوياً.',
+  ),
   'db.contact.copied': ('Number copied', 'تم نسخ الرقم'),
   'db.notFound.t': ('Not found', 'غير موجود'),
   'db.notFound.pro': (
@@ -637,7 +642,10 @@ const Map<String, (String, String)> dbStrings = {
     'هذا الارتباط لم يعد متاحاً.',
   ),
   'db.eng.t.you': ('Your confirmation', 'تأكيدك'),
-  'db.eng.t.review': ('Review opens after both confirm', 'يُفتح التقييم بعد تأكيد الطرفين'),
+  'db.eng.t.review': (
+    'Review opens after both confirm',
+    'يُفتح التقييم بعد تأكيد الطرفين',
+  ),
   'db.eng.done': ('Done', 'تم'),
   'db.eng.pending': ('Pending', 'قيد الانتظار'),
   'db.eng.deadline': ('Confirm by {d}.', 'أكّد قبل {d}.'),
@@ -657,7 +665,10 @@ const Map<String, (String, String)> dbStrings = {
   'db.eng.s.awaitingClient': ('Waiting for the client', 'بانتظار العميل'),
   'db.eng.s.confirmedByBoth': ('Confirmed by both', 'مؤكد من الطرفين'),
   'db.eng.s.expired': ('Confirmation window ended', 'انتهت مدة التأكيد'),
-  'db.eng.s.awaitingMyConfirmation.x': ('Confirm that this work was completed. The client also has to confirm before a review is possible.', 'أكّد أن هذا العمل قد اكتمل. يجب أن يؤكد العميل أيضاً قبل إمكانية التقييم.'),
+  'db.eng.s.awaitingMyConfirmation.x': (
+    'Confirm that this work was completed. The client also has to confirm before a review is possible.',
+    'أكّد أن هذا العمل قد اكتمل. يجب أن يؤكد العميل أيضاً قبل إمكانية التقييم.',
+  ),
   'db.eng.s.awaitingClient.x': (
     'You confirmed. The client has not confirmed yet.',
     'أكّدت أنت. لم يؤكد العميل بعد.',

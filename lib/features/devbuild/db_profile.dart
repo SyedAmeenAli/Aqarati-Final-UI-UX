@@ -91,18 +91,32 @@ Future<void> showDbContactSheet(
                 excludeSemantics: true,
                 child: AQPressable(
                   onTap: () async {
-                    await Clipboard.setData(ClipboardData(text: number));
-                    if (repo.caps.leadEvents) {
+                    var copied = true;
+                    try {
+                      await Clipboard.setData(ClipboardData(text: number));
+                    } catch (_) {
+                      copied = false;
+                    }
+                    if (copied && repo.caps.leadEvents) {
                       try {
                         await repo.logContactEvent(pro.id, ch);
                       } catch (_) {}
                     }
                     if (!s.mounted) return;
                     Navigator.of(s).pop();
-                    if (context.mounted)
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(f.t('db.contact.copied'))),
+                        SnackBar(
+                          content: Text(
+                            f.t(
+                              copied
+                                  ? 'db.contact.copied'
+                                  : 'db.contact.copyFailed',
+                            ),
+                          ),
+                        ),
                       );
+                    }
                   },
                   child: Container(
                     constraints: const BoxConstraints(
@@ -647,14 +661,14 @@ class _DbProfileScreenState extends ConsumerState<DbProfileScreen> {
             style: AQTypography.of(context, AQText.headlineSmall),
           ),
           const SizedBox(height: AQSpacing.x2),
-          DbPillRow(
-            pills: [
+          DbTagRow(
+            tags: [
               if (p.serviceType == InteriorExteriorServiceType.interior ||
                   p.serviceType == InteriorExteriorServiceType.both)
-                (f.t('service.interior'), true, () {}),
+                f.t('service.interior'),
               if (p.serviceType == InteriorExteriorServiceType.exterior ||
                   p.serviceType == InteriorExteriorServiceType.both)
-                (f.t('service.exterior'), true, () {}),
+                f.t('service.exterior'),
             ],
           ),
         ],
@@ -958,7 +972,7 @@ class _DbProjectsScreenState extends ConsumerState<DbProjectsScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AQSpacing.x3),
                     child: Text(
-                      f.t('db.projectsN', {'n': VFmt.n(context, shown.length)}),
+                      dbProjectsCount(context, f, shown.length),
                       style: AQTypography.of(context, AQText.titleSmall),
                     ),
                   ),
@@ -1071,7 +1085,7 @@ class DbProjectDetailScreen extends ConsumerWidget {
               c,
               'bed',
               VFmt.n(context, p.bedrooms!),
-              f.t('disc.beds'),
+              f.t('db.f.beds'),
             ),
           if (p.bathrooms != null)
             _fact(
@@ -1079,7 +1093,7 @@ class DbProjectDetailScreen extends ConsumerWidget {
               c,
               'bath',
               VFmt.n(context, p.bathrooms!),
-              f.t('home.baths'),
+              f.t('db.f.baths'),
             ),
           if (p.areaSqm != null)
             _fact(

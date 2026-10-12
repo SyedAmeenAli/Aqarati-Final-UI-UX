@@ -203,7 +203,7 @@ class DemoDevBuildRepository implements DevBuildRepository {
       latitude: 23.6788,
       longitude: 57.8870,
       mediaUrls: [
-        'assets/properties/p4/01_Residential_townhouse_row_Muscat.jpg',
+        'assets/properties/p4/01_Contemporary_family_villa_comple.jpg',
       ],
       rating: 4.4,
       reviewCount: 18,
@@ -430,7 +430,8 @@ class DemoDevBuildRepository implements DevBuildRepository {
       id: 'me',
       name: s.businessName ?? '',
       type: type,
-      locationLabel: 'Oman',
+      locationLabel: '',
+      governorate: '',
       verified: true,
     );
   }

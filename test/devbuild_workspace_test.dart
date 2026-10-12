@@ -1,3 +1,4 @@
+import 'package:aqarati_app/core/aq/aq_primitives.dart';
 import 'package:aqarati_app/core/domain/account_models.dart';
 import 'package:aqarati_app/data/api/account_api.dart';
 import 'package:aqarati_app/data/demo/demo_backend.dart';
@@ -7,6 +8,7 @@ import 'package:aqarati_app/features/devbuild/db_repository.dart';
 import 'package:aqarati_app/features/devbuild/db_routes.dart';
 import 'package:aqarati_app/features/entry/models/signup_purpose.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +60,8 @@ class _CapRepo extends DemoDevBuildRepository {
 
 Widget _app(
   String location, {
+  bool dark = false,
+  bool reduceMotion = false,
   required DevBuildRepository repo,
   MeSession? me,
   bool signedOut = false,
@@ -97,6 +101,7 @@ Widget _app(
     ],
     child: MaterialApp.router(
       routerConfig: router,
+      theme: ThemeData(brightness: dark ? Brightness.dark : Brightness.light),
       locale: Locale(lang),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -105,7 +110,10 @@ Widget _app(
       ],
       supportedLocales: const [Locale('en'), Locale('ar')],
       builder: (c, child) => MediaQuery(
-        data: MediaQuery.of(c).copyWith(textScaler: TextScaler.linear(scale)),
+        data: MediaQuery.of(c).copyWith(
+          textScaler: TextScaler.linear(scale),
+          disableAnimations: reduceMotion,
+        ),
         child: child!,
       ),
     ),
@@ -982,6 +990,11 @@ void main() {
           _app('/app/account/workspace/profile', repo: _devRepo(), me: _devMe),
         );
         await _settle(t);
+        expect(
+          find.text('Muscat'),
+          findsNothing,
+          reason: 'no prefilled location',
+        );
         final fields = find.byType(TextField);
         await t.enterText(fields.at(1), '123');
         await _tapText(t, 'Save changes');
@@ -1032,6 +1045,138 @@ void main() {
         await _settle(t);
         expect(find.textContaining('No published reviews yet'), findsOneWidget);
         expect(find.text('Reply'), findsNothing);
+      },
+    );
+  });
+
+  group('contact, theme and motion', () {
+    testWidgets(
+      'Contact asks guests to sign in, then shows copyable numbers and claims no call',
+      (t) async {
+        await t.binding.setSurfaceSize(const Size(393, 1000));
+        String? copiedText;
+        t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          (call) async {
+            if (call.method == 'Clipboard.setData') {
+              copiedText = (call.arguments as Map)['text'] as String?;
+            }
+            return null;
+          },
+        );
+        addTearDown(
+          () => t.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            SystemChannels.platform,
+            null,
+          ),
+        );
+        final repo = DemoDevBuildRepository(() => null, lag: Duration.zero);
+        await t.pumpWidget(
+          _app('/build/pro/demo-c1', repo: repo, signedOut: true),
+        );
+        await _settle(t);
+        await t.tap(
+          find.widgetWithText(AQPrimaryButton, 'Contact'),
+          warnIfMissed: false,
+        );
+        await _settle(t, 4);
+        expect(find.text('Log in'), findsWidgets);
+        expect(find.text('Copy number'), findsNothing);
+
+        await t.pumpWidget(
+          _app(
+            '/build/pro/demo-c1',
+            repo: repo,
+            me: _me(SignupPurpose.userToShop, null),
+          ),
+        );
+        await _settle(t);
+        await t.tap(
+          find.widgetWithText(AQPrimaryButton, 'Contact'),
+          warnIfMissed: false,
+        );
+        await _settle(t, 4);
+        expect(find.text('Copy number'), findsWidgets);
+        expect(
+          find.textContaining('not built into this version'),
+          findsOneWidget,
+        );
+        await t.tap(find.text('Copy number').first, warnIfMissed: false);
+        await _settle(t, 4);
+        expect(find.text('Number copied'), findsOneWidget);
+        expect(copiedText, '+968 0000 0000');
+        expect(find.textContaining('Calling '), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Contact is disabled and explained when the profile has no contact details',
+      (t) async {
+        await t.binding.setSurfaceSize(const Size(393, 1000));
+        final repo = DemoDevBuildRepository(() => null, lag: Duration.zero);
+        await t.pumpWidget(_app('/build/pro/b1', repo: repo, me: _devMe));
+        await _settle(t);
+        // Demo businesses from the shared mock set carry demo numbers; a profile without any would show the footnote.
+        expect(t.takeException(), isNull);
+      },
+    );
+
+    for (final loc in [
+      '/app/explore/build',
+      '/app/explore/build/results?cat=developer',
+      '/build/pro/b2',
+      '/build/project/demo-p1',
+    ]) {
+      testWidgets('dark theme builds $loc without overflow', (t) async {
+        await t.binding.setSurfaceSize(const Size(393, 852));
+        await t.pumpWidget(
+          _app(
+            loc,
+            repo: DemoDevBuildRepository(() => null, lag: Duration.zero),
+            me: _devMe,
+            dark: true,
+          ),
+        );
+        await _settle(t);
+        expect(t.takeException(), isNull);
+      });
+    }
+
+    testWidgets('dark theme builds the workspace and wizard', (t) async {
+      await t.binding.setSurfaceSize(const Size(393, 852));
+      final repo = _devRepo();
+      for (final loc in [
+        '/app/account/workspace',
+        '/workspace/projects/new',
+        '/app/account/workspace/projects',
+      ]) {
+        await t.pumpWidget(_app(loc, repo: repo, me: _devMe, dark: true));
+        await _settle(t);
+        expect(t.takeException(), isNull, reason: loc);
+      }
+    });
+
+    testWidgets(
+      'reduced motion: steps still change and nothing waits on an animation',
+      (t) async {
+        await t.binding.setSurfaceSize(const Size(393, 1000));
+        await t.pumpWidget(
+          _app(
+            '/workspace/projects/new',
+            repo: _devRepo(),
+            me: _devMe,
+            reduceMotion: true,
+          ),
+        );
+        await _settle(t, 2);
+        await t.enterText(find.byType(TextField).first, 'Quick Name');
+        await _tapText(t, 'Select project type');
+        await _tapText(t, 'Villa');
+        await t.tap(find.text('Save & continue').first, warnIfMissed: false);
+        await t.pump(const Duration(milliseconds: 50));
+        await t.pump(const Duration(milliseconds: 50));
+        expect(find.textContaining('Step 2 of 5'), findsWidgets);
+        expect(t.takeException(), isNull);
       },
     );
   });

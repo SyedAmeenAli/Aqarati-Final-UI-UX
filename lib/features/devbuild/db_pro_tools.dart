@@ -1087,28 +1087,63 @@ class _Timeline extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
     final f = FlowStrings.of(context);
-    final youDone = state == EngagementState.awaitingClient || state == EngagementState.confirmedByBoth;
+    final youDone =
+        state == EngagementState.awaitingClient ||
+        state == EngagementState.confirmedByBoth;
     final bothDone = state == EngagementState.confirmedByBoth;
     Widget node(bool done, String label) => Expanded(
-          child: Semantics(
-            label: '$label: ${f.t(done ? 'db.eng.done' : 'db.eng.pending')}',
-            excludeSemantics: true,
-            child: Column(children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: done ? c.success : Colors.transparent, border: Border.all(color: done ? c.success : c.hairline, width: 1.5)),
-                child: done ? Center(child: AQIcon('check', size: 16, color: c.isDark ? c.background : Colors.white)) : null,
+      child: Semantics(
+        label: '$label: ${f.t(done ? 'db.eng.done' : 'db.eng.pending')}',
+        excludeSemantics: true,
+        child: Column(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: done ? c.success : Colors.transparent,
+                border: Border.all(
+                  color: done ? c.success : c.hairline,
+                  width: 1.5,
+                ),
               ),
-              const SizedBox(height: AQSpacing.x2),
-              Text(label, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.labelSmall, soft: !done)),
-            ]),
+              child: done
+                  ? Center(
+                      child: AQIcon(
+                        'check',
+                        size: 16,
+                        color: c.isDark ? c.background : Colors.white,
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(height: AQSpacing.x2),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AQTypography.of(context, AQText.labelSmall, soft: !done),
+            ),
+          ],
+        ),
+      ),
+    );
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        node(youDone, f.t('db.eng.t.you')),
+        Padding(
+          padding: const EdgeInsets.only(top: 15),
+          child: SizedBox(
+            width: 40,
+            child: Divider(
+              color: youDone ? c.success : c.hairline,
+              thickness: 2,
+            ),
           ),
-        );
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      node(youDone, f.t('db.eng.t.you')),
-      Padding(padding: const EdgeInsets.only(top: 15), child: SizedBox(width: 40, child: Divider(color: youDone ? c.success : c.hairline, thickness: 2))),
-      node(bothDone, f.t('db.eng.t.review')),
-    ]);
+        ),
+        node(bothDone, f.t('db.eng.t.review')),
+      ],
+    );
   }
 }

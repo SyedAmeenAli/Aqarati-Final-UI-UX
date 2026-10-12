@@ -413,9 +413,7 @@ class DbProCard extends ConsumerWidget {
                           if (projects != null && projects.isNotEmpty) ...[
                             const SizedBox(height: AQSpacing.x1),
                             Text(
-                              f.t('db.projectsN', {
-                                'n': VFmt.n(context, projects.length),
-                              }),
+                              dbProjectsCount(context, f, projects.length),
                               style: AQTypography.of(
                                 context,
                                 AQText.labelMedium,
@@ -480,7 +478,7 @@ class DbProjectCard extends StatelessWidget {
     return Semantics(
       button: onTap != null,
       label:
-          '${p.name}, ${p.locationLabel}, $facts${showStatus ? ', ${f.t(p.status.key)}' : ''}',
+          '${p.name}, ${p.locationLabel.isEmpty ? '' : '${p.locationLabel}, '}$facts${showStatus ? ', ${f.t(p.status.key)}' : ''}',
       excludeSemantics: true,
       child: AQPressable(
         onTap: onTap,
@@ -514,23 +512,25 @@ class DbProjectCard extends StatelessWidget {
                       VFmt.iso(p.name),
                       style: AQTypography.of(context, AQText.headlineSmall),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        AQIcon('pin', size: 14, color: c.accent),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            VFmt.iso(p.locationLabel),
-                            style: AQTypography.of(
-                              context,
-                              AQText.bodySmall,
-                              soft: true,
+                    if (p.locationLabel.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          AQIcon('pin', size: 14, color: c.accent),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              VFmt.iso(p.locationLabel),
+                              style: AQTypography.of(
+                                context,
+                                AQText.bodySmall,
+                                soft: true,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 2),
                     Text(
                       facts,
@@ -940,3 +940,36 @@ class DbStatusBanner extends StatelessWidget {
     );
   }
 }
+
+/// Read-only labels (services offered). Deliberately not tappable, and drawn differently from the pill choices.
+class DbTagRow extends StatelessWidget {
+  final List<String> tags;
+  const DbTagRow({super.key, required this.tags});
+  @override
+  Widget build(BuildContext context) {
+    final c = AQColors.of(context);
+    return Wrap(
+      spacing: AQSpacing.x2,
+      runSpacing: AQSpacing.x2,
+      children: [
+        for (final t in tags)
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AQSpacing.x3,
+              vertical: 6,
+            ),
+            decoration: BoxDecoration(
+              color: c.surfaceSelected,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(t, style: AQTypography.of(context, AQText.labelMedium)),
+          ),
+      ],
+    );
+  }
+}
+
+/// "1 project" / "N projects".
+String dbProjectsCount(BuildContext context, FlowStrings f, int n) => n == 1
+    ? f.t('db.projects1')
+    : f.t('db.projectsN', {'n': VFmt.n(context, n)});
