@@ -87,6 +87,7 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
 
   Widget _card(BuildContext context, FlowStrings f, PropCategory k, double w) {
     final c = AQColors.of(context);
+    final large = aqLargeText(context);
     final on = k == _sel;
     return SizedBox(
       width: w,
@@ -116,18 +117,18 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   AspectRatio(
-                    aspectRatio: 1.05,
+                    aspectRatio: 1.45,
                     child: ExcludeSemantics(
                       child: aqImg(k.image, cacheWidth: 380),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(AQSpacing.x2),
+                    padding: const EdgeInsets.all(AQSpacing.x3),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AQIcon(_catIcon(k), size: 20, color: c.accent),
-                        const SizedBox(height: 4),
+                        AQIcon(_catIcon(k), size: 22, color: c.accent),
+                        const SizedBox(height: AQSpacing.x1),
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: AlignmentDirectional.centerStart,
@@ -137,14 +138,17 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
                             style: AQTypography.of(context, AQText.titleSmall),
                           ),
                         ),
-                        Text(
-                          f.t('pt.c.${k.name}'),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: AQTypography.of(
-                            context,
-                            AQText.labelSmall,
-                            soft: true,
+                        ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: large ? 0 : 54),
+                          child: Text(
+                            f.t('pt.c.${k.name}'),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: AQTypography.of(
+                              context,
+                              AQText.bodySmall,
+                              soft: true,
+                            ),
                           ),
                         ),
                         const SizedBox(height: AQSpacing.x2),
@@ -261,7 +265,8 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
           LayoutBuilder(
             builder: (context, box) {
               const gap = AQSpacing.x2;
-              final cols = large ? 2 : 4;
+              // Four cards in one row leave ~80 px each; two by two gives every description room to read.
+              const cols = 2;
               final w = (box.maxWidth - gap * (cols - 1)) / cols;
               return Wrap(
                 spacing: gap,

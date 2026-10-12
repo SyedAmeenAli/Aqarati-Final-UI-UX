@@ -2,10 +2,6 @@ import 'package:flutter/widgets.dart' show ValueKey;
 import 'package:go_router/go_router.dart';
 import '../../features/business/aq_business_profile.dart';
 import '../../features/business/aq_professionals.dart';
-import '../../features/explore/explore_screen.dart';
-import '../../features/home/home_screen.dart';
-import '../../features/messages/messages_screen.dart';
-import '../../features/profile/profile_screen.dart';
 import '../../features/property/property_detail_screen.dart';
 import '../../features/saved/saved_screen.dart';
 import '../../features/search/aq_map.dart';
@@ -34,7 +30,6 @@ import '../../features/calculators/calculators_list_screen.dart';
 import '../aq/aq_scene.dart' show AQRoute;
 import '../../features/workspace/aq_app_shell.dart';
 import '../../features/devbuild/db_routes.dart';
-import 'app_shell.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/entry',
@@ -121,15 +116,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/business/:id',
       builder: (context, state) => AQBusinessProfileScreen(businessId: state.pathParameters['id']!),
-    ),
-    ShellRoute(
-      builder: (context, state, child) => AppShell(child: child),
-      routes: [
-        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-        GoRoute(path: '/explore', builder: (context, state) => const ExploreScreen()),
-        GoRoute(path: '/messages', builder: (context, state) => const MessagesScreen()),
-        GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
-      ],
     ),
   ],
 );

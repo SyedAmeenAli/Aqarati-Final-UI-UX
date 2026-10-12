@@ -126,6 +126,7 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
     final f = FlowStrings.of(context);
     final r = await showAQSheet<String>(
       context,
+      useRootNavigator: true,
       builder: (s) => Padding(
         padding: const EdgeInsets.fromLTRB(
           AQSpacing.gutter,
@@ -176,6 +177,8 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
   }
 
   Future<void> _save({required bool submit}) async {
+    // One request at a time: a second tap while the first is in flight must not send a second write.
+    if (_busy) return;
     if (submit) {
       final all = _draft.validateAll();
       if (all.isNotEmpty) {
@@ -213,6 +216,8 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
           '/workspace/projects/${saved.id}/submitted?r=${submit ? 'submitted' : 'draft'}',
         );
     } on ProjectValidationException catch (e) {
+      // The server refused the content, so the next attempt is a new request, not a retry.
+      _key = null;
       if (mounted) {
         setState(() {
           _errors = e.fields;
@@ -781,7 +786,8 @@ class _DbWizardScreenState extends ConsumerState<DbWizardScreen> {
         onBack: _back,
         bottom: ready
             ? AQBottomActionBar(
-                stack: last,
+                // "Save & continue" wraps to two lines beside Back on the narrowest phones.
+                stack: last || MediaQuery.sizeOf(context).width < 380,
                 primary: last
                     ? AQPrimaryButton(
                         label: f.t(submitKey),

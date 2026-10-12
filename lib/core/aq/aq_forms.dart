@@ -28,6 +28,9 @@ class AQTextField extends StatefulWidget {
   final FocusNode? focusNode;
   /// Quiet confirmation (a small check) once the value is acceptable.
   final bool valid;
+
+  /// More than one line for messages; the field grows up to [maxLines].
+  final int minLines, maxLines;
   const AQTextField({
     super.key,
     required this.label,
@@ -47,6 +50,8 @@ class AQTextField extends StatefulWidget {
     this.suffix,
     this.focusNode,
     this.valid = false,
+    this.minLines = 1,
+    this.maxLines = 1,
   });
 
   @override
@@ -99,7 +104,9 @@ class _AQTextFieldState extends State<AQTextField> {
                 focusNode: _focus,
                 enabled: widget.enabled,
                 obscureText: widget.obscure,
-                keyboardType: widget.keyboardType,
+                minLines: widget.obscure ? 1 : widget.minLines,
+                maxLines: widget.obscure ? 1 : widget.maxLines,
+                keyboardType: widget.maxLines > 1 ? (widget.keyboardType ?? TextInputType.multiline) : widget.keyboardType,
                 textInputAction: widget.action,
                 inputFormatters: widget.formatters,
                 autofillHints: widget.autofill,

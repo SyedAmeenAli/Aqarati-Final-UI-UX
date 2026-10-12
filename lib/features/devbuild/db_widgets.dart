@@ -323,7 +323,9 @@ class DbProCard extends ConsumerWidget {
     final c = AQColors.of(context);
     final f = FlowStrings.of(context);
     final large = aqLargeText(context);
-    final w = large ? 96.0 : 120.0;
+    // On the narrowest phones a wide photo leaves no room for "Construction" on one line.
+    final narrow = MediaQuery.sizeOf(context).width < 360;
+    final w = narrow ? 88.0 : (large ? 96.0 : 120.0);
     final projects = pro.type == ProType.developer
         ? ref.watch(dbApprovedProjectsProvider(pro.id)).valueOrNull
         : null;
@@ -566,6 +568,7 @@ Future<T?> showDbChoiceSheet<T>(
 }) {
   return showAQSheet<T>(
     context,
+    useRootNavigator: true,
     builder: (s) {
       final c = AQColors.of(s);
       return ConstrainedBox(

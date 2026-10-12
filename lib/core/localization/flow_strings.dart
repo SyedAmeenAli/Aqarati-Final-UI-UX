@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/devbuild/db_strings.dart';
+import '../../features/enquiry/enquiry_strings.dart';
 
 /// Localization resources for the auth / sign-up / OTP / documents / verification
 /// flows. Every user-visible string lives here (no copy inside widgets).
@@ -13,14 +14,14 @@ class FlowStrings {
   static FlowStrings of(BuildContext c) => FlowStrings._(Localizations.localeOf(c).languageCode == 'ar');
 
   String t(String key, [Map<String, String> args = const {}]) {
-    final e = _s[key] ?? dbStrings[key];
+    final e = _s[key] ?? dbStrings[key] ?? enquiryStrings[key];
     assert(e != null, 'Missing string: $key');
     var out = e == null ? key : (ar ? e.$2 : e.$1);
     args.forEach((k, v) => out = out.replaceAll('{$k}', v));
     return out;
   }
 
-  static Iterable<String> get keys => [..._s.keys, ...dbStrings.keys];
+  static Iterable<String> get keys => [..._s.keys, ...dbStrings.keys, ...enquiryStrings.keys];
 }
 
 const Map<String, (String, String)> _s = {

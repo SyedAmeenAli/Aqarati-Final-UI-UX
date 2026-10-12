@@ -169,13 +169,18 @@ class DemoDevBuildRepository implements DevBuildRepository {
   final Map<String, DbProject> _byKey = {};
   int _n = 0;
 
-  static const _demoPhone = '+968 0000 0000';
+  /// Fictional but plausible-looking Oman mobile number, stable per business, for the demo roster only.
+  static String _demoPhoneFor(String id) {
+    final n = id.codeUnits.fold<int>(7, (a, b) => (a * 31 + b) % 10000000);
+    final d = n.toString().padLeft(7, '0');
+    return '+968 9${d.substring(0, 3)} ${d.substring(3)}';
+  }
 
   static final List<DbProfessional> _roster = [
     for (final b in mockBusinesses)
       if (DbProfessional.fromBusiness(b) case final p?)
         if (p.verified) _withDemoContact(p),
-    const DbProfessional(
+    DbProfessional(
       id: 'demo-c1',
       name: 'Sahari Contracting',
       type: ProType.construction,
@@ -190,9 +195,9 @@ class DemoDevBuildRepository implements DevBuildRepository {
       ],
       rating: 4.6,
       reviewCount: 31,
-      phone: _demoPhone,
+      phone: _demoPhoneFor('demo-c1'),
     ),
-    const DbProfessional(
+    DbProfessional(
       id: 'demo-d1',
       name: 'Zahra Developments',
       type: ProType.developer,
@@ -207,9 +212,9 @@ class DemoDevBuildRepository implements DevBuildRepository {
       ],
       rating: 4.4,
       reviewCount: 18,
-      phone: _demoPhone,
+      phone: _demoPhoneFor('demo-d1'),
     ),
-    const DbProfessional(
+    DbProfessional(
       id: 'demo-i1',
       name: 'Dar Nuqta Interiors',
       type: ProType.interiorExterior,
@@ -225,7 +230,7 @@ class DemoDevBuildRepository implements DevBuildRepository {
       ],
       rating: 4.7,
       reviewCount: 22,
-      phone: _demoPhone,
+      phone: _demoPhoneFor('demo-i1'),
     ),
   ];
 
@@ -243,8 +248,8 @@ class DemoDevBuildRepository implements DevBuildRepository {
     mediaUrls: p.mediaUrls,
     rating: p.rating,
     reviewCount: p.reviewCount,
-    phone: _demoPhone,
-    whatsapp: _demoPhone,
+    phone: _demoPhoneFor(p.id),
+    whatsapp: _demoPhoneFor(p.id),
   );
 
   static const _coords = <String, (double, double)>{

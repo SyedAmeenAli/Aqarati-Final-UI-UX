@@ -45,6 +45,7 @@ class _DbMyProjectsScreenState extends ConsumerState<DbMyProjectsScreen> {
     final f = FlowStrings.of(context);
     await showAQSheet<void>(
       context,
+      useRootNavigator: true,
       builder: (s) => Padding(
         padding: const EdgeInsets.fromLTRB(
           AQSpacing.gutter,
@@ -156,18 +157,8 @@ class _DbMyProjectsScreenState extends ConsumerState<DbMyProjectsScreen> {
               ),
               data: (all) {
                 if (all.isEmpty) {
-                  return Column(
-                    children: [
-                      DbNotice(f.t('db.proj.empty'), icon: 'development'),
-                      const SizedBox(height: AQSpacing.x3),
-                      AQSecondaryButton(
-                        label: f.t('db.ws.add'),
-                        trailingChevron: false,
-                        onPressed: () =>
-                            context.push('/workspace/projects/new'),
-                      ),
-                    ],
-                  );
+                  // The primary Add button above is the one way in; no second copy here.
+                  return DbNotice(f.t('db.proj.empty'), icon: 'development');
                 }
                 final shown = [
                   for (final p in all)
@@ -262,6 +253,7 @@ class _DbProjectStatusScreenState extends ConsumerState<DbProjectStatusScreen> {
     final f = FlowStrings.of(context);
     final ok = await showAQSheet<bool>(
       context,
+      useRootNavigator: true,
       builder: (s) => Padding(
         padding: const EdgeInsets.fromLTRB(
           AQSpacing.gutter,

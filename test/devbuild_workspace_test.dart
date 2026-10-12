@@ -1104,7 +1104,8 @@ void main() {
         await t.tap(find.text('Copy number').first, warnIfMissed: false);
         await _settle(t, 4);
         expect(find.text('Number copied'), findsOneWidget);
-        expect(copiedText, '+968 0000 0000');
+        expect(copiedText, matches(RegExp(r'^\+968 9\d{3} \d{4}$')));
+        expect(copiedText, isNot(contains('0000 0000')));
         expect(find.textContaining('Calling '), findsNothing);
       },
     );

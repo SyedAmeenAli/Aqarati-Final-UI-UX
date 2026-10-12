@@ -155,6 +155,7 @@ class _DbHomeScreenState extends ConsumerState<DbHomeScreen> {
     return aqPage(
       context,
       hero: AQHero(
+        showLocation: false,
         image: _heroImage,
         eyebrow: f.t('db.eyebrow'),
         title: f.t('db.home.title'),
@@ -330,6 +331,7 @@ class DbCategoriesScreen extends StatelessWidget {
     return aqPage(
       context,
       hero: AQHero(
+        showLocation: false,
         image: _heroImage,
         eyebrow: f.t('db.eyebrow'),
         title: f.t('db.cat.title'),
@@ -615,6 +617,7 @@ class _DbResultsScreenState extends ConsumerState<DbResultsScreen> {
     return aqPage(
       context,
       hero: AQHero(
+        showLocation: false,
         image: _heroImage,
         eyebrow: f.t('db.eyebrow'),
         title: title,

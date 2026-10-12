@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
+
+import '../../core/aq/aq_primitives.dart';
+import '../../core/aq/aq_tokens.dart';
+import '../../core/aq/aq_typography.dart';
+import '../../core/localization/flow_strings.dart';
 import '../../data/models/property.dart';
+import '../viewing/widgets/viewing_format.dart';
 
-enum _GalleryCategory { all, video, floorPlan }
+// A photograph viewer sits on a deep warm dark in both themes so the pictures lead.
+const _stage = Color(0xFF14110F);
+const _onStage = Color(0xFFF7F2EA);
+const _onStageSoft = Color(0xB3F7F2EA);
+const _priceTan = Color(0xFFE2BC97);
 
-extension on _GalleryCategory {
-  String get label {
-    switch (this) {
-      case _GalleryCategory.all:
-        return 'Photos';
-      case _GalleryCategory.video:
-        return 'Video';
-      case _GalleryCategory.floorPlan:
-        return 'Floor Plan';
-    }
-  }
-}
+enum _Kind { photos, video }
 
-/// Dark, editorial media viewer — deliberately breaks from the light app
-/// theme, matching the Figma gallery's dark chrome for photography focus.
+/// Photos and video for one listing: swipe between photos, pinch to zoom, real counts, and an honest
+/// empty state when the listing has no media.
 class PropertyGalleryScreen extends StatefulWidget {
   final Property property;
-
   const PropertyGalleryScreen({super.key, required this.property});
 
   @override
@@ -31,184 +28,273 @@ class PropertyGalleryScreen extends StatefulWidget {
 }
 
 class _PropertyGalleryScreenState extends State<PropertyGalleryScreen> {
-  _GalleryCategory _category = _GalleryCategory.all;
+  _Kind _kind = _Kind.photos;
   int _index = 0;
-  final _pageController = PageController();
+  final _pages = PageController();
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pages.dispose();
     super.dispose();
+  }
+
+  Widget _kindPill(BuildContext context, String label, _Kind k) {
+    final on = _kind == k;
+    final c = AQColors.of(context);
+    return Semantics(
+      button: true,
+      selected: on,
+      label: label,
+      excludeSemantics: true,
+      child: AQPressable(
+        onTap: () => setState(() {
+          _kind = k;
+          _index = 0;
+        }),
+        child: AnimatedContainer(
+          duration: AQMotion.scaled(context, AQMotion.fast),
+          constraints: const BoxConstraints(
+            minHeight: AQControl.tap - 4,
+            minWidth: 72,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: on ? c.accent : const Color(0x22F7F2EA),
+            borderRadius: BorderRadius.circular(AQRadius.large),
+          ),
+          child: Text(
+            label,
+            style: AQTypography.of(
+              context,
+              AQText.labelLarge,
+              color: on ? c.onAccent : _onStage,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final images = widget.property.imageUrls;
-    final videos = widget.property.videoUrls;
-    final isFloorPlan = _category == _GalleryCategory.floorPlan;
-    final isVideo = _category == _GalleryCategory.video;
-    final categories = [
-      _GalleryCategory.all,
-      if (videos.isNotEmpty) _GalleryCategory.video,
-      _GalleryCategory.floorPlan,
-    ];
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  isFloorPlan
-                      ? const _FloorPlanUnavailableView()
-                      : isVideo
-                          ? _VideoView(videoUrls: videos)
-                          : images.isEmpty
-                              ? const _EmptyMediaView()
-                              : _PhotoPageView(
-                                  controller: _pageController,
-                                  imageUrls: images,
-                                  onPageChanged: (i) => setState(() => _index = i),
+    final f = FlowStrings.of(context);
+    final p = widget.property;
+    final images = p.imageUrls;
+    final videos = p.videoUrls;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: _stage,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (_kind == _Kind.video)
+                      _VideoStage(videoUrls: videos)
+                    else if (images.isEmpty)
+                      _Message(f.t('gal.none'))
+                    else
+                      PageView.builder(
+                        controller: _pages,
+                        itemCount: images.length,
+                        onPageChanged: (i) => setState(() => _index = i),
+                        itemBuilder: (context, i) => Semantics(
+                          label:
+                              '${f.t('gal.photos')} ${f.t('gal.count', {'a': VFmt.n(context, i + 1), 'b': VFmt.n(context, images.length)})}',
+                          image: true,
+                          child: InteractiveViewer(
+                            minScale: 1,
+                            maxScale: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AQSpacing.x2,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  AQRadius.medium,
                                 ),
-                  Positioned(
-                    left: AppSpacing.sm,
-                    top: AppSpacing.sm,
-                    child: _GlassIconButton(icon: Icons.arrow_back_rounded, onTap: () => Navigator.of(context).pop()),
-                  ),
-                  Positioned(
-                    right: AppSpacing.sm,
-                    top: AppSpacing.sm,
-                    child: _GlassIconButton(icon: Icons.ios_share_rounded, onTap: () {}),
-                  ),
-                  if (!isFloorPlan && !isVideo && images.isNotEmpty)
-                    Positioned(
-                      bottom: AppSpacing.md,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
-                          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.55), borderRadius: BorderRadius.circular(AppRadius.pill)),
-                          child: Text('${_index + 1} / ${images.length}', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                child: Image.asset(
+                                  images[i],
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, _, _) =>
+                                      _Message(f.t('gal.err')),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    PositionedDirectional(
+                      start: AQSpacing.x2,
+                      top: AQSpacing.x2,
+                      child: DecoratedBox(
+                        decoration: const BoxDecoration(
+                          color: Color(0x66000000),
+                          shape: BoxShape.circle,
+                        ),
+                        child: AQIconButton(
+                          icon: 'chevron-left',
+                          semanticsLabel: f.t('common.back'),
+                          color: _onStage,
+                          onPressed: () => Navigator.of(context).maybePop(),
                         ),
                       ),
                     ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.property.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        Text(widget.property.locationLabel.split(',').take(2).join(','), style: const TextStyle(color: Colors.white60, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                      ],
-                    ),
-                  ),
-                  Text(widget.property.price.compact, style: const TextStyle(color: AppColors.red400, fontWeight: FontWeight.w700, fontSize: 16)),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              child: SizedBox(
-                height: 36,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
-                  itemBuilder: (context, i) {
-                    final cat = categories[i];
-                    final selected = cat == _category;
-                    return ChoiceChip(
-                      label: Text(cat.label),
-                      selected: selected,
-                      selectedColor: AppColors.primary,
-                      backgroundColor: Colors.white10,
-                      labelStyle: TextStyle(color: selected ? Colors.white : Colors.white70),
-                      side: BorderSide.none,
-                      onSelected: (_) => setState(() {
-                        _category = cat;
-                        _index = 0;
-                      }),
-                    );
-                  },
+                    if (_kind == _Kind.photos && images.isNotEmpty)
+                      Positioned(
+                        bottom: AQSpacing.x3,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Semantics(
+                            liveRegion: true,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: const Color(0x99000000),
+                                borderRadius: BorderRadius.circular(
+                                  AQRadius.large,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AQSpacing.x4,
+                                  vertical: 6,
+                                ),
+                                child: Text(
+                                  f.t('gal.count', {
+                                    'a': VFmt.n(context, _index + 1),
+                                    'b': VFmt.n(context, images.length),
+                                  }),
+                                  style: AQTypography.of(
+                                    context,
+                                    AQText.labelMedium,
+                                    color: _onStage,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AQSpacing.gutter,
+                  AQSpacing.x4,
+                  AQSpacing.gutter,
+                  0,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            VFmt.iso(p.title),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AQTypography.of(
+                              context,
+                              AQText.titleMedium,
+                              color: _onStage,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            VFmt.iso(
+                              p.locationLabel
+                                  .split(',')
+                                  .take(2)
+                                  .join(',')
+                                  .trim(),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AQTypography.of(
+                              context,
+                              AQText.bodySmall,
+                              color: _onStageSoft,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AQSpacing.x3),
+                    Text(
+                      p.price.compact,
+                      style: AQTypography.of(
+                        context,
+                        AQText.titleMedium,
+                        color: _priceTan,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (videos.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AQSpacing.gutter,
+                    AQSpacing.x3,
+                    AQSpacing.gutter,
+                    0,
+                  ),
+                  child: Row(
+                    children: [
+                      _kindPill(context, f.t('gal.photos'), _Kind.photos),
+                      const SizedBox(width: AQSpacing.x2),
+                      _kindPill(context, f.t('gal.video'), _Kind.video),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: AQSpacing.x4),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _PhotoPageView extends StatelessWidget {
-  final PageController controller;
-  final List<String> imageUrls;
-  final ValueChanged<int> onPageChanged;
-
-  const _PhotoPageView({required this.controller, required this.imageUrls, required this.onPageChanged});
-
+class _Message extends StatelessWidget {
+  final String text;
+  const _Message(this.text);
   @override
-  Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: controller,
-      itemCount: imageUrls.length,
-      onPageChanged: onPageChanged,
-      itemBuilder: (context, i) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          child: Image.asset(
-            imageUrls[i],
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stack) => const Center(
-              child: Icon(Icons.landscape_outlined, size: 64, color: Colors.white24),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(AQSpacing.x6),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: AQTypography.of(context, AQText.bodyMedium, color: _onStageSoft),
+      ),
+    ),
+  );
 }
 
-class _EmptyMediaView extends StatelessWidget {
-  const _EmptyMediaView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('No photos available yet', style: TextStyle(color: Colors.white54)),
-    );
-  }
-}
-
-class _VideoView extends StatefulWidget {
+class _VideoStage extends StatefulWidget {
   final List<String> videoUrls;
-
-  const _VideoView({required this.videoUrls});
-
+  const _VideoStage({required this.videoUrls});
   @override
-  State<_VideoView> createState() => _VideoViewState();
+  State<_VideoStage> createState() => _VideoStageState();
 }
 
-class _VideoViewState extends State<_VideoView> {
+class _VideoStageState extends State<_VideoStage> {
   VideoPlayerController? _controller;
   int _index = 0;
+  bool _failed = false;
 
   @override
   void initState() {
@@ -218,12 +304,18 @@ class _VideoViewState extends State<_VideoView> {
 
   void _load(int i) {
     _controller?.dispose();
+    _failed = false;
     if (widget.videoUrls.isEmpty) return;
-    final controller = VideoPlayerController.asset(widget.videoUrls[i]);
-    _controller = controller;
-    controller.initialize().then((_) {
-      if (mounted) setState(() {});
-    });
+    final c = VideoPlayerController.asset(widget.videoUrls[i]);
+    _controller = c;
+    c
+        .initialize()
+        .then((_) {
+          if (mounted) setState(() {});
+        })
+        .catchError((_) {
+          if (mounted) setState(() => _failed = true);
+        });
   }
 
   @override
@@ -234,113 +326,110 @@ class _VideoViewState extends State<_VideoView> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.videoUrls.isEmpty) {
-      return const Center(
-        child: Text('No video available for this property', style: TextStyle(color: Colors.white54)),
-      );
-    }
-    final controller = _controller;
+    final f = FlowStrings.of(context);
+    final c = AQColors.of(context);
+    if (widget.videoUrls.isEmpty) return _Message(f.t('gal.novideo'));
+    if (_failed) return _Message(f.t('gal.err'));
+    final v = _controller;
+    final ready = v != null && v.value.isInitialized;
     return Column(
       children: [
         Expanded(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(AppRadius.md)),
-            child: Center(
-              child: controller != null && controller.value.isInitialized
-                  ? GestureDetector(
-                      onTap: () => setState(() {
-                        controller.value.isPlaying ? controller.pause() : controller.play();
-                      }),
+          child: Center(
+            child: ready
+                ? Semantics(
+                    button: true,
+                    label: v.value.isPlaying
+                        ? f.t('gal.pause')
+                        : f.t('gal.play'),
+                    excludeSemantics: true,
+                    child: AQPressable(
+                      onTap: () => setState(
+                        () => v.value.isPlaying ? v.pause() : v.play(),
+                      ),
                       child: AspectRatio(
-                        aspectRatio: controller.value.aspectRatio,
+                        aspectRatio: v.value.aspectRatio,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            VideoPlayer(controller),
-                            if (!controller.value.isPlaying)
-                              const Icon(Icons.play_circle_fill_rounded, size: 64, color: Colors.white70),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                AQRadius.medium,
+                              ),
+                              child: VideoPlayer(v),
+                            ),
+                            if (!v.value.isPlaying)
+                              DecoratedBox(
+                                decoration: const BoxDecoration(
+                                  color: Color(0x99000000),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(AQSpacing.x3),
+                                  child: Icon(
+                                    Icons.play_arrow_rounded,
+                                    size: 44,
+                                    color: _onStage,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
-                    )
-                  : const CircularProgressIndicator(color: Colors.white70),
-            ),
+                    ),
+                  )
+                : SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: c.accent,
+                    ),
+                  ),
           ),
         ),
         if (widget.videoUrls.length > 1)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            child: SizedBox(
-              height: 48,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                itemCount: widget.videoUrls.length,
-                separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
-                itemBuilder: (context, i) => GestureDetector(
-                  onTap: () => setState(() {
-                    _index = i;
-                    _load(i);
-                  }),
-                  child: Container(
-                    width: 48,
-                    decoration: BoxDecoration(
-                      color: i == _index ? AppColors.primary : Colors.white12,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
+            padding: const EdgeInsets.symmetric(vertical: AQSpacing.x3),
+            child: Wrap(
+              spacing: AQSpacing.x2,
+              children: [
+                for (var i = 0; i < widget.videoUrls.length; i++)
+                  Semantics(
+                    button: true,
+                    selected: i == _index,
+                    label: f.t('gal.videoN', {'n': VFmt.n(context, i + 1)}),
+                    excludeSemantics: true,
+                    child: AQPressable(
+                      onTap: () => setState(() {
+                        _index = i;
+                        _load(i);
+                      }),
+                      child: Container(
+                        width: AQControl.tap,
+                        height: AQControl.tap - 4,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: i == _index
+                              ? c.accent
+                              : const Color(0x22F7F2EA),
+                          borderRadius: BorderRadius.circular(AQRadius.small),
+                        ),
+                        child: Text(
+                          VFmt.n(context, i + 1),
+                          style: AQTypography.of(
+                            context,
+                            AQText.labelLarge,
+                            color: i == _index ? c.onAccent : _onStage,
+                          ),
+                        ),
+                      ),
                     ),
-                    child: Icon(Icons.videocam_outlined, color: i == _index ? Colors.white : Colors.white54, size: 18),
                   ),
-                ),
-              ),
+              ],
             ),
           ),
       ],
-    );
-  }
-}
-
-class _GlassIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _GlassIconButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.4),
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.sm),
-          child: Icon(icon, color: Colors.white, size: AppIconSize.compact),
-        ),
-      ),
-    );
-  }
-}
-
-class _FloorPlanUnavailableView extends StatelessWidget {
-  const _FloorPlanUnavailableView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.grid_view_rounded, size: 48, color: Colors.white24),
-            SizedBox(height: AppSpacing.md),
-            Text('Floor plan not available for this listing', style: TextStyle(color: Colors.white54)),
-          ],
-        ),
-      ),
     );
   }
 }

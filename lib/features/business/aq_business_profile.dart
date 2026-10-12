@@ -85,26 +85,6 @@ class _Profile extends ConsumerWidget {
     return AQViewingScaffold(
       backLabel: f.t('common.back'),
       onBack: onBack,
-      bottom: AQBottomActionBar(
-        primary: AQPrimaryButton(
-          label: f.t('bp.quote'),
-          trailingChevron: false,
-          leadingIcon: 'send',
-          onPressed: () => showAQSheet<void>(
-            context,
-            builder: (s) => Padding(
-              padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x3, AQSpacing.gutter, AQSpacing.x2),
-              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Text(f.t('bp.soon.t'), style: AQTypography.of(s, AQText.headlineSmall)),
-                const SizedBox(height: AQSpacing.x2),
-                Text(f.t('bp.soon.b'), style: AQTypography.of(s, AQText.bodyMedium, soft: true)),
-                const SizedBox(height: AQSpacing.x4),
-                AQPrimaryButton(label: f.t('bp.ok'), trailingChevron: false, onPressed: () => Navigator.of(s).pop()),
-              ]),
-            ),
-          ),
-        ),
-      ),
       children: [
         if (cover != null)
           ClipRRect(

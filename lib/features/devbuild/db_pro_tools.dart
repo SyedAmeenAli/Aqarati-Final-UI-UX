@@ -820,6 +820,7 @@ class _DbEngagementDetailScreenState
     final f = FlowStrings.of(context);
     final ok = await showAQSheet<bool>(
       context,
+      useRootNavigator: true,
       builder: (s) => Padding(
         padding: const EdgeInsets.fromLTRB(
           AQSpacing.gutter,

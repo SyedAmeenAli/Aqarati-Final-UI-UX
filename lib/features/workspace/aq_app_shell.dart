@@ -64,7 +64,8 @@ class _AQAppShellState extends State<AQAppShell> {
             controller: _nav,
             onSelected: (i) {
               _nav.setCompact(false);
-              if (i != index) context.go(_tabs[i]);
+              // Tapping the tab you are already on returns to that tab's first page (e.g. out of a workspace or directory page).
+              if (i != index || location != _tabs[i]) context.go(_tabs[i]);
             },
           ),
         ),

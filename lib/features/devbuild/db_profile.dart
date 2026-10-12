@@ -46,6 +46,7 @@ Future<void> showDbContactSheet(
   final repo = ref.read(devBuildRepositoryProvider);
   return showAQSheet<void>(
     context,
+    useRootNavigator: true,
     builder: (s) {
       final f = FlowStrings.of(s);
       final c = AQColors.of(s);
@@ -78,9 +79,15 @@ Future<void> showDbContactSheet(
                       ),
                       style: AQTypography.of(s, AQText.labelMedium),
                     ),
-                    Text(
-                      VFmt.iso(number),
-                      style: AQTypography.of(s, AQText.bodyLarge),
+                    // A phone number reads as one unit; shrink it rather than wrap it onto three lines.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        VFmt.iso(number),
+                        maxLines: 1,
+                        style: AQTypography.of(s, AQText.bodyLarge),
+                      ),
                     ),
                   ],
                 ),

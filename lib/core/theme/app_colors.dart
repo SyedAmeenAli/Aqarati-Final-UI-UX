@@ -6,7 +6,8 @@ class AppColors {
   AppColors._();
 
   // Brand
-  static const Color primary = Color(0xFFC8392B); // Omani Red
+  // The AQARATI accent (warm brown). Any Material widget that falls back to the theme uses this, never the old red.
+  static const Color primary = Color(0xFF825C3F);
   static const Color secondary = Color(0xFF2D6B4A); // Omani Green (verified/success)
   static const Color accent = Color(0xFFA8895E); // Sand
 

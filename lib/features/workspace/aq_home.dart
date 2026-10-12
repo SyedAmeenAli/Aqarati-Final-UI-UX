@@ -56,6 +56,9 @@ class AQHero extends StatelessWidget {
   final String title;
   final String sub;
   final VoidCallback? onBack;
+
+  /// The property-area chip is a Home/Explore preference; pages it does not filter hide it.
+  final bool showLocation;
   const AQHero({
     super.key,
     required this.image,
@@ -63,6 +66,7 @@ class AQHero extends StatelessWidget {
     required this.title,
     required this.sub,
     this.onBack,
+    this.showLocation = true,
   });
 
   @override
@@ -146,8 +150,10 @@ class AQHero extends StatelessWidget {
                         ),
                       ),
                     const Spacer(),
-                    const _LocationPill(),
-                    const SizedBox(width: AQSpacing.x2),
+                    if (showLocation) ...[
+                      const _LocationPill(),
+                      const SizedBox(width: AQSpacing.x2),
+                    ],
                     Semantics(
                       button: true,
                       label: f.t('nav.account'),

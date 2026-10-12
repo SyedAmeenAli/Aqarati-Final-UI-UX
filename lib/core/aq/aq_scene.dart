@@ -144,10 +144,12 @@ class AQChoiceTile extends StatelessWidget {
 }
 
 /// Bottom sheet: large top radius, drag handle, safe area, keyboard inset, tonal surface.
-Future<T?> showAQSheet<T>(BuildContext context, {required WidgetBuilder builder, bool dismissible = true}) {
+/// [useRootNavigator] puts the sheet above the shell's tab bar; use it from pages that live inside the shell.
+Future<T?> showAQSheet<T>(BuildContext context, {required WidgetBuilder builder, bool dismissible = true, bool useRootNavigator = false}) {
   final c = AQColors.of(context);
   return showModalBottomSheet<T>(
     context: context,
+    useRootNavigator: useRootNavigator,
     isScrollControlled: true,
     isDismissible: dismissible,
     enableDrag: dismissible,
