@@ -53,3 +53,9 @@ Legend. **Built**: implemented and routed. **Tests**: widget/unit tests (D = `de
 - Screens marked "not opened" in the Browser column were not viewed in a browser; they are covered by widget tests only.
 - Native Google map pins were not seen.
 - Everything listed under BLOCKED-BY-CONTRACT is an honest placeholder, not a working feature.
+
+## Stabilisation pass: what was viewed (2026-10-12)
+
+- Browser (Chromium, release web build, Playwright + semantics): Dev&Build screens #59–#86 and the rebuilt listing pages. Scripted regression: 25 checks, 0 failures at 393 px light, 393 px dark and 320 px light. Roles viewed: developer, construction, pending. Also viewed by eye at 360 and 412 px and in Arabic.
+- Widget tests: 225 passing, including the three bug regressions, the wizard stepper at 320/360/393/412 × 2 text scales, and the listing pages in dark and Arabic.
+- Not tested: devices, screen readers, native maps, backend.

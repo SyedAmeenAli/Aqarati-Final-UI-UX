@@ -139,3 +139,15 @@ Prefilled from the stored project, status chip visible, approved projects say ch
 ## Motion
 
 Route changes use `AQRoute.forward` / `AQRoute.hero`; wizard steps fade and slide 4% over `AQMotion.standard`; pills, stepper and status transitions animate with `AQMotion.scaled`, which becomes zero when the platform asks to reduce motion. No looping animation is used.
+
+## Listing pages rebuilt in the stabilisation pass
+
+| Page | Controls | Result / honest state |
+|---|---|---|
+| Enquiry | name, email, phone, message, Save enquiry | Validation errors per field; valid input is saved on this device; result says it has not been delivered |
+| Make offer | amount (OMR), acknowledgement, Save offer | Both required; saved on this device; result says it has not been delivered |
+| Photo gallery | swipe, pinch zoom, Photos/Video pills (only if videos exist), back | Real count; empty state when no media; no share or floor-plan control |
+| Compare | two or more properties, View property | Real values only; "Nothing to compare" when empty |
+| Write a review | back | Explains that reviews open after a both-sides-confirmed engagement; no form |
+| Property types | four type cards | Two columns, full descriptions |
+| Bottom tab bar | Home, Explore, Activity, Account | Tapping the current tab returns to its root; works from deep pages |

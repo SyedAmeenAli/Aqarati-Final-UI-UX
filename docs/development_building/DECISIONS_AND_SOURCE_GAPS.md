@@ -73,3 +73,12 @@ There is no real API in the app yet. `lib/core/config/backend_mode.dart` sets `k
 - Brokers and maintenance providers stay in the existing `/professionals` directory; they are not part of Development & Building.
 - The mock business "Namaa Construction" is both a developer and a builder in the shared mock data. In the directory it appears as a developer (it has approved projects); a real organisation has one professional type.
 - Pre-existing formatting noise: running `dart format` over some directories reformatted unrelated files (`entry_strings.dart`, `viewing_strings.dart`, `app_shell.dart`, `demo_backend.dart`, several tests). Those changes are formatting only and are left uncommitted.
+
+## Stabilisation decisions (2026-10-12)
+
+- **Enquiries and offers are local.** No enquiry or offer service is in the contract, so both are stored on the device and the result page says they were not delivered. If delivery is wanted, the backend needs lead and offer endpoints; none were invented.
+- **Reviews have no form.** They depend on engagements that both sides confirm, which the backend does not expose yet (see engagements blocker above).
+- **Old unreachable screens were deleted** rather than restyled. Anything deleted is recoverable from commits before `8cce211`.
+- **Demo phone numbers** are generated for the demo repository only and must not be mistaken for data.
+- **Formatting noise** in six files (`entry_strings.dart`, `viewing_strings.dart`, `demo_backend.dart`, and three tests) is a stat-only difference with no content change; they are left untouched.
+- **Proposed, not built:** in-app chat, review replies, CRM statuses and a fifth tab remain out of scope.

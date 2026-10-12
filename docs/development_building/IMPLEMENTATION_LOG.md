@@ -85,3 +85,23 @@ Goal: close the three known browser bugs with tests, audit the Git tree, and reg
 ### Verification run in this pass
 
 See the table at the end of `SCREEN_READINESS_CHECKLIST.md` for browsers and viewports, and the final report for counts.
+
+### Follow-up work in the same pass (2026-10-12)
+
+- **Footer navigation.** Tapping the tab you are already on now returns to that tab's root (`aq_app_shell.dart`), so a page opened inside a tab can always be left through the bar. All four tabs were clicked from deep pages in the browser.
+- **Old red build removed from reachable pages.** `AppColors.primary` is now the AQ brown. The enquiry, make-offer, photo gallery, compare and write-review pages were rebuilt on the AQ components (`AQViewingScaffold`, `AQTextField`, `AQBottomActionBar`). Enquiries and offers are saved only on this device (`enquiriesProvider`, `offersProvider`); the result page says "has not been delivered" because no service exists. The review page explains that reviews open after an engagement is confirmed by both sides and offers no form. The gallery shows the real photo count and drops the dead share and floor-plan controls. The "Quote / coming soon" bar on the business profile was removed.
+- **Property types page.** Two columns, larger images, full descriptions (no clipping at 320/360/393 px, 1.0× and 1.5× text).
+- **Old screens deleted.** The old `ShellRoute` (home, explore, messages, profile), its shell, the 12 old shared widgets, 10 old models, mock conversation/project data and 10 old feature folders were unreachable from `main.dart`. They were found with an import-graph scan (`lib/main.dart` as root), snapshot-committed, then removed with plain `git rm` (52 files, about 7,970 lines; commit `8cce211`). 108 live files remain. Git history keeps every deleted file.
+- **Demo contacts.** Demo professionals get a deterministic `+968 9XXX XXXX` number (`_demoPhoneFor`); the original placeholder was not a valid Omani mobile format. Real numbers must come from the backend.
+
+### Final verification
+
+| Check | Result |
+|---|---|
+| `flutter test` (full suite) | 225 passed, 0 failed, exit 0 |
+| `flutter analyze` | 0 errors, 0 warnings, 41 info lints (older files) |
+| `dart format --set-exit-if-changed` on files owned by this work (devbuild, enquiry, compare, reviews, gallery, new tests) | 19 files, 0 changed |
+| Browser regression (Chromium via Playwright, release web build) | 25 pass / 0 fail at 393 px light, 393 px dark, 320 px light, after the deletion |
+| Web production build | `flutter build web --release` succeeded before the deletion; the deletion removed only unreachable code and the tests and review builds above compiled after it. Not rebuilt after the deletion. |
+
+Not tested: real devices, VoiceOver/TalkBack, haptics, native Google Maps pins, any backend. Arabic copy is draft; the Arabic browser pass was viewed by eye, not fully scripted. Numerals are mixed (Western digits in some Arabic strings).
