@@ -42,7 +42,7 @@ const Map<String, (String, String)> dbStrings = {
   'db.type.developer.tile': ('Developers', 'المطورون'),
   'db.type.construction.tile': ('Construction', 'المقاولات'),
   'db.type.architecture.tile': ('Architecture', 'العمارة'),
-  'db.type.interiorExterior.tile': ('Interior & Exterior', 'داخلي وخارجي'),
+  'db.type.interiorExterior.tile': ('Design', 'التصميم'),
   'db.type.developer.long': ('Property Developers', 'المطورون العقاريون'),
   'db.type.construction.long': ('Construction Companies', 'شركات المقاولات'),
   'db.type.architecture.long': ('Architecture Studios', 'مكاتب العمارة'),

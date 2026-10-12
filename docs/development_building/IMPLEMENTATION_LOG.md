@@ -40,9 +40,9 @@ Chronological, concise. Commands and results are what was actually run.
 | Command | Result |
 |---|---|
 | `flutter analyze` | no errors; one pre-existing warning (`_Action` unused in `aq_home.dart`) |
-| `flutter test test/devbuild_discovery_test.dart` | 26 passed |
-| `flutter test test/devbuild_workspace_test.dart` | 49 passed |
-| `flutter test` (whole suite) | all passed (see the final run noted in the handoff) |
+| `flutter test test/devbuild_discovery_test.dart` | 29 passed |
+| `flutter test test/devbuild_workspace_test.dart` | 51 passed |
+| `flutter test` (whole suite) | 158 passed |
 | `flutter build web --release --pwa-strategy=none --dart-define=REVIEW_TOOLS=true --dart-define=REVIEW_SESSION=developer -o build/web_qa` (and `AQ_THEME=dark` to `web_qad`) | built |
 
 ## Not done / not verified

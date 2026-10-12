@@ -109,17 +109,20 @@ class _DbHomeScreenState extends ConsumerState<DbHomeScreen> {
                                 children: [
                                   AQIcon(t.icon, size: 20, color: c.accent),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    f.t('${t.key}.tile'),
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        AQTypography.of(
-                                          context,
-                                          AQText.bodySmall,
-                                        ).copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0,
-                                        ),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      f.t('${t.key}.tile'),
+                                      textAlign: TextAlign.center,
+                                      style:
+                                          AQTypography.of(
+                                            context,
+                                            AQText.bodySmall,
+                                          ).copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 0,
+                                          ),
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   AQIcon(
