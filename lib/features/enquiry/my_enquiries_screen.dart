@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/states.dart';
@@ -13,8 +14,12 @@ class MyEnquiriesScreen extends ConsumerStatefulWidget {
   ConsumerState<MyEnquiriesScreen> createState() => _MyEnquiriesScreenState();
 }
 
-class _MyEnquiriesScreenState extends ConsumerState<MyEnquiriesScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabController = TabController(length: 3, vsync: this);
+class _MyEnquiriesScreenState extends ConsumerState<MyEnquiriesScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController = TabController(
+    length: 3,
+    vsync: this,
+  );
 
   @override
   void dispose() {
@@ -37,7 +42,11 @@ class _MyEnquiriesScreenState extends ConsumerState<MyEnquiriesScreen> with Sing
           unselectedLabelColor: AppColors.slate,
           indicatorColor: AppColors.primary,
           isScrollable: false,
-          tabs: const [Tab(text: 'Enquiries'), Tab(text: 'Offers'), Tab(text: 'Viewings')],
+          tabs: const [
+            Tab(text: 'Enquiries'),
+            Tab(text: 'Offers'),
+            Tab(text: 'Viewings'),
+          ],
         ),
       ),
       body: TabBarView(
@@ -52,14 +61,17 @@ class _MyEnquiriesScreenState extends ConsumerState<MyEnquiriesScreen> with Sing
               : ListView.separated(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   itemCount: enquiries.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.md),
                   itemBuilder: (context, i) {
                     final e = enquiries[enquiries.length - 1 - i];
                     return _RecordCard(
                       title: e.propertyTitle,
                       subtitle: e.message,
                       statusLabel: e.replied ? 'Replied' : 'Pending',
-                      statusColor: e.replied ? AppColors.verified : AppColors.pending,
+                      statusColor: e.replied
+                          ? AppColors.verified
+                          : AppColors.pending,
                     );
                   },
                 ),
@@ -67,12 +79,14 @@ class _MyEnquiriesScreenState extends ConsumerState<MyEnquiriesScreen> with Sing
               ? const AqaratiEmptyState(
                   icon: Icons.local_offer_outlined,
                   title: 'No offers yet',
-                  message: 'Make an offer on a property to track its status here.',
+                  message:
+                      'Make an offer on a property to track its status here.',
                 )
               : ListView.separated(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   itemCount: offers.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.md),
                   itemBuilder: (context, i) {
                     final o = offers[offers.length - 1 - i];
                     return _RecordCard(
@@ -92,12 +106,14 @@ class _MyEnquiriesScreenState extends ConsumerState<MyEnquiriesScreen> with Sing
               : ListView.separated(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   itemCount: bookings.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.md),
                   itemBuilder: (context, i) {
                     final b = bookings[bookings.length - 1 - i];
                     return _RecordCard(
                       title: b.contextTitle,
-                      subtitle: '${b.date.day}/${b.date.month}/${b.date.year} · ${b.timeSlotLabel}',
+                      subtitle:
+                          '${b.date.day}/${b.date.month}/${b.date.year} · ${b.timeSlotLabel}',
                       statusLabel: 'Confirmed',
                       statusColor: AppColors.verified,
                     );
@@ -169,17 +185,30 @@ class _RecordCard extends StatelessWidget {
             children: [
               Expanded(child: Text(title, style: theme.textTheme.titleSmall)),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 2,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
-                child: Text(statusLabel, style: theme.textTheme.labelSmall?.copyWith(color: statusColor)),
+                child: Text(
+                  statusLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: statusColor,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          Text(subtitle, style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
