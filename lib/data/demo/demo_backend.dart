@@ -28,6 +28,7 @@ class DemoBackendState {
   bool emailVerified = false;
   String? reason;
   String? businessName;
+  InteriorExteriorServiceType? serviceType;
   String? reference;
   DateTime? decidedAt;
 }
@@ -116,6 +117,7 @@ class DemoAccountApi implements AccountApi {
     s.purpose = purpose;
     s.phone = values.phone;
     s.businessName = values.businessName.isNotEmpty ? values.businessName : (values.agencyName.isNotEmpty ? values.agencyName : '${values.firstName} ${values.lastName}'.trim());
+    s.serviceType = values.serviceType;
     s.account = AccountState.otpPending;
     s.grant = null;
     return _me();

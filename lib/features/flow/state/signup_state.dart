@@ -37,8 +37,8 @@ class SignupState {
 }
 
 final _emailRe = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
-// Oman mobile numbers: 8 digits starting 7 or 9 (landlines 2 are not valid for SMS OTP).
-final _omanMobileRe = RegExp(r'^[79]\d{7}$');
+// Source (architecture §30): +968 followed by 8 digits. No leading-digit restriction is documented.
+final _omanMobileRe = RegExp(r'^\d{8}$');
 
 bool isValidOmanMobile(String v) => _omanMobileRe.hasMatch(v.replaceAll(' ', ''));
 bool isValidEmail(String v) => _emailRe.hasMatch(v.trim());
@@ -57,6 +57,10 @@ Map<String, String> validateStep(RoleFormConfig cfg, SignupStep step, SignupForm
       if (cfg.hasBusinessName && v.businessName.trim().isEmpty) e['businessName'] = 'common.required';
       if (cfg.hasAgencyName && v.agencyName.trim().isEmpty) e['agencyName'] = 'common.required';
       if (cfg.hasServiceType && v.serviceType == null) e['serviceType'] = 'common.required';
+      if (cfg.hasCompanyContact) {
+        if (!isValidEmail(v.companyEmail)) e['companyEmail'] = 'err.email';
+        if (cfg.companyAddressRequired && v.companyAddress.trim().isEmpty) e['companyAddress'] = 'common.required';
+      }
     case SignupStep.account:
       if (!passwordMeetsPolicy(password)) e['password'] = 'err.passwordRules';
       if (confirm != password || confirm.isEmpty) e['confirm'] = 'err.passwordMismatch';
@@ -158,7 +162,9 @@ class SignupController extends StateNotifier<SignupState> {
     }
     state = state.copyWith(submitting: true, clearBanner: true, errors: const {});
     try {
-      await ref.read(authRepositoryProvider).createUserWithEmail(state.values.email.trim(), password);
+      // Company paths sign in with the company email; people sign in with their own email.
+      final username = cfg.hasCompanyContact ? state.values.companyEmail : state.values.email;
+      await ref.read(authRepositoryProvider).createUserWithEmail(username.trim(), password);
       await ref.read(accountApiProvider).signUp(purpose, state.values);
       await ref.read(signupDraftStoreProvider).clear(purpose);
       if (mounted) state = state.copyWith(submitting: false);

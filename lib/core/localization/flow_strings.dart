@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/devbuild/db_strings.dart';
+import '../../features/role_home/role_home_strings.dart';
 import '../../features/enquiry/enquiry_strings.dart';
 
 /// Localization resources for the auth / sign-up / OTP / documents / verification
@@ -14,14 +15,14 @@ class FlowStrings {
   static FlowStrings of(BuildContext c) => FlowStrings._(Localizations.localeOf(c).languageCode == 'ar');
 
   String t(String key, [Map<String, String> args = const {}]) {
-    final e = _s[key] ?? dbStrings[key] ?? enquiryStrings[key];
+    final e = _s[key] ?? dbStrings[key] ?? enquiryStrings[key] ?? roleHomeStrings[key];
     assert(e != null, 'Missing string: $key');
     var out = e == null ? key : (ar ? e.$2 : e.$1);
     args.forEach((k, v) => out = out.replaceAll('{$k}', v));
     return out;
   }
 
-  static Iterable<String> get keys => [..._s.keys, ...dbStrings.keys, ...enquiryStrings.keys];
+  static Iterable<String> get keys => [..._s.keys, ...dbStrings.keys, ...enquiryStrings.keys, ...roleHomeStrings.keys];
 }
 
 const Map<String, (String, String)> _s = {
@@ -40,12 +41,17 @@ const Map<String, (String, String)> _s = {
   'field.firstName': ('First name', 'الاسم الأول'),
   'field.lastName': ('Last name', 'اسم العائلة'),
   'field.phone': ('Mobile number', 'رقم الجوال'),
-  'field.phoneHint': ('9X XXX XXX', '9X XXX XXX'),
+  'field.phoneHint': ('XXXX XXXX', 'XXXX XXXX'),
   'field.email': ('Email', 'البريد الإلكتروني'),
   'field.password': ('Password', 'كلمة المرور'),
   'field.confirmPassword': ('Confirm password', 'تأكيد كلمة المرور'),
   'field.newPassword': ('New password', 'كلمة المرور الجديدة'),
   'field.businessName': ('Business name', 'اسم الشركة'),
+  // Arabic below is a draft and needs native review.
+  'field.companyEmail': ('Company email', 'البريد الإلكتروني للشركة'),
+  'field.companyEmail.help': ('This is the email you will sign in with.', 'هذا هو البريد الذي ستسجّل به الدخول.'),
+  'field.companyAddress': ('Company address', 'عنوان الشركة'),
+  'field.companyAddressOptional': ('Company address (optional)', 'عنوان الشركة (اختياري)'),
   'field.agencyName': ('Agency / brokerage name', 'اسم الوكالة / شركة الوساطة'),
   'field.serviceType': ('Service type', 'نوع الخدمة'),
   'field.show': ('Show password', 'إظهار كلمة المرور'),
@@ -417,8 +423,8 @@ const Map<String, (String, String)> _s = {
   'ws.sub': ('Here is what your approved role unlocks.', 'هذا ما يتيحه دورك المعتمد.'),
   'ws.cta': ('Open workspace', 'فتح مساحة العمل'),
   'ws.cap.agent.1': ('Switch between Buyer and Agent', 'التبديل بين مشترٍ ووسيط'),
-  'ws.cap.agent.2': ('Create and manage listings', 'إنشاء الإعلانات وإدارتها'),
-  'ws.cap.agent.3': ('Manage viewing availability', 'إدارة مواعيد المعاينة'),
+  'ws.cap.agent.2': ('See your listing status when the listing service is connected', 'اطّلع على حالة إعلاناتك عند ربط خدمة الإعلانات'),
+  'ws.cap.agent.3': ('Open your viewing activity', 'افتح نشاط المعاينات'),
   'ws.cap.pro.1': ('Your company profile is visible in the directory', 'ملف شركتك ظاهر في الدليل'),
   'ws.cap.pro.2': ('Keep your profile and documents up to date', 'أبقِ ملفك ومستنداتك محدّثة'),
   'ws.cap.dev.1': ('Your developer profile is live', 'ملف المطوّر ظاهر الآن'),

@@ -34,6 +34,12 @@ class RoleFormConfig {
   final bool hasBusinessName;
   final bool hasAgencyName;
   final bool hasServiceType;
+  /// Company paths collect a company email (the account username, distinct from the
+  /// contact person's email) and a physical address. Source: architecture §19.5-19.8.
+  final bool hasCompanyContact;
+  /// The address is marked required for architecture and interior/exterior only; for the
+  /// other company paths the source lists the field without marking it required.
+  final bool companyAddressRequired;
   final List<DocumentKind> documents;
   final bool fourEyes;
   const RoleFormConfig({
@@ -41,12 +47,14 @@ class RoleFormConfig {
     this.hasBusinessName = false,
     this.hasAgencyName = false,
     this.hasServiceType = false,
+    this.hasCompanyContact = false,
+    this.companyAddressRequired = false,
     this.documents = const [],
     this.fourEyes = false,
   });
 
   bool get needsDocuments => documents.isNotEmpty;
-  bool get hasBusinessStep => hasBusinessName || hasAgencyName || hasServiceType;
+  bool get hasBusinessStep => hasBusinessName || hasAgencyName || hasServiceType || hasCompanyContact;
 }
 
 const roleConfigs = <SignupPurpose, RoleFormConfig>{
@@ -61,22 +69,28 @@ const roleConfigs = <SignupPurpose, RoleFormConfig>{
   SignupPurpose.constructionCompany: RoleFormConfig(
     purpose: SignupPurpose.constructionCompany,
     hasBusinessName: true,
+    hasCompanyContact: true,
     documents: [DocumentKind.crCertificate, DocumentKind.municipalLicence],
   ),
   SignupPurpose.propertyDevelopmentCompany: RoleFormConfig(
     purpose: SignupPurpose.propertyDevelopmentCompany,
     hasBusinessName: true,
+    hasCompanyContact: true,
     fourEyes: true,
     documents: [DocumentKind.officialCorporateRegistration, DocumentKind.crCertificate, DocumentKind.activityLicences, DocumentKind.developerLicence],
   ),
   SignupPurpose.buildingArchitecture: RoleFormConfig(
     purpose: SignupPurpose.buildingArchitecture,
     hasBusinessName: true,
+    hasCompanyContact: true,
+    companyAddressRequired: true,
     documents: [DocumentKind.crCertificate, DocumentKind.municipalLicence],
   ),
   SignupPurpose.interiorExteriorDesign: RoleFormConfig(
     purpose: SignupPurpose.interiorExteriorDesign,
     hasBusinessName: true,
+    hasCompanyContact: true,
+    companyAddressRequired: true,
     hasServiceType: true,
     documents: [DocumentKind.crCertificate, DocumentKind.municipalLicence],
   ),
@@ -84,18 +98,20 @@ const roleConfigs = <SignupPurpose, RoleFormConfig>{
 
 /// Public form values. Passwords and documents are NEVER part of this object.
 class SignupFormValues {
-  final String firstName, lastName, phone, email, businessName, agencyName;
+  final String firstName, lastName, phone, email, businessName, agencyName, companyEmail, companyAddress;
   final InteriorExteriorServiceType? serviceType;
   final bool consent;
-  const SignupFormValues({this.firstName = '', this.lastName = '', this.phone = '', this.email = '', this.businessName = '', this.agencyName = '', this.serviceType, this.consent = false});
+  const SignupFormValues({this.firstName = '', this.lastName = '', this.phone = '', this.email = '', this.businessName = '', this.agencyName = '', this.companyEmail = '', this.companyAddress = '', this.serviceType, this.consent = false});
 
-  SignupFormValues copyWith({String? firstName, String? lastName, String? phone, String? email, String? businessName, String? agencyName, InteriorExteriorServiceType? serviceType, bool? consent}) => SignupFormValues(
+  SignupFormValues copyWith({String? firstName, String? lastName, String? phone, String? email, String? businessName, String? agencyName, String? companyEmail, String? companyAddress, InteriorExteriorServiceType? serviceType, bool? consent}) => SignupFormValues(
         firstName: firstName ?? this.firstName,
         lastName: lastName ?? this.lastName,
         phone: phone ?? this.phone,
         email: email ?? this.email,
         businessName: businessName ?? this.businessName,
         agencyName: agencyName ?? this.agencyName,
+        companyEmail: companyEmail ?? this.companyEmail,
+        companyAddress: companyAddress ?? this.companyAddress,
         serviceType: serviceType ?? this.serviceType,
         consent: consent ?? this.consent,
       );
@@ -107,6 +123,8 @@ class SignupFormValues {
         'email': email,
         'businessName': businessName,
         'agencyName': agencyName,
+        'companyEmail': companyEmail,
+        'companyAddress': companyAddress,
         'serviceType': serviceType?.name,
         'consent': consent,
       };
@@ -118,6 +136,8 @@ class SignupFormValues {
         email: j['email'] as String? ?? '',
         businessName: j['businessName'] as String? ?? '',
         agencyName: j['agencyName'] as String? ?? '',
+        companyEmail: j['companyEmail'] as String? ?? '',
+        companyAddress: j['companyAddress'] as String? ?? '',
         serviceType: InteriorExteriorServiceType.values.where((e) => e.name == j['serviceType']).firstOrNull,
         consent: j['consent'] as bool? ?? false,
       );

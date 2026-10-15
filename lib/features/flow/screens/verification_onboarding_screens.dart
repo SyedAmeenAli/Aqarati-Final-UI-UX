@@ -112,7 +112,13 @@ class DocumentOnboardingScreen extends ConsumerWidget {
           progress: journeyProgress(context, m.purpose!, JourneyAt.documents),
           bottom: Column(mainAxisSize: MainAxisSize.min, children: [
             if (!allDone) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x2), child: Text(f.t('review.incomplete'), style: AQTypography.of(context, AQText.bodySmall, color: AQColors.of(context).inkFaint))),
-            AQPrimaryButton(label: f.t('docs.review'), onPressed: allDone && !anyBusy ? () => context.go('/onboarding/review') : null),
+            AQPrimaryButton(label: f.t('docs.review'), onPressed: allDone && !anyBusy
+                  ? () {
+                      // Uploads changed the server state; the review must not read a cached copy.
+                      ref.invalidate(verificationProvider);
+                      context.go('/onboarding/review');
+                    }
+                  : null),
           ]),
           children: [
             if (cfg.fourEyes) AQErrorBanner(tone: AQBannerTone.info, text: f.t('docs.fourEyes')),

@@ -124,7 +124,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           loading: st.phase == OtpPhase.verifying,
           onPressed: _code.length == 6 && st.canType ? () => ctl.verify(_code) : null,
         ),
-        if (kShowReviewTools) Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: Text(f.t('otp.demoHint'), style: AQTypography.of(context, AQText.labelSmall, color: c.accentDeep))),
+        if (kUseDemoBackend) Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: Text(f.t('otp.demoHint'), style: AQTypography.of(context, AQText.labelSmall, color: c.accentDeep))),
       ]),
       children: [
         if (st.errorKey != null && st.phase != OtpPhase.invalid) AQErrorBanner(text: f.t(st.errorKey!)),

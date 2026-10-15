@@ -32,6 +32,8 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
   final _email = TextEditingController();
   final _business = TextEditingController();
   final _agency = TextEditingController();
+  final _companyEmail = TextEditingController();
+  final _companyAddress = TextEditingController();
   // Passwords live only in these controllers: never in state, drafts or logs.
   final _password = TextEditingController();
   final _confirm = TextEditingController();
@@ -52,7 +54,7 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
   void dispose() {
     _linkTerms.dispose();
     _linkPrivacy.dispose();
-    for (final c in [_first, _last, _phone, _email, _business, _agency, _password, _confirm]) {
+    for (final c in [_first, _last, _phone, _email, _business, _agency, _companyEmail, _companyAddress, _password, _confirm]) {
       c.dispose();
     }
     super.dispose();
@@ -66,6 +68,8 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
     _email.text = v.email;
     _business.text = v.businessName;
     _agency.text = v.agencyName;
+    _companyEmail.text = v.companyEmail;
+    _companyAddress.text = v.companyAddress;
   }
 
   void _push() {
@@ -77,6 +81,8 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
           email: _email.text,
           businessName: _business.text,
           agencyName: _agency.text,
+          companyEmail: _companyEmail.text,
+          companyAddress: _companyAddress.text,
         ));
   }
 
@@ -140,6 +146,10 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
         body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (cfg.hasAgencyName) AQTextField(label: f.t('field.agencyName'), controller: _agency, valid: v.agencyName.trim().isNotEmpty, error: err('agencyName'), onChanged: (_) => _push()),
           if (cfg.hasBusinessName) AQTextField(label: f.t('field.businessName'), controller: _business, valid: v.businessName.trim().isNotEmpty, error: err('businessName'), onChanged: (_) => _push()),
+          if (cfg.hasCompanyContact) ...[
+            AQTextField(label: f.t('field.companyEmail'), helper: f.t('field.companyEmail.help'), controller: _companyEmail, keyboardType: TextInputType.emailAddress, autofill: const [AutofillHints.email], valid: isValidEmail(v.companyEmail), error: err('companyEmail'), onChanged: (_) => _push()),
+            AQTextField(label: f.t(cfg.companyAddressRequired ? 'field.companyAddress' : 'field.companyAddressOptional'), controller: _companyAddress, keyboardType: TextInputType.streetAddress, valid: v.companyAddress.trim().isNotEmpty, error: err('companyAddress'), onChanged: (_) => _push()),
+          ],
           if (cfg.hasServiceType)
             AQSegmented<InteriorExteriorServiceType>(
               label: f.t('field.serviceType'),

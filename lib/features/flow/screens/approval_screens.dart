@@ -14,7 +14,6 @@ import '../../../data/api/account_api.dart';
 import '../../entry/models/signup_purpose.dart';
 import '../../entry/widgets/entry_common.dart' show MasterLogo;
 import '../widgets/document_upload_tile.dart';
-import '../../devbuild/db_models.dart' show proTypeOfPurpose;
 import '../widgets/flow_common.dart';
 
 /// The emotional payoff: restrained, one drawn check, four lines that arrive in
@@ -185,7 +184,7 @@ class WorkspaceActivationScreen extends ConsumerWidget {
           subtitle: '${roleTitle(context, info.purpose)} · ${f.t('ws.sub')}',
           onBack: () => context.go('/verification/summary'),
           backLabel: f.t('common.back'),
-          bottom: AQPrimaryButton(label: f.t('ws.cta'), onPressed: () => context.go(proTypeOfPurpose(info.purpose) != null ? '/app/account/workspace' : '/app/home')),
+          bottom: AQPrimaryButton(label: f.t('ws.cta'), onPressed: () => context.go('/app/home')),
           children: [
             AQSurface(
               padding: const EdgeInsets.all(AQSpacing.x4),

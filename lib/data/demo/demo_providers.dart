@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import '../../core/config/backend_mode.dart';
 import '../../core/domain/account_models.dart';
 import '../../features/entry/models/signup_purpose.dart';
@@ -28,8 +30,36 @@ List<Override> demoOverrides() {
 const _reviewSession = String.fromEnvironment('REVIEW_SESSION');
 
 void _seedReviewSession(DemoBackendState s) {
-  if (!kShowReviewTools || _reviewSession.isEmpty) return;
-  final (purpose, grant, stage) = switch (_reviewSession) {
+  if (!kShowReviewTools) return;
+  // QA builds can also pick the session at run time: `/?session=agent#/app/home`.
+  final name = _reviewSession.isNotEmpty ? _reviewSession : (kIsWeb ? (Uri.base.queryParameters['session'] ?? '') : '');
+  if (name.isEmpty) return;
+  final (purpose, grant, stage) = switch (name) {
+    'agent' => (
+      SignupPurpose.realEstateAgent,
+      GrantState.approved,
+      null,
+    ),
+    'agent-pending' => (
+      SignupPurpose.realEstateAgent,
+      GrantState.pendingVerification,
+      ReviewStage.underReview,
+    ),
+    'suspended' => (
+      SignupPurpose.constructionCompany,
+      GrantState.suspended,
+      null,
+    ),
+    'resubmission' => (
+      SignupPurpose.buildingArchitecture,
+      GrantState.resubmissionRequired,
+      null,
+    ),
+    'buyer' => (
+      SignupPurpose.userToShop,
+      null,
+      null,
+    ),
     'developer' => (
       SignupPurpose.propertyDevelopmentCompany,
       GrantState.approved,
@@ -76,6 +106,7 @@ void _seedReviewSession(DemoBackendState s) {
     ..grant = grant
     ..stage = stage
     ..businessName = 'Review Business'
+    ..serviceType = name == 'interior' ? InteriorExteriorServiceType.both : null
     ..signedIn = true
     ..emailVerified = true;
 }

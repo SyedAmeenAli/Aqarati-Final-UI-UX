@@ -371,46 +371,47 @@ class AQSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: AQSpacing.x6, bottom: AQSpacing.x3),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Semantics(
-                  header: true,
-                  child: Text(
-                    title,
-                    style: AQTypography.of(context, AQText.headlineMedium),
-                  ),
-                ),
-                if (sub != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      sub!,
-                      style: AQTypography.of(
-                        context,
-                        AQText.bodySmall,
-                        soft: true,
-                      ),
-                    ),
-                  ),
-              ],
+    final heading = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Semantics(
+          header: true,
+          child: Text(
+            title,
+            style: AQTypography.of(context, AQText.headlineMedium),
+          ),
+        ),
+        if (sub != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              sub!,
+              style: AQTypography.of(context, AQText.bodySmall, soft: true),
             ),
           ),
-          if (action != null)
-            AQTextButton(
-              label: action!,
-              color: c.accentDeep,
-              trailingIcon: 'chevron-right',
-              onPressed: onAction,
+      ],
+    );
+    final button = action == null
+        ? null
+        : AQTextButton(
+            label: action!,
+            color: c.accentDeep,
+            trailingIcon: 'chevron-right',
+            onPressed: onAction,
+          );
+    // At very large text the action moves under the heading instead of squeezing it.
+    final stacked = MediaQuery.textScalerOf(context).scale(1) > 1.4;
+    return Padding(
+      padding: const EdgeInsets.only(top: AQSpacing.x6, bottom: AQSpacing.x3),
+      child: stacked && button != null
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [heading, Align(alignment: AlignmentDirectional.centerEnd, child: button)],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [Expanded(child: heading), ?button],
             ),
-        ],
-      ),
     );
   }
 }
@@ -1238,7 +1239,10 @@ Widget aqPage(
 // ---------------------------------------------------------------- Home
 
 class AQHomeScreen extends ConsumerWidget {
-  const AQHomeScreen({super.key});
+  /// Optional first block under the hero: the Buyer / Agent switcher for an approved agent, or
+  /// the status banner for an application that is not approved yet.
+  final Widget? topSlot;
+  const AQHomeScreen({super.key, this.topSlot});
 
   String _greeting(FlowStrings f) {
     final h = DateTime.now().hour;
@@ -1265,6 +1269,7 @@ class AQHomeScreen extends ConsumerWidget {
         sub: '',
       ),
       children: [
+        if (topSlot != null) topSlot!,
         AQSearchEntry(hint: f.t('home.search.hint')),
         AQSectionHeader(
           f.t('home.browse'),

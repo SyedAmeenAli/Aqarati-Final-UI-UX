@@ -435,6 +435,7 @@ class DemoDevBuildRepository implements DevBuildRepository {
       id: 'me',
       name: s.businessName ?? '',
       type: type,
+      serviceType: type == ProType.interiorExterior ? s.serviceType : null,
       locationLabel: '',
       governorate: '',
       verified: true,

@@ -33,8 +33,8 @@ const Map<SignupPurpose, List<String>> _copy = {
   SignupPurpose.realEstateAgent: ['Real Estate Agent', 'Join AQARATI as a licensed real estate agent.', 'وسيط عقاري', 'انضم إلى عقاراتي كوسيط عقاري مرخّص.'],
   SignupPurpose.constructionCompany: ['Construction Company', 'Register your construction business on AQARATI.', 'شركة مقاولات', 'سجّل شركة المقاولات الخاصة بك في عقاراتي.'],
   SignupPurpose.propertyDevelopmentCompany: ['Property Development Company', 'Present your development company and projects.', 'شركة تطوير عقاري', 'اعرض شركتك التطويرية ومشاريعك.'],
-  SignupPurpose.buildingArchitecture: ['Building Architecture', 'Register your architecture practice on AQARATI.', 'العمارة والتصميم الإنشائي', 'سجّل مكتبك الهندسي المعماري في عقاراتي.'],
-  SignupPurpose.interiorExteriorDesign: ['Interior & Exterior Design', 'Register your interior and exterior design practice.', 'التصميم الداخلي والخارجي', 'سجّل مكتب التصميم الداخلي والخارجي الخاص بك.'],
+  SignupPurpose.buildingArchitecture: ['Building Architecture', 'Register your architecture firm on AQARATI.', 'العمارة والتصميم الإنشائي', 'سجّل مكتبك الهندسي المعماري في عقاراتي.'],
+  SignupPurpose.interiorExteriorDesign: ['Interior & Exterior Design', 'Register your design firm on AQARATI.', 'التصميم الداخلي والخارجي', 'سجّل مكتب التصميم الداخلي والخارجي الخاص بك.'],
 };
 
 // en, ar (Arabic is a draft and needs native review)

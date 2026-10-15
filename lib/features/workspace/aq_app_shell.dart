@@ -15,7 +15,7 @@ import '../devbuild/db_models.dart' show proTypeOfPurpose;
 import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
 import 'aq_explore.dart';
-import 'aq_home.dart';
+import '../role_home/role_home_screen.dart';
 
 const _tabs = ['/app/home', '/app/explore', '/app/activity', '/app/account'];
 
@@ -148,7 +148,7 @@ Widget _guestCard(BuildContext context) {
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
   @override
-  Widget build(BuildContext context) => const AQHomeScreen();
+  Widget build(BuildContext context) => const RoleHomeScreen();
 }
 
 class ExploreTab extends StatelessWidget {
