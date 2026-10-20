@@ -72,11 +72,18 @@ class AQTopBar extends StatelessWidget {
         if (onBack != null) AQIconButton(icon: 'chevron-left', semanticsLabel: backLabel ?? 'Back', onPressed: onBack) else const SizedBox(width: AQControl.tap),
         const Spacer(),
         if (actionLabel != null)
-          Semantics(
-            button: true,
-            label: actionSemantics ?? actionLabel,
-            excludeSemantics: true,
-            child: AQTextButton(label: actionLabel!, trailingIcon: 'chevron-right', onPressed: onAction),
+          // A long action label (large text, Arabic) scales down instead of overflowing the bar.
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: AlignmentDirectional.centerEnd,
+              child: Semantics(
+                button: true,
+                label: actionSemantics ?? actionLabel,
+                excludeSemantics: true,
+                child: AQTextButton(label: actionLabel!, trailingIcon: 'chevron-right', onPressed: onAction),
+              ),
+            ),
           ),
       ]),
     );
@@ -90,10 +97,53 @@ class AQChoiceTile extends StatelessWidget {
   final String description;
   final bool selected;
   final VoidCallback onTap;
-  const AQChoiceTile({super.key, required this.icon, required this.title, required this.description, required this.selected, required this.onTap});
+
+  /// Optional shortcut chip in the corner (demo builds only): [onSkip] runs instead of [onTap].
+  final String? skipLabel;
+  final String? skipSemantics;
+  final VoidCallback? onSkip;
+  const AQChoiceTile({super.key, required this.icon, required this.title, required this.description, required this.selected, required this.onTap, this.skipLabel, this.skipSemantics, this.onSkip});
 
   @override
   Widget build(BuildContext context) {
+    final tile = _tile(context);
+    if (onSkip == null || skipLabel == null) return tile;
+    final c = AQColors.of(context);
+    return Stack(children: [
+      tile,
+      PositionedDirectional(
+        top: 0,
+        end: 0,
+        child: Semantics(
+          button: true,
+          label: skipSemantics ?? skipLabel,
+          excludeSemantics: true,
+          child: AQPressable(
+            onTap: () {
+              AQHaptics.confirm();
+              onSkip!();
+            },
+            // Generous invisible hit area around a small pill.
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(AQSpacing.x3, AQSpacing.x2, AQSpacing.x2, AQSpacing.x3),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 28),
+                padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x3),
+                decoration: BoxDecoration(color: c.accent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AQRadius.medium), border: Border.all(color: c.accent.withValues(alpha: 0.4))),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(skipLabel!, style: AQTypography.of(context, AQText.labelMedium, color: c.accentDeep)),
+                  const SizedBox(width: 2),
+                  AQIcon('chevron-right', size: 12, directional: true, color: c.accentDeep),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _tile(BuildContext context) {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
@@ -155,7 +205,7 @@ Future<T?> showAQSheet<T>(BuildContext context, {required WidgetBuilder builder,
     enableDrag: dismissible,
     backgroundColor: Colors.transparent,
     barrierColor: const Color(0x66000000),
-    sheetAnimationStyle: AnimationStyle(duration: AQMotion.slow, reverseDuration: AQMotion.standard, curve: AQMotion.spring),
+    sheetAnimationStyle: AnimationStyle(duration: AQMotion.sheet, reverseDuration: AQMotion.sheetReverse, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic),
     builder: (sheetContext) {
       final bottom = MediaQuery.of(sheetContext).viewInsets.bottom;
       return Padding(
@@ -217,25 +267,60 @@ class AQSheetRow extends StatelessWidget {
 class AQRoute {
   AQRoute._();
 
+  /// Standard push: the new page arrives from the logical forward side (right in LTR, left in RTL)
+  /// by [AQMotion.routeTravel] px while fading in; the page underneath drifts back a few px and
+  /// fades. Pop plays the same motion in reverse. Reduced motion is a plain fade.
   static Page<T> forward<T>({required LocalKey key, required Widget child}) => CustomTransitionPage<T>(
         key: key,
         child: child,
         transitionDuration: AQMotion.page,
         reverseTransitionDuration: AQMotion.standard,
+        transitionsBuilder: forwardTransition,
+      );
+
+  /// The standard push motion, shared by router pages and [route].
+  static Widget forwardTransition(BuildContext context, Animation<double> animation, Animation<double> secondary, Widget child) {
+    if (AQMotion.reduced(context)) return FadeTransition(opacity: animation, child: child);
+    final dir = Directionality.of(context) == TextDirection.rtl ? -1.0 : 1.0;
+    final inCurve = animation.drive(CurveTween(curve: Curves.easeOutCubic));
+    final outCurve = secondary.drive(CurveTween(curve: Curves.easeInOutCubic));
+    return AnimatedBuilder(
+      animation: Listenable.merge([animation, secondary]),
+      child: child,
+      builder: (context, child) {
+        final dx = dir * (AQMotion.routeTravel * (1 - inCurve.value) - 6 * outCurve.value);
+        final fadeIn = animation.drive(CurveTween(curve: const Interval(0, 0.75, curve: Curves.easeOut))).value;
+        final fadeOut = 1 - secondary.drive(CurveTween(curve: const Interval(0, 0.6, curve: Curves.easeIn))).value;
+        return Opacity(opacity: (fadeIn * fadeOut).clamp(0.0, 1.0), child: Transform.translate(offset: Offset(dx, 0), child: child));
+      },
+    );
+  }
+
+  /// For screens opened with `Navigator.push` (they carry an object, so they have no URL): the same
+  /// motion as every router page, instead of the platform default.
+  static Route<T> route<T>(Widget child) => PageRouteBuilder<T>(
+        transitionDuration: AQMotion.page,
+        reverseTransitionDuration: AQMotion.standard,
+        pageBuilder: (context, animation, secondary) => child,
+        transitionsBuilder: forwardTransition,
+      );
+
+  /// Main tabs: a quick cross-fade, no travel (tabs are peers, not a journey).
+  static Page<T> tab<T>({required LocalKey key, required Widget child}) => CustomTransitionPage<T>(
+        key: key,
+        child: child,
+        transitionDuration: AQMotion.fast,
+        reverseTransitionDuration: AQMotion.fast,
         transitionsBuilder: (context, animation, secondary, child) {
-          if (AQMotion.reduced(context)) return FadeTransition(opacity: animation, child: child);
-          final inCurve = CurvedAnimation(parent: animation, curve: AQMotion.emphasized);
-          final outCurve = CurvedAnimation(parent: secondary, curve: AQMotion.emphasized);
-          return FadeTransition(
-            opacity: Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: animation, curve: const Interval(0, 0.7))),
-            child: SlideTransition(
-              position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(inCurve),
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 0.992, end: 1).animate(inCurve),
-                // The page underneath eases back very slightly while a new one arrives.
-                child: FadeTransition(opacity: Tween<double>(begin: 1, end: 0.0).animate(outCurve), child: child),
-              ),
-            ),
+          if (AQMotion.reduced(context)) return child;
+          // Fade-through: the outgoing tab clears in the first half, the incoming one fades in during
+          // the second, so two pages' text never sits on top of each other.
+          final fadeIn = animation.drive(CurveTween(curve: const Interval(0.4, 1, curve: Curves.easeOut)));
+          final fadeOut = secondary.drive(CurveTween(curve: const Interval(0, 0.5, curve: Curves.easeIn)));
+          return AnimatedBuilder(
+            animation: Listenable.merge([animation, secondary]),
+            child: child,
+            builder: (context, child) => Opacity(opacity: (fadeIn.value * (1 - fadeOut.value)).clamp(0.0, 1.0), child: child),
           );
         },
       );
@@ -334,38 +419,68 @@ class AQGlassNav extends StatelessWidget {
                     filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                     child: DecoratedBox(
                       decoration: BoxDecoration(color: tint, border: Border.all(color: c.hairline), borderRadius: BorderRadius.circular(compact ? 26 : AQRadius.large)),
-                      child: Row(children: [
-                        for (var i = 0; i < items.length; i++)
-                          Expanded(
-                            child: Semantics(
-                              button: true,
-                              selected: i == index,
-                              label: items[i].label,
-                              excludeSemantics: true,
-                              child: AQPressable(
-                                onTap: () {
-                                  AQHaptics.selection();
-                                  onSelected(i);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-                                  child: AnimatedContainer(
-                                    duration: AQMotion.scaled(context, AQMotion.fast),
-                                    curve: AQMotion.standardCurve,
-                                    decoration: BoxDecoration(color: i == index ? c.accent.withValues(alpha: c.isDark ? 0.32 : 0.24) : Colors.transparent, borderRadius: BorderRadius.circular(compact ? 20 : 20)),
-                                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                      AQIcon(items[i].icon, size: AQIconSize.medium, color: i == index ? c.accentDeep : c.inkSoft),
-                                      if (!compact) ...[
-                                        const SizedBox(height: 3),
-                                        FittedBox(fit: BoxFit.scaleDown, child: Text(items[i].label, maxLines: 1, style: AQTypography.of(context, AQText.labelMedium, color: i == index ? c.accentDeep : c.inkSoft).copyWith(fontSize: 11, fontWeight: i == index ? FontWeight.w700 : FontWeight.w500))),
-                                      ],
-                                    ]),
+                      child: LayoutBuilder(
+                        builder: (context, box) {
+                          final w = box.maxWidth / items.length;
+                          final pillColor = c.accent.withValues(alpha: c.isDark ? 0.32 : 0.24);
+                          return Stack(children: [
+                            // One indicator that slides to the selected tab (start-aligned, so it mirrors in RTL).
+                            AnimatedPositionedDirectional(
+                              key: const ValueKey('nav-indicator'),
+                              duration: AQMotion.scaled(context, AQMotion.fast),
+                              curve: Curves.easeInOutCubic,
+                              start: index * w + 4,
+                              width: w - 8,
+                              top: 5,
+                              bottom: 5,
+                              child: DecoratedBox(decoration: BoxDecoration(color: pillColor, borderRadius: BorderRadius.circular(20))),
+                            ),
+                            Row(children: [
+                              for (var i = 0; i < items.length; i++)
+                                Expanded(
+                                  child: Semantics(
+                                    button: true,
+                                    selected: i == index,
+                                    label: items[i].label,
+                                    excludeSemantics: true,
+                                    child: AQPressable(
+                                      onTap: () {
+                                        AQHaptics.selection();
+                                        onSelected(i);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+                                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                          AnimatedScale(
+                                            scale: i == index ? 1 : 0.92,
+                                            duration: AQMotion.scaled(context, AQMotion.icon),
+                                            curve: Curves.easeOutCubic,
+                                            child: TweenAnimationBuilder<Color?>(
+                                              tween: ColorTween(end: i == index ? c.accentDeep : c.inkSoft),
+                                              duration: AQMotion.scaled(context, AQMotion.icon),
+                                              builder: (context, col, _) => AQIcon(items[i].icon, size: AQIconSize.medium, color: col),
+                                            ),
+                                          ),
+                                          if (!compact) ...[
+                                            const SizedBox(height: 3),
+                                            FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: AnimatedDefaultTextStyle(
+                                                duration: AQMotion.scaled(context, AQMotion.icon),
+                                                style: AQTypography.of(context, AQText.labelMedium, color: i == index ? c.accentDeep : c.inkSoft).copyWith(fontSize: 11, fontWeight: i == index ? FontWeight.w700 : FontWeight.w500),
+                                                child: Text(items[i].label, maxLines: 1),
+                                              ),
+                                            ),
+                                          ],
+                                        ]),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                      ]),
+                            ]),
+                          ]);
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -376,6 +491,104 @@ class AQGlassNav extends StatelessWidget {
       },
     );
   }
+}
+
+/// AnimatedSize that is safe under reduced motion. Flutter asserts when an AnimatedSize with a zero
+/// duration changes size, so with reduced motion the child is placed directly and just snaps.
+class AQAnimatedSize extends StatelessWidget {
+  final Duration duration;
+  final Curve curve;
+  final AlignmentGeometry alignment;
+  final Widget child;
+  const AQAnimatedSize({super.key, this.duration = AQMotion.standard, this.curve = Curves.easeOutCubic, this.alignment = Alignment.topCenter, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    if (AQMotion.reduced(context)) return child;
+    return AnimatedSize(duration: duration, curve: curve, alignment: alignment, child: child);
+  }
+}
+
+/// Swaps a multi-step form body with a short directional slide and fade. [forward] is the logical
+/// direction of travel (Next = true, Back = false) and mirrors in RTL. Keep [stepKey] stable per
+/// step so the right child animates; values live outside this widget so nothing is lost.
+class AQStepSwitcher extends StatelessWidget {
+  final Object stepKey;
+  final bool forward;
+  final Widget child;
+  const AQStepSwitcher({super.key, required this.stepKey, required this.forward, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final reduced = AQMotion.reduced(context);
+    final dir = (Directionality.of(context) == TextDirection.rtl ? -1.0 : 1.0) * (forward ? 1.0 : -1.0);
+    final currentKey = ValueKey<Object>(stepKey);
+    return AQAnimatedSize(
+      duration: AQMotion.formStep,
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: AnimatedSwitcher(
+        duration: reduced ? Duration.zero : AQMotion.formStep,
+        reverseDuration: reduced ? Duration.zero : AQMotion.formStep,
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        layoutBuilder: (current, previous) => Stack(alignment: AlignmentDirectional.topStart, children: [...previous, ?current]),
+        transitionBuilder: (child, animation) {
+          final incoming = child.key == currentKey;
+          // Incoming starts stepTravel px behind the direction of travel; outgoing leaves ahead of it.
+          final offset = animation.drive(Tween<Offset>(begin: Offset(incoming ? dir * AQMotion.stepTravel : -dir * AQMotion.stepTravel, 0), end: Offset.zero));
+          return FadeTransition(
+            opacity: animation,
+            child: AnimatedBuilder(animation: offset, child: child, builder: (context, c) => Transform.translate(offset: offset.value, child: c)),
+          );
+        },
+        child: KeyedSubtree(key: currentKey, child: child),
+      ),
+    );
+  }
+}
+
+/// A heart that pops once (0.9 to 1.08 to 1.0) when [saved] actually changes. It never animates on
+/// first build, never loops, and is static under reduced motion.
+class AQHeart extends StatefulWidget {
+  final bool saved;
+  final double size;
+  final Color savedColor;
+  final Color idleColor;
+  const AQHeart({super.key, required this.saved, this.size = 22, required this.savedColor, required this.idleColor});
+  @override
+  State<AQHeart> createState() => _AQHeartState();
+}
+
+class _AQHeartState extends State<AQHeart> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
+  late final Animation<double> _scale = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.08).chain(CurveTween(curve: Curves.easeOut)), weight: 45),
+    TweenSequenceItem(tween: Tween(begin: 1.08, end: 1.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 55),
+  ]).animate(_c);
+
+  @override
+  void didUpdateWidget(AQHeart old) {
+    super.didUpdateWidget(old);
+    if (old.saved != widget.saved && !AQMotion.reduced(context)) _c.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _c,
+        builder: (context, child) => Transform.scale(scale: _c.isAnimating ? _scale.value : 1.0, child: child),
+        child: TweenAnimationBuilder<Color?>(
+          tween: ColorTween(end: widget.saved ? widget.savedColor : widget.idleColor),
+          duration: AQMotion.scaled(context, AQMotion.icon),
+          builder: (context, col, _) => Icon(widget.saved ? Icons.favorite : Icons.favorite_border, size: widget.size, color: col),
+        ),
+      );
 }
 
 /// Convenience used by screens: pop if possible, else go to [fallback].

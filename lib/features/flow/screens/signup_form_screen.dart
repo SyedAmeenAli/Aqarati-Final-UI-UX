@@ -40,6 +40,8 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
   final _linkTerms = TapGestureRecognizer();
   final _linkPrivacy = TapGestureRecognizer();
   bool _seeded = false;
+  int _lastStep = 0;
+  bool _forward = true;
 
   RoleFormConfig get cfg => roleConfigs[widget.purpose]!;
 
@@ -121,6 +123,11 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
 
     final steps = stepsFor(cfg);
     final step = steps[st.stepIndex];
+    // Direction of travel for the step transition (Next forward, Back reverse).
+    if (st.stepIndex != _lastStep) {
+      _forward = st.stepIndex > _lastStep;
+      _lastStep = st.stepIndex;
+    }
     String? err(String field) => st.errors[field] == null ? null : f.t(st.errors[field]!);
     final v = st.values;
     final title = switch (step) {
@@ -171,7 +178,7 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
             return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               AQPasswordField(label: f.t('field.password'), controller: _password, showLabel: f.t('field.show'), hideLabel: f.t('field.hide'), newPassword: true, error: err('password')),
               // Requirements guide while the password is being written, then fold into one calm line.
-              AnimatedSize(
+              AQAnimatedSize(
                 duration: AQMotion.scaled(context, AQMotion.standard),
                 curve: AQMotion.standardCurve,
                 alignment: Alignment.topCenter,
@@ -239,7 +246,7 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
           Flexible(child: Text(f.t('signup.draftSaved'), textAlign: TextAlign.center, style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint).copyWith(fontSize: 11.5))),
         ]),
       ]),
-      children: [body],
+      children: [AQStepSwitcher(stepKey: step, forward: _forward, child: body)],
     );
   }
 }

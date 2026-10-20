@@ -61,6 +61,10 @@ abstract class AccountApi {
 
   /// POST /me/verification/resubmit (grant -> pending_verification).
   Future<void> resubmit();
+
+  /// Asks AQARATI to delete the signed-in account. The endpoint is not confirmed; callers must treat a
+  /// thrown [ApiException] as "nothing was deleted".
+  Future<void> deleteAccount();
 }
 
 class UnavailableAccountApi implements AccountApi {
@@ -84,6 +88,8 @@ class UnavailableAccountApi implements AccountApi {
   Future<void> submitVerification() async => _no();
   @override
   Future<void> resubmit() async => _no();
+  @override
+  Future<void> deleteAccount() async => _no();
 }
 
 final accountApiProvider = Provider<AccountApi>((ref) => const UnavailableAccountApi());

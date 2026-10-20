@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/aq/aq_demo.dart';
 import '../../core/aq/aq_documents.dart' show AQStatusBadge;
 import '../../core/aq/aq_primitives.dart';
 import '../../core/aq/aq_scene.dart';
@@ -43,7 +44,7 @@ class RoleHomePage extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: AQSpacing.maxContent + AQSpacing.gutter * 2),
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x2, AQSpacing.gutter, 128),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [...children, const SizedBox(height: AQSpacing.x6), const AQDemoNotice()]),
           ),
         ),
       ),
@@ -280,7 +281,7 @@ class _RoleTileState extends State<RoleTile> {
             widget.onTap?.call();
           }
         },
-        child: AnimatedSize(
+        child: AQAnimatedSize(
           duration: AQMotion.scaled(context, AQMotion.standard),
           curve: AQMotion.standardCurve,
           alignment: Alignment.topCenter,

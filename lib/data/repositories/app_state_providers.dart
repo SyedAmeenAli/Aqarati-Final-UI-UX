@@ -4,14 +4,15 @@ import '../models/enums.dart';
 import '../models/money.dart';
 import '../models/saved.dart';
 
-/// Session-scoped app state — in-memory only (no backend yet). Actions taken
-/// in one screen (save, book, offer) show up in another (Saved, My Home,
-/// My Enquiries) within the same session.
+/// Session-scoped app state, in memory (no backend yet). Actions taken in one screen (save, book,
+/// offer) show up in another within the same session. Saved property ids and recent searches are
+/// also kept on the device by [AQLocalPersistence].
 
 final savedPropertyIdsProvider = StateProvider<Set<String>>((ref) => {});
 
 final savedSearchesProvider = StateProvider<List<SavedSearch>>((ref) => []);
-final recentSearchesProvider = StateProvider<List<String>>((ref) => ['3 Bedroom Villas', 'Muscat', 'Interior Design', 'Al Mouj']);
+/// The person's own recent searches. Starts empty: no sample history is invented.
+final recentSearchesProvider = StateProvider<List<String>>((ref) => []);
 
 class PropertyOffer {
   final String id;

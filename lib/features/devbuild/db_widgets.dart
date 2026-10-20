@@ -758,7 +758,7 @@ class DbFieldFrame extends StatelessWidget {
           ),
         ),
         child,
-        AnimatedSize(
+        AQAnimatedSize(
           duration: AQMotion.scaled(context, AQMotion.fast),
           alignment: Alignment.topLeft,
           child: error == null

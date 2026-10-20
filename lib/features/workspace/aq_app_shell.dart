@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/aq/aq_demo.dart';
 import '../../core/aq/aq_documents.dart';
 import '../../core/aq/aq_primitives.dart';
 import '../../core/aq/aq_scene.dart';
 import '../../core/aq/aq_tokens.dart';
 import '../../core/aq/aq_typography.dart';
 import '../../core/auth/auth_repository.dart';
+import '../../core/config/backend_mode.dart';
 import '../../core/domain/account_models.dart';
 import '../../core/localization/entry_strings.dart';
 import '../../core/localization/flow_strings.dart';
@@ -14,6 +16,7 @@ import '../../data/api/account_api.dart';
 import '../devbuild/db_models.dart' show proTypeOfPurpose;
 import '../flow/screens/approval_screens.dart' show workspaceCaps;
 import '../flow/widgets/flow_common.dart';
+import '../notifications/notifications.dart';
 import 'aq_explore.dart';
 import '../role_home/role_home_screen.dart';
 
@@ -166,7 +169,10 @@ class AccountTab extends ConsumerWidget {
     final me = ref.watch(meProvider);
     final current = ref.watch(localeProvider).languageCode;
     final m = me.valueOrNull;
+    final c = AQColors.of(context);
     return _TabPage(title: f.t('account.title'), children: [
+      const AQDemoNotice(),
+      if (kUseDemoBackend) const SizedBox(height: AQSpacing.x4),
       if (me.isLoading && m == null) const AQSkeleton(),
       if (m == null && me.hasError) _guestCard(context),
       if (m != null) ..._sessionSections(context, m),
@@ -175,6 +181,20 @@ class AccountTab extends ConsumerWidget {
           if (m.purpose != null) AQKeyValue(f.t('account.role'), roleTitle(context, m.purpose!)),
           if (m.phoneLast4 != null) AQKeyValue(f.t('account.phone'), '•••• ${m.phoneLast4}'),
         ]),
+      if (m != null)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+          child: Builder(builder: (context) {
+            final unread = ref.watch(unreadNotificationsProvider);
+            return AQSecondaryButton(
+              label: unread > 0 ? '${f.t('ntf.row')} ($unread)' : f.t('ntf.row'),
+              semanticsLabel: unread > 0 ? '${f.t('ntf.row')}. ${f.t('ntf.unread', {'n': '$unread'})}' : f.t('ntf.row'),
+              leadingIcon: 'activity',
+              trailingChevron: false,
+              onPressed: () => context.push('/notifications'),
+            );
+          }),
+        ),
       Padding(
         padding: const EdgeInsets.only(bottom: AQSpacing.x3),
         child: AQSecondaryButton(label: f.t('account.saved'), leadingIcon: 'star', trailingChevron: false, onPressed: () => context.push('/saved')),
@@ -202,6 +222,10 @@ class AccountTab extends ConsumerWidget {
             if (context.mounted) context.go('/entry');
           },
         ),
+      if (m != null) ...[
+        const SizedBox(height: AQSpacing.x3),
+        Center(child: AQTextButton(label: f.t('del.row'), color: c.danger, onPressed: () => context.push('/account/delete'))),
+      ],
     ]);
   }
 }

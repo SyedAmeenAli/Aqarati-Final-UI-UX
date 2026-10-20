@@ -24,6 +24,25 @@ List<Override> demoOverrides() {
   ];
 }
 
+/// DEMO ONLY: replaces the simulated account with a signed-in one for [purpose], so a presenter can
+/// open that role's home page without going through sign-up and verification. A buyer has no
+/// business grant; every other role is shown as an approved business. Never used with a real backend.
+void demoEnterAs(DemoBackendState s, SignupPurpose purpose) {
+  s.wipe();
+  final business = purpose != SignupPurpose.userToShop;
+  s
+    ..email = 'demo@example.test'
+    ..phone = '90000000'
+    ..purpose = purpose
+    ..account = AccountState.active
+    ..grant = business ? GrantState.approved : null
+    ..stage = null
+    ..businessName = business ? 'Demo business' : null
+    ..serviceType = purpose == SignupPurpose.interiorExteriorDesign ? InteriorExteriorServiceType.both : null
+    ..signedIn = true
+    ..emailVerified = true;
+}
+
 /// REVIEW TOOLS ONLY (`--dart-define=REVIEW_TOOLS=true --dart-define=REVIEW_SESSION=<name>`): starts the
 /// demo already signed in as an approved business, so reviewers can open the workspace without
 /// clicking through sign-up and verification. Does nothing in a normal build.

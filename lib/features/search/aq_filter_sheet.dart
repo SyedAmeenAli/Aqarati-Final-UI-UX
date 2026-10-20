@@ -84,7 +84,8 @@ class AQResultsBar extends StatelessWidget {
     final text = Semantics(liveRegion: true, child: Text(f.t('props.count', {'n': VFmt.n(context, count)}), style: AQTypography.of(context, AQText.titleMedium)));
     final filters = _button(context, icon: 'search', label: f.t('flt.button'), badge: activeFilters, onTap: onFilters);
     final sort = _button(context, icon: 'chevron-down', label: f.t('sort.button'), onTap: onSort);
-    if (aqLargeText(context)) {
+    // Stack the count above the two buttons on narrow screens as well as at large text.
+    if (aqLargeText(context) || MediaQuery.sizeOf(context).width < 360) {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [text, const SizedBox(height: AQSpacing.x2), Wrap(spacing: AQSpacing.x2, runSpacing: AQSpacing.x2, children: [filters, sort])]);
     }
     return Row(children: [Expanded(child: text), filters, const SizedBox(width: AQSpacing.x2), sort]);
@@ -121,7 +122,7 @@ Future<AQFilters?> showAQFilterSheet(BuildContext context, {required List<Proper
     backgroundColor: Colors.transparent,
     barrierColor: const Color(0x66000000),
     constraints: const BoxConstraints(maxWidth: AQSpacing.maxContent + AQSpacing.gutter * 2),
-    sheetAnimationStyle: AnimationStyle(duration: AQMotion.slow, reverseDuration: AQMotion.standard, curve: AQMotion.spring),
+    sheetAnimationStyle: AnimationStyle(duration: AQMotion.sheet, reverseDuration: AQMotion.sheetReverse, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic),
     builder: (sheet) => SizedBox(
       height: MediaQuery.sizeOf(sheet).height * 0.92,
       child: DecoratedBox(

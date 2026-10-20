@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/aq/aq_primitives.dart';
 import '../../../core/aq/aq_scene.dart';
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/localization/entry_strings.dart';
+import '../../../data/api/account_api.dart' show meProvider;
+import '../../../data/demo/demo_providers.dart';
+import '../../role_home/role_home_model.dart' show homeWorkspaceProvider;
 import '../models/signup_purpose.dart';
 import '../widgets/entry_common.dart' show MasterLogo;
 
 /// Captures sign-up intent only: nothing is created, sent or persisted here,
 /// and choosing a role does not mean the person is verified. The journey length
 /// depends on the role, so no fixed "step x of 3" is shown.
-class PurposeSelectionScreen extends StatefulWidget {
+class PurposeSelectionScreen extends ConsumerStatefulWidget {
   const PurposeSelectionScreen({super.key});
 
   @override
-  State<PurposeSelectionScreen> createState() => _PurposeSelectionScreenState();
+  ConsumerState<PurposeSelectionScreen> createState() => _PurposeSelectionScreenState();
 }
 
-class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with SingleTickerProviderStateMixin {
+class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _enter;
   SignupPurpose? _selected;
 
@@ -51,6 +55,16 @@ class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with Si
         _ => Alignment.bottomCenter,
       };
 
+  /// Demo builds only: jump straight into this role's home page (see [demoEnterAs]).
+  void _skip(SignupPurposeOption o) {
+    final state = ref.read(demoBackendStateProvider);
+    if (state == null) return;
+    demoEnterAs(state, o.id);
+    ref.read(homeWorkspaceProvider.notifier).state = null;
+    ref.invalidate(meProvider);
+    context.go('/app/home');
+  }
+
   void _continue(EntryStrings s) {
     final selected = _selected;
     if (selected == null) return;
@@ -77,7 +91,17 @@ class _PurposeSelectionScreenState extends State<PurposeSelectionScreen> with Si
     final rows = <Widget>[];
     for (var i = 0; i < signupPurposeOptions.length; i += 2) {
       final a = signupPurposeOptions[i], b = signupPurposeOptions[i + 1];
-      Widget tile(SignupPurposeOption o) => AQChoiceTile(icon: o.icon, title: o.title(s), description: o.description(s), selected: _selected == o.id, onTap: () => setState(() => _selected = o.id));
+      final demo = ref.watch(demoBackendStateProvider) != null;
+      Widget tile(SignupPurposeOption o) => AQChoiceTile(
+            icon: o.icon,
+            title: o.title(s),
+            description: o.description(s),
+            selected: _selected == o.id,
+            onTap: () => setState(() => _selected = o.id),
+            skipLabel: demo ? s.skip : null,
+            skipSemantics: demo ? '${s.skip}: ${o.title(s)}' : null,
+            onSkip: demo ? () => _skip(o) : null,
+          );
       rows.add(AQReveal(
         animation: _enter,
         begin: 0.28 + i * 0.05,

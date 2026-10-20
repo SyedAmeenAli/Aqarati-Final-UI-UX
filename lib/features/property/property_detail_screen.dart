@@ -126,7 +126,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           ref.read(savedPropertyIdsProvider.notifier).state = saved ? ({...cur}..remove(p.id)) : {...cur, p.id};
         },
         pressedScale: 0.9,
-        child: Container(width: size, height: size, decoration: BoxDecoration(color: c.surfaceRaised.withValues(alpha: 0.92), shape: BoxShape.circle, border: Border.all(color: c.hairline)), child: Center(child: Icon(saved ? Icons.favorite : Icons.favorite_border, size: 22, color: saved ? const Color(0xFFD9705C) : c.ink))),
+        child: Container(width: size, height: size, decoration: BoxDecoration(color: c.surfaceRaised.withValues(alpha: 0.92), shape: BoxShape.circle, border: Border.all(color: c.hairline)), child: Center(child: AQHeart(saved: saved, savedColor: const Color(0xFFD9705C), idleColor: c.ink))),
       ),
     );
   }
@@ -195,7 +195,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                     button: true,
                     label: f.t('pd.photo', {'i': VFmt.n(context, i + 1), 'n': VFmt.n(context, images.length)}),
                     excludeSemantics: true,
-                    child: GestureDetector(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PropertyGalleryScreen(property: p))), child: aqImg(images[i], cacheWidth: 1000)),
+                    child: GestureDetector(onTap: () => Navigator.of(context).push(AQRoute.route<void>(PropertyGalleryScreen(property: p))), child: aqImg(images[i], cacheWidth: 1000)),
                   ),
                 ),
               PositionedDirectional(
@@ -330,7 +330,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                       ),
                       if (p.transactionType == TransactionType.buy) ...[
                         const SizedBox(height: AQSpacing.x3),
-                        AQSecondaryButton(label: f.t('pd.offer'), trailingChevron: false, leadingIcon: 'send', onPressed: () => aqRequireSession(context, ref, actionKey: 'pd.a.offer', go: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => MakeOfferScreen(property: p))))),
+                        AQSecondaryButton(label: f.t('pd.offer'), trailingChevron: false, leadingIcon: 'send', onPressed: () => aqRequireSession(context, ref, actionKey: 'pd.a.offer', go: () => Navigator.of(context).push(AQRoute.route<void>(MakeOfferScreen(property: p))))),
                       ],
                       _head(context, f.t('pd.listedBy')),
                       _lister(context, f, c, p, lister),
@@ -353,7 +353,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                 AQBottomActionBar(
                   secondary: AQBarSecondaryButton(
                     label: f.t('pd.enquire'),
-                    onPressed: () => aqRequireSession(context, ref, actionKey: 'pd.a.enquire', go: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EnquiryScreen(property: p)))),
+                    onPressed: () => aqRequireSession(context, ref, actionKey: 'pd.a.enquire', go: () => Navigator.of(context).push(AQRoute.route<void>(EnquiryScreen(property: p)))),
                   ),
                   primary: AQPrimaryButton(
                     label: f.t('pd.book'),
@@ -405,7 +405,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               label: f.t('pd.contact'),
               compact: true,
               trailingChevron: false,
-              onPressed: () => aqRequireSession(context, ref, actionKey: 'pd.a.enquire', go: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EnquiryScreen(property: p)))),
+              onPressed: () => aqRequireSession(context, ref, actionKey: 'pd.a.enquire', go: () => Navigator.of(context).push(AQRoute.route<void>(EnquiryScreen(property: p)))),
             ),
           ),
         ]),

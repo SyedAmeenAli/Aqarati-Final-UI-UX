@@ -86,9 +86,103 @@ class AQColors {
     warning: Color(0xFFD9A86A),
   );
 
-  static AQColors of(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? dark : light;
+  /// The colours for this subtree. Inside [AQThemeTransition] this is the (possibly mid-transition)
+  /// interpolated palette, so every surface fades together; without it the palette follows the
+  /// Material brightness, as before.
+  static AQColors of(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<AQColorScope>();
+    if (scope != null) return scope.colors;
+    return Theme.of(context).brightness == Brightness.dark ? dark : light;
+  }
+
+  /// Linear interpolation between two palettes. Brightness flips at the midpoint.
+  static AQColors lerp(AQColors a, AQColors b, double t) {
+    if (t <= 0) return a;
+    if (t >= 1) return b;
+    Color c(Color x, Color y) => Color.lerp(x, y, t)!;
+    return AQColors._(
+      brightness: t < 0.5 ? a.brightness : b.brightness,
+      background: c(a.background, b.background),
+      surface: c(a.surface, b.surface),
+      surfaceRaised: c(a.surfaceRaised, b.surfaceRaised),
+      surfaceSelected: c(a.surfaceSelected, b.surfaceSelected),
+      ink: c(a.ink, b.ink),
+      inkSoft: c(a.inkSoft, b.inkSoft),
+      inkFaint: c(a.inkFaint, b.inkFaint),
+      hairline: c(a.hairline, b.hairline),
+      accent: c(a.accent, b.accent),
+      accentDeep: c(a.accentDeep, b.accentDeep),
+      onAccent: c(a.onAccent, b.onAccent),
+      accentDisabled: c(a.accentDisabled, b.accentDisabled),
+      danger: c(a.danger, b.danger),
+      success: c(a.success, b.success),
+      warning: c(a.warning, b.warning),
+    );
+  }
 
   bool get isDark => brightness == Brightness.dark;
+}
+
+/// Carries the current palette down the tree. See [AQColors.of] and [AQThemeTransition].
+class AQColorScope extends InheritedWidget {
+  final AQColors colors;
+  const AQColorScope({super.key, required this.colors, required super.child});
+  @override
+  bool updateShouldNotify(AQColorScope old) => !identical(colors, old.colors);
+}
+
+/// Animates the palette when the in-app theme changes (colours, text, borders, icons, fields and
+/// bars all read [AQColors.of]), so nothing snaps. The route, scroll position, form values and
+/// role are untouched because only colours change. Reduced motion shortens it to a brief fade.
+class AQThemeTransition extends StatefulWidget {
+  final ThemeMode mode;
+  final Widget child;
+  const AQThemeTransition({super.key, required this.mode, required this.child});
+  @override
+  State<AQThemeTransition> createState() => _AQThemeTransitionState();
+}
+
+class _AQThemeTransitionState extends State<AQThemeTransition> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: AQMotion.theme);
+  bool _first = true;
+
+  double _target(BuildContext context) => switch (widget.mode) {
+        ThemeMode.dark => 1,
+        ThemeMode.light => 0,
+        ThemeMode.system => MediaQuery.platformBrightnessOf(context) == Brightness.dark ? 1 : 0,
+      };
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final target = _target(context);
+    if (_first) {
+      _first = false;
+      _c.value = target;
+    } else if (_c.value != target) {
+      final reduced = AQMotion.reduced(context);
+      _c.animateTo(target, duration: reduced ? AQMotion.themeReduced : AQMotion.theme, curve: Curves.easeInOutCubic);
+    }
+  }
+
+  @override
+  void didUpdateWidget(AQThemeTransition old) {
+    super.didUpdateWidget(old);
+    if (old.mode != widget.mode) didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _c,
+        child: widget.child,
+        builder: (context, child) => AQColorScope(colors: AQColors.lerp(AQColors.light, AQColors.dark, _c.value), child: child!),
+      );
 }
 
 /// 4-pt rhythm.
@@ -142,7 +236,23 @@ class AQMotion {
   static const Duration fast = Duration(milliseconds: 180);
   static const Duration standard = Duration(milliseconds: 260);
   static const Duration slow = Duration(milliseconds: 380);
-  static const Duration page = Duration(milliseconds: 340);
+  /// Standard route push (pop uses [standard]).
+  static const Duration page = Duration(milliseconds: 300);
+
+  // Brief tokens (docs/motion). Press starts at once; release settles a little slower.
+  static const Duration tapDown = Duration(milliseconds: 100);
+  static const Duration tapUp = Duration(milliseconds: 160);
+  static const Duration icon = Duration(milliseconds: 180);
+  static const Duration sheet = Duration(milliseconds: 320);
+  static const Duration sheetReverse = Duration(milliseconds: 240);
+  static const Duration dialog = Duration(milliseconds: 200);
+  static const Duration formStep = Duration(milliseconds: 240);
+  static const Duration theme = Duration(milliseconds: 340);
+  static const Duration themeReduced = Duration(milliseconds: 100);
+  static const Duration state = Duration(milliseconds: 220);
+  /// Horizontal travel for route and step changes, in logical pixels (mirrors in RTL).
+  static const double routeTravel = 20;
+  static const double stepTravel = 14;
   static const Duration hero = Duration(milliseconds: 700);
   static const Duration reveal = Duration(milliseconds: 640);
 

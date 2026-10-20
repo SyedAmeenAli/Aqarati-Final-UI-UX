@@ -31,6 +31,31 @@ class DemoBackendState {
   InteriorExteriorServiceType? serviceType;
   String? reference;
   DateTime? decidedAt;
+
+  /// DEMO: forgets the simulated account (used by the simulated account deletion).
+  void wipe() {
+    email = null;
+    password = null;
+    phone = null;
+    purpose = null;
+    account = AccountState.otpPending;
+    grant = null;
+    stage = null;
+    submittedAt = null;
+    docs.clear();
+    otpExpiresAt = null;
+    lastOtpAt = null;
+    otpSends.clear();
+    wrongAttempts = 0;
+    signedIn = false;
+    emailVerifySentAt = null;
+    emailVerified = false;
+    reason = null;
+    businessName = null;
+    serviceType = null;
+    reference = null;
+    decidedAt = null;
+  }
 }
 
 class DemoAuthRepository implements AuthRepository {
@@ -205,6 +230,12 @@ class DemoAccountApi implements AccountApi {
     s.stage = ReviewStage.underReview;
     s.submittedAt = DateTime.now();
     s.reference ??= 'AQ-${DateTime.now().millisecondsSinceEpoch.toRadixString(36).toUpperCase().substring(3)}';
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    s.wipe();
   }
 
   @override

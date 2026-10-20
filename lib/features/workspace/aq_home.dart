@@ -948,14 +948,12 @@ class _FeaturedState extends ConsumerState<_Featured> {
                                 color: Color(0x66000000),
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(
-                                isSaved
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                size: 22,
-                                color: isSaved
-                                    ? const Color(0xFFE08A78)
-                                    : Colors.white,
+                              child: Center(
+                                child: AQHeart(
+                                  saved: isSaved,
+                                  savedColor: const Color(0xFFE08A78),
+                                  idleColor: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -1269,7 +1267,7 @@ class AQHomeScreen extends ConsumerWidget {
         sub: '',
       ),
       children: [
-        if (topSlot != null) topSlot!,
+        ?topSlot,
         AQSearchEntry(hint: f.t('home.search.hint')),
         AQSectionHeader(
           f.t('home.browse'),

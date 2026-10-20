@@ -59,7 +59,8 @@ class _AQPressableState extends State<AQPressable> {
       onTap: widget.onTap,
       child: AnimatedScale(
         scale: _down ? widget.pressedScale : 1,
-        duration: AQMotion.scaled(context, AQMotion.micro),
+        // Press starts at once; release settles slightly slower.
+        duration: AQMotion.scaled(context, _down ? AQMotion.tapDown : AQMotion.tapUp),
         curve: AQMotion.standardCurve,
         child: widget.child,
       ),
@@ -96,6 +97,7 @@ class _AQButton extends StatelessWidget {
       excludeSemantics: true,
       child: AQPressable(
         onTap: enabled ? onPressed : null,
+        pressedScale: 0.98,
         child: AnimatedContainer(
           duration: AQMotion.scaled(context, AQMotion.fast),
           constraints: BoxConstraints(minHeight: compact ? AQControl.buttonCompact : AQControl.button),

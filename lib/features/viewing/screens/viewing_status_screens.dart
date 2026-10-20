@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/aq/aq_demo.dart';
 import '../../../core/aq/aq_forms.dart';
 import '../../../core/aq/aq_primitives.dart';
 import '../../../core/aq/aq_scene.dart';
@@ -146,6 +147,8 @@ class ViewingRequestedScreen extends StatelessWidget {
             AQSurface(padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x3, vertical: AQSpacing.x4), child: AQViewingTimeline(current: pres.stage ?? ViewingStage.underReview)),
             const SizedBox(height: AQSpacing.x4),
             AQNoticeCard(icon: 'info', title: v.t('vw.next'), body: v.t('vw.next.requested')),
+            const SizedBox(height: AQSpacing.x3),
+            const AQDemoNotice(),
             AQDemoHostControls(viewing: viewing),
           ],
         );

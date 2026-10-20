@@ -9,7 +9,6 @@ import '../../core/aq/aq_typography.dart';
 import '../../core/localization/flow_strings.dart';
 import '../../data/models/saved.dart';
 import '../../data/repositories/app_state_providers.dart';
-import '../compare/compare_screen.dart';
 import '../viewing/widgets/viewing_format.dart';
 import '../viewing/widgets/viewing_scaffold.dart';
 import '../workspace/aq_home.dart' show AQResultCard, AQSkeletonBox, AQSlideSwitch, aqAllPropertiesProvider;
@@ -164,7 +163,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
               primary: AQPrimaryButton(
                 label: f.t('saved.compare', {'n': VFmt.n(context, _compare.length)}),
                 trailingChevron: false,
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CompareScreen(propertyIds: List.of(_compare)))),
+                onPressed: () => context.push('/compare?ids=${_compare.join(',')}'),
               ),
             )
           : null,

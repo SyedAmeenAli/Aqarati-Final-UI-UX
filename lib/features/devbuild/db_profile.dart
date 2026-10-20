@@ -644,7 +644,7 @@ class _DbProfileScreenState extends ConsumerState<DbProfileScreen> {
         if (p.bio.isEmpty)
           DbNotice(f.t('db.noBio'))
         else
-          AnimatedSize(
+          AQAnimatedSize(
             duration: AQMotion.scaled(context, AQMotion.fast),
             alignment: Alignment.topLeft,
             child: Text(

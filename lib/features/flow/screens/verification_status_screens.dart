@@ -41,7 +41,16 @@ class VerificationStatusScreen extends ConsumerWidget {
     return v.when(
       loading: () => aqLoadingFrame(context, title: f.t('ver.title')),
       error: (_, _) => aqErrorFrame(context, ref, title: f.t('ver.title'), onRetry: () => ref.invalidate(verificationProvider)),
-      data: (info) => _Status(info: info),
+      data: (info) {
+        // Buyers have no application to verify; never show them a business-style status.
+        if (!(roleConfigs[info.purpose]?.needsDocuments ?? false)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) context.go('/app/home');
+          });
+          return const SizedBox.shrink();
+        }
+        return _Status(info: info);
+      },
     );
   }
 }

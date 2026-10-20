@@ -5,6 +5,7 @@ import '../../../core/aq/aq_auth_scaffold.dart';
 import '../../../core/aq/aq_documents.dart';
 import '../../../core/aq/aq_forms.dart';
 import '../../../core/aq/aq_primitives.dart';
+import '../../../core/aq/aq_scene.dart' show AQAnimatedSize;
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/domain/account_models.dart';
@@ -111,7 +112,18 @@ class DocumentOnboardingScreen extends ConsumerWidget {
           backLabel: f.t('common.back'),
           progress: journeyProgress(context, m.purpose!, JourneyAt.documents),
           bottom: Column(mainAxisSize: MainAxisSize.min, children: [
-            if (!allDone) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x2), child: Text(f.t('review.incomplete'), style: AQTypography.of(context, AQText.bodySmall, color: AQColors.of(context).inkFaint))),
+            // The prerequisite hint folds away smoothly once every document is in.
+            AQAnimatedSize(
+              duration: AQMotion.scaled(context, AQMotion.state),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.bottomCenter,
+              child: AnimatedSwitcher(
+                duration: AQMotion.scaled(context, AQMotion.state),
+                child: allDone
+                    ? const SizedBox(key: ValueKey('ready'), width: double.infinity)
+                    : Padding(key: const ValueKey('hint'), padding: const EdgeInsets.only(bottom: AQSpacing.x2), child: Text(f.t('review.incomplete'), style: AQTypography.of(context, AQText.bodySmall, color: AQColors.of(context).inkFaint))),
+              ),
+            ),
             AQPrimaryButton(label: f.t('docs.review'), onPressed: allDone && !anyBusy
                   ? () {
                       // Uploads changed the server state; the review must not read a cached copy.

@@ -3,6 +3,11 @@ import 'package:go_router/go_router.dart';
 import '../../features/business/aq_business_profile.dart';
 import '../../features/business/aq_professionals.dart';
 import '../../features/property/property_detail_screen.dart';
+import '../../features/account/delete_account_screen.dart';
+import '../../features/activity/activity_screen.dart';
+import '../../features/compare/compare_screen.dart';
+import '../../features/maintenance/maintenance_screens.dart';
+import '../../features/notifications/notifications.dart';
 import '../../features/saved/saved_screen.dart';
 import '../../features/search/aq_map.dart';
 import '../../features/search/aq_property_types.dart';
@@ -19,7 +24,6 @@ import '../../features/flow/screens/verification_onboarding_screens.dart';
 import '../../features/flow/screens/verification_status_screens.dart';
 import '../../features/entry/screens/purpose_selection_screen.dart';
 import '../../features/entry/widgets/entry_common.dart';
-import '../../features/viewing/screens/my_viewings_screen.dart';
 import '../../features/viewing/screens/viewing_detail_screen.dart';
 import '../../features/viewing/screens/viewing_schedule_screens.dart';
 import '../../features/viewing/screens/viewing_status_screens.dart';
@@ -61,10 +65,10 @@ final appRouter = GoRouter(
     ShellRoute(
       builder: (context, state, child) => AQAppShell(child: child),
       routes: [
-        GoRoute(path: '/app/home', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const HomeTab())),
-        GoRoute(path: '/app/explore', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const ExploreTab())),
-        GoRoute(path: '/app/activity', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const MyViewingsScreen())),
-        GoRoute(path: '/app/account', pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const AccountTab())),
+        GoRoute(path: '/app/home', pageBuilder: (context, state) => AQRoute.tab(key: state.pageKey, child: const HomeTab())),
+        GoRoute(path: '/app/explore', pageBuilder: (context, state) => AQRoute.tab(key: state.pageKey, child: const ExploreTab())),
+        GoRoute(path: '/app/activity', pageBuilder: (context, state) => AQRoute.tab(key: state.pageKey, child: const ActivityScreen())),
+        GoRoute(path: '/app/account', pageBuilder: (context, state) => AQRoute.tab(key: state.pageKey, child: const AccountTab())),
         ...dbShellRoutes(),
       ],
     ),
@@ -91,31 +95,39 @@ final appRouter = GoRouter(
     GoRoute(path: '/properties/all', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQPropertiesScreen(category: state.uri.queryParameters['cat'], tx: state.uri.queryParameters['tx'], types: state.uri.queryParameters['types']))),
     ...dbStandaloneRoutes(),
     GoRoute(path: '/map', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQMapScreen(tx: state.uri.queryParameters['tx']))),
-    GoRoute(path: '/calculators', builder: (context, state) => const CalculatorsListScreen()),
+    GoRoute(path: '/calculators', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: const CalculatorsListScreen())),
     GoRoute(
       path: '/calculators/:id',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final type = CalculatorType.values.where((t) => t.name == state.pathParameters['id']).firstOrNull;
-        return type == null ? const CalculatorsListScreen() : CalculatorScreen(type: type);
+        return AQRoute.forward(key: state.pageKey, child: type == null ? const CalculatorsListScreen() : CalculatorScreen(type: type));
       },
     ),
-    GoRoute(path: '/saved', builder: (context, state) => const SavedScreen()),
+    GoRoute(path: '/business/:id/book', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: MaintenanceBookScreen(providerId: state.pathParameters['id']!))),
+    GoRoute(path: '/bookings/:id', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: MaintenanceDetailScreen(id: state.pathParameters['id']!))),
+    GoRoute(path: '/notifications', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: const NotificationsScreen())),
+    GoRoute(path: '/account/delete', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: const DeleteAccountScreen())),
+    GoRoute(
+      path: '/compare',
+      pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: CompareScreen(propertyIds: (state.uri.queryParameters['ids'] ?? '').split(',').where((x) => x.isNotEmpty).toList())),
+    ),
+    GoRoute(path: '/saved', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: const SavedScreen())),
     GoRoute(
       path: '/search',
-      builder: (context, state) => SearchResultsScreen(initialQuery: state.uri.queryParameters['q']),
+      pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: SearchResultsScreen(initialQuery: state.uri.queryParameters['q'])),
     ),
-    GoRoute(path: '/search/start', builder: (context, state) => const SearchScreen()),
+    GoRoute(path: '/search/start', pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: const SearchScreen())),
     GoRoute(
       path: '/property/:id',
-      builder: (context, state) => PropertyDetailScreen(propertyId: state.pathParameters['id']!),
+      pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: PropertyDetailScreen(propertyId: state.pathParameters['id']!)),
     ),
     GoRoute(
       path: '/professionals',
-      builder: (context, state) => AQProfessionalsScreen(key: ValueKey(state.uri.toString()), query: state.uri.queryParameters['q'], category: state.uri.queryParameters['cat']),
+      pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQProfessionalsScreen(key: ValueKey(state.uri.toString()), query: state.uri.queryParameters['q'], category: state.uri.queryParameters['cat'])),
     ),
     GoRoute(
       path: '/business/:id',
-      builder: (context, state) => AQBusinessProfileScreen(businessId: state.pathParameters['id']!),
+      pageBuilder: (context, state) => AQRoute.forward(key: state.pageKey, child: AQBusinessProfileScreen(businessId: state.pathParameters['id']!)),
     ),
   ],
 );

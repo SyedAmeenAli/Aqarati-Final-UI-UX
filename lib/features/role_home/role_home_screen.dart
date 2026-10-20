@@ -42,8 +42,16 @@ class RoleHomeScreen extends ConsumerWidget {
       HomeRole.architecture => const ArchitectureHome(),
       HomeRole.interiorExterior => const InteriorHome(),
     };
+    // Role changes: a short fade with a small rise, then the new home. Reduced motion removes the rise.
+    final reduced = AQMotion.reduced(context);
     return AnimatedSwitcher(
-      duration: AQMotion.scaled(context, const Duration(milliseconds: 220)),
+      duration: reduced ? Duration.zero : AQMotion.state,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: reduced ? child : AnimatedBuilder(animation: animation, child: child, builder: (context, c) => Transform.translate(offset: Offset(0, 8 * (1 - animation.value)), child: c)),
+      ),
       child: KeyedSubtree(key: ValueKey(r.role), child: home),
     );
   }
@@ -56,7 +64,7 @@ class RoleHomeScreen extends ConsumerWidget {
       );
     }
     if (r.hasPendingApplication) {
-      return Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: RoleStatusBanner(grant: r.pendingGrant!, stage: r.pendingStage));
+      return Padding(padding: const EdgeInsets.only(top: AQSpacing.x3), child: RoleReveal(child: RoleStatusBanner(grant: r.pendingGrant!, stage: r.pendingStage)));
     }
     return null;
   }

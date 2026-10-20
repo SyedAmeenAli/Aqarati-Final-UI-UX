@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../features/devbuild/db_strings.dart';
 import '../../features/role_home/role_home_strings.dart';
+import 'extra_strings.dart';
+import 'product_strings.dart';
 import '../../features/enquiry/enquiry_strings.dart';
 
 /// Localization resources for the auth / sign-up / OTP / documents / verification
@@ -15,14 +17,14 @@ class FlowStrings {
   static FlowStrings of(BuildContext c) => FlowStrings._(Localizations.localeOf(c).languageCode == 'ar');
 
   String t(String key, [Map<String, String> args = const {}]) {
-    final e = _s[key] ?? dbStrings[key] ?? enquiryStrings[key] ?? roleHomeStrings[key];
+    final e = _s[key] ?? dbStrings[key] ?? enquiryStrings[key] ?? roleHomeStrings[key] ?? productStrings[key] ?? extraStrings[key];
     assert(e != null, 'Missing string: $key');
     var out = e == null ? key : (ar ? e.$2 : e.$1);
     args.forEach((k, v) => out = out.replaceAll('{$k}', v));
     return out;
   }
 
-  static Iterable<String> get keys => [..._s.keys, ...dbStrings.keys, ...enquiryStrings.keys, ...roleHomeStrings.keys];
+  static Iterable<String> get keys => [..._s.keys, ...dbStrings.keys, ...enquiryStrings.keys, ...roleHomeStrings.keys, ...productStrings.keys, ...extraStrings.keys];
 }
 
 const Map<String, (String, String)> _s = {
@@ -33,6 +35,8 @@ const Map<String, (String, String)> _s = {
   'common.cancel': ('Cancel', 'إلغاء'),
   'common.retry': ('Try again', 'إعادة المحاولة'),
   'common.demo': ('DEMO DATA', 'بيانات تجريبية'),
+  // Arabic is a draft and needs native review.
+  'demo.notice': ('Accounts, viewings and verification are simulated in this build. Nothing is sent to AQARATI or to any agent.', 'الحسابات والمعاينات والتحقق محاكاة في هذه النسخة. لا يُرسل أي شيء إلى عقاراتي أو إلى أي وسيط.'),
   'common.networkError': ('We could not reach AQARATI. Check your connection and try again.', 'تعذّر الوصول إلى عقاراتي. تحقق من اتصالك وحاول مرة أخرى.'),
   'common.genericError': ('Something went wrong. Please try again.', 'حدث خطأ ما. حاول مرة أخرى.'),
   'common.loading': ('Loading', 'جارٍ التحميل'),

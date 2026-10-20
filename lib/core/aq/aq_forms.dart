@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart' show CustomSemanticsAction;
 import 'package:flutter/services.dart';
 import 'aq_primitives.dart';
+import 'aq_scene.dart' show AQAnimatedSize;
 import 'aq_tokens.dart';
 import 'aq_typography.dart';
 
@@ -150,7 +151,7 @@ class _AQTextFieldState extends State<AQTextField> {
               ),
           ]),
         ),
-        AnimatedSize(
+        AQAnimatedSize(
           duration: AQMotion.scaled(context, AQMotion.fast),
           alignment: Alignment.topCenter,
           child: (hasError || widget.helper != null)

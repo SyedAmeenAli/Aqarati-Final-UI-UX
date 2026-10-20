@@ -8,6 +8,7 @@ import '../../core/aq/aq_tokens.dart';
 import '../../core/aq/aq_typography.dart';
 import '../../core/localization/flow_strings.dart';
 import '../../data/models/business.dart';
+import '../../data/models/enums.dart' show BusinessCategory;
 import '../../data/repositories/providers.dart';
 import '../reviews/review_screen.dart';
 import '../viewing/widgets/viewing_format.dart';
@@ -47,7 +48,13 @@ class _Profile extends ConsumerWidget {
 
   Widget _head(BuildContext context, String text, {Widget? trailing}) => Padding(
         padding: const EdgeInsets.only(top: AQSpacing.x6, bottom: AQSpacing.x3),
-        child: Row(children: [Expanded(child: Semantics(header: true, child: Text(text, style: AQTypography.of(context, AQText.headlineMedium)))), ?trailing]),
+        child: LayoutBuilder(
+          builder: (context, box) => Row(children: [
+            Expanded(child: Semantics(header: true, child: Text(text, style: AQTypography.of(context, AQText.headlineMedium)))),
+            // A long trailing action scales down instead of pushing the heading out of the row.
+            if (trailing != null) ConstrainedBox(constraints: BoxConstraints(maxWidth: box.maxWidth * 0.5), child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerEnd, child: trailing)),
+          ]),
+        ),
       );
 
   Widget _info(BuildContext context, String icon, String text) {
@@ -66,6 +73,7 @@ class _Profile extends ConsumerWidget {
     showDialog<void>(
       context: context,
       barrierColor: const Color(0xDD000000),
+      animationStyle: AnimationStyle(duration: AQMotion.dialog, reverseDuration: AQMotion.fast, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic),
       builder: (d) => Stack(children: [
         Positioned.fill(child: GestureDetector(onTap: () => Navigator.of(d).pop(), child: Center(child: InteractiveViewer(child: Image.asset(url, fit: BoxFit.contain))))),
         SafeArea(child: Align(alignment: AlignmentDirectional.topEnd, child: AQIconButton(icon: 'close', directional: false, color: Colors.white, semanticsLabel: FlowStrings.of(context).t('flt.close'), onPressed: () => Navigator.of(d).pop()))),
@@ -98,13 +106,17 @@ class _Profile extends ConsumerWidget {
         const SizedBox(height: AQSpacing.x3),
         Wrap(spacing: AQSpacing.x4, runSpacing: AQSpacing.x2, children: [
           if (b.verification.isVerified)
-            Row(mainAxisSize: MainAxisSize.min, children: [AQIcon('verified', size: 18, color: c.accent), const SizedBox(width: 6), Text(f.t('bp.verifiedBusiness'), style: AQTypography.of(context, AQText.labelMedium, color: c.accentDeep))]),
+            Row(mainAxisSize: MainAxisSize.min, children: [AQIcon('verified', size: 18, color: c.accent), const SizedBox(width: 6), Flexible(child: Text(f.t('bp.verifiedBusiness'), style: AQTypography.of(context, AQText.labelMedium, color: c.accentDeep)))]),
           if (b.rating != null)
-            Row(mainAxisSize: MainAxisSize.min, children: [AQIcon('star-fill', size: 16, color: c.warning), const SizedBox(width: 6), Text('${b.rating!.toStringAsFixed(1)} · ${f.t('pro.reviews', {'n': VFmt.n(context, b.reviewCount ?? 0)})}', style: AQTypography.of(context, AQText.labelMedium))]),
+            Row(mainAxisSize: MainAxisSize.min, children: [AQIcon('star-fill', size: 16, color: c.warning), const SizedBox(width: 6), Flexible(child: Text('${b.rating!.toStringAsFixed(1)} · ${f.t('pro.reviews', {'n': VFmt.n(context, b.reviewCount ?? 0)})}', style: AQTypography.of(context, AQText.labelMedium)))]),
         ]),
         const SizedBox(height: AQSpacing.x4),
         _info(context, 'pin', b.locationLabel),
         if (b.serviceArea.isNotEmpty) _info(context, 'globe', f.t('bp.serves', {'area': b.serviceArea})),
+        if (b.categories.contains(BusinessCategory.maintenance)) ...[
+          const SizedBox(height: AQSpacing.x3),
+          AQPrimaryButton(label: f.t('mnt.book.cta'), leadingIcon: 'calendar', trailingChevron: false, onPressed: () => context.push('/business/${b.id}/book')),
+        ],
         _head(context, f.t('bp.about')),
         Text(b.description.isEmpty ? f.t('bp.noDesc') : b.description, style: AQTypography.of(context, AQText.bodyMedium)),
         _head(context, f.t('bp.services')),
@@ -136,7 +148,7 @@ class _Profile extends ConsumerWidget {
           _head(context, f.t('bp.listings')),
           for (final p in props) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: AQResultCard(property: p)),
         ],
-        _head(context, f.t('bp.reviews'), trailing: AQTextButton(label: f.t('bp.write'), color: c.accentDeep, onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ReviewScreen(listingLabel: b.locationLabel, listingTitle: b.name, priceLabel: ''))))),
+        _head(context, f.t('bp.reviews'), trailing: AQTextButton(label: f.t('bp.write'), color: c.accentDeep, onPressed: () => Navigator.of(context).push(AQRoute.route<void>(ReviewScreen(listingLabel: b.locationLabel, listingTitle: b.name, priceLabel: ''))))),
         Text(b.rating == null ? f.t('bp.noReviews') : f.t('bp.ratedBy', {'r': b.rating!.toStringAsFixed(1), 'n': VFmt.n(context, b.reviewCount ?? 0)}), style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
         const SizedBox(height: AQSpacing.x4),
       ],
