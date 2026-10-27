@@ -1,4 +1,5 @@
 import 'package:aqarati_app/core/config/demo_mode.dart';
+import 'package:aqarati_app/core/domain/account_models.dart' show MeSession;
 import 'package:aqarati_app/data/api/account_api.dart';
 import 'package:aqarati_app/data/demo/demo_providers.dart';
 import 'package:aqarati_app/features/entry/models/signup_purpose.dart';
@@ -92,7 +93,7 @@ void main() {
         reason: 'says plainly that nothing was registered',
       );
       expect(find.textContaining('registered successfully'), findsNothing);
-      final me = await _box.read(meProvider.future);
+      final me = await t.runAsync(() => _box.read(meProvider.future)) as MeSession;
       expect(me.purpose, SignupPurpose.userToShop);
       expect(me.grant, isNull, reason: 'a buyer gets no business grant');
     });
@@ -108,7 +109,7 @@ void main() {
         await _settle(t);
         expect(find.text('HOME'), findsOneWidget);
         expect(find.textContaining('no account was created'), findsOneWidget);
-        final me = await _box.read(meProvider.future);
+        final me = await t.runAsync(() => _box.read(meProvider.future)) as MeSession;
         expect(me.purpose, SignupPurpose.realEstateAgent);
       },
     );
