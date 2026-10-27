@@ -116,6 +116,8 @@ class _DeveloperHomeState extends ConsumerState<DeveloperHome> {
           ]);
         },
       ),
+      RoleSection(f.t('rh.leads.dev'), accent: accent),
+      RoleRow(label: f.t('rh.leads.dev'), value: f.t('rh.view'), onTap: () => context.push('/workspace/enquiries')),
     ]);
   }
 }

@@ -11,6 +11,10 @@ import '../../../core/auth/auth_repository.dart';
 import '../../../core/domain/account_models.dart';
 import '../../../core/localization/flow_strings.dart';
 import '../../../data/api/account_api.dart';
+import '../../entry/admin_link.dart';
+import '../../entry/models/entry_experience.dart';
+import '../../entry/models/signup_purpose.dart';
+import '../../viewing/widgets/viewing_components.dart' show AQNoticeCard;
 import '../state/signup_state.dart';
 
 /// Where a hydrated session belongs. Authentication is not verification:
@@ -50,7 +54,9 @@ class _SecureNote extends StatelessWidget {
 /// Firebase email + password. Credentials never reach the Aqarati API; after
 /// sign-in the session is hydrated with GET /me and routed by account state.
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  /// The entry experience the person came through (`user` or `agent`). Context only.
+  final String? experience;
+  const LoginScreen({super.key, this.experience});
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
@@ -85,6 +91,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final me = await ref.read(accountApiProvider).getMe();
       if (!mounted) return;
       AQHaptics.confirm();
+      final want = entryExperienceFrom(widget.experience);
+      final isAgent = me.purpose == SignupPurpose.realEstateAgent;
+      final isUser = me.purpose == null || me.purpose == SignupPurpose.userToShop;
+      final mismatch = (want == EntryExperience.agent && !isAgent) || (want == EntryExperience.user && !isUser);
+      if (mismatch) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(FlowStrings.of(context).t(want == EntryExperience.agent ? 'xp.mismatch.agent' : 'xp.mismatch.user'))));
+      }
       context.go(routeForSession(me));
     } on AuthException catch (e) {
       if (mounted) setState(() => _bannerKey = switch (e.error) { AuthError.network => 'common.networkError', AuthError.tooManyRequests => 'login.tooMany', AuthError.unavailable => 'login.unavailable', _ => 'login.invalid' });
@@ -106,9 +119,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       onBack: () => aqBack(context, '/entry'),
       backLabel: f.t('common.back'),
       actionLabel: f.t('login.createShort'),
-      onAction: () => context.push('/onboarding/purpose'),
-      bottom: AQPrimaryButton(label: f.t('login.action'), loading: _busy, onPressed: _submit),
+      onAction: () => context.push(entryExperienceFrom(widget.experience)?.signupRoute ?? '/onboarding/purpose'),
+      bottom: Column(mainAxisSize: MainAxisSize.min, children: [
+        AQPrimaryButton(label: f.t('login.action'), loading: _busy, onPressed: _submit),
+        // Discoverable but quiet: the Admin Console is a separate application with its own sign-in.
+        const AdminConsoleLink(),
+      ]),
       children: [
+        // Its own component with a clear gap below it, the same spacing the fields use between themselves.
+        if (entryExperienceFrom(widget.experience) != null) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x4), child: AQNoticeCard(icon: widget.experience == 'agent' ? 'agent' : 'user', title: f.t(widget.experience == 'agent' ? 'xp.login.agent' : 'xp.login.user'), body: '')),
         if (_bannerKey != null) AQErrorBanner(text: f.t(_bannerKey!)),
         AQTextField(label: f.t('field.email'), controller: _email, keyboardType: TextInputType.emailAddress, autofill: const [AutofillHints.email], error: _emailErr == null ? null : f.t(_emailErr!), onChanged: (_) => _emailErr == null ? null : setState(() => _emailErr = null)),
         AQPasswordField(

@@ -21,18 +21,49 @@ class AQDemoNotice extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(AQSpacing.x3),
-        decoration: BoxDecoration(color: c.surfaceSelected, borderRadius: BorderRadius.circular(AQRadius.medium), border: Border.all(color: c.hairline)),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(padding: const EdgeInsets.only(top: 2), child: AQIcon('info', size: AQIconSize.small, color: c.accentDeep)),
-          const SizedBox(width: AQSpacing.x2),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(f.t('common.demo'), style: AQTypography.of(context, AQText.labelSmall, color: c.accentDeep).copyWith(letterSpacing: 1.2)),
-              const SizedBox(height: 2),
-              Text(f.t('demo.notice'), style: AQTypography.of(context, AQText.bodySmall, soft: true)),
-            ]),
-          ),
-        ]),
+        decoration: BoxDecoration(
+          color: c.surfaceSelected,
+          borderRadius: BorderRadius.circular(AQRadius.medium),
+          border: Border.all(color: c.hairline),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: AQIcon(
+                'info',
+                size: AQIconSize.small,
+                color: c.accentDeep,
+              ),
+            ),
+            const SizedBox(width: AQSpacing.x2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    f.t('common.demo'),
+                    style: AQTypography.of(
+                      context,
+                      AQText.labelSmall,
+                      color: c.accentDeep,
+                    ).copyWith(letterSpacing: 1.2),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    f.t('demo.notice'),
+                    style: AQTypography.of(
+                      context,
+                      AQText.bodySmall,
+                      soft: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

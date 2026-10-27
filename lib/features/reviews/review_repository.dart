@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/config/qa_faults.dart';
+
 import '../../core/config/backend_mode.dart';
 import '../../data/api/account_api.dart'
     show ApiErrorCode, ApiException, meProvider;
@@ -72,6 +74,7 @@ class DemoReviewRepository implements ReviewRepository {
 
   Future<void> _lag() async {
     if (latency > Duration.zero) await Future<void>.delayed(latency);
+    if (qaCallsFail()) throw const ApiException(ApiErrorCode.network);
   }
 
   @override

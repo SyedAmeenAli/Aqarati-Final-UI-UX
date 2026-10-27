@@ -8,9 +8,9 @@ extension PropCategoryX on PropCategory {
   String get key => 'cat.$name';
   bool matches(PropertyType t) => switch (this) {
         PropCategory.residential => const {PropertyType.apartment, PropertyType.villa, PropertyType.house, PropertyType.townhouse, PropertyType.penthouse, PropertyType.building, PropertyType.residentialLand, PropertyType.chalet, PropertyType.guesthouse}.contains(t),
-        PropCategory.commercial => const {PropertyType.office, PropertyType.shop, PropertyType.showroom, PropertyType.commercialBuilding, PropertyType.hotel, PropertyType.resort, PropertyType.mixedUse}.contains(t),
+        PropCategory.commercial => const {PropertyType.office, PropertyType.shop, PropertyType.showroom, PropertyType.commercialBuilding, PropertyType.hotel, PropertyType.resort, PropertyType.mixedUse, PropertyType.commercialLand, PropertyType.warehouse}.contains(t),
         PropCategory.agriculture => const {PropertyType.agriculturalLand, PropertyType.farm}.contains(t),
-        PropCategory.industrial => const {PropertyType.industrial, PropertyType.warehouse}.contains(t),
+        PropCategory.industrial => const {PropertyType.industrial, PropertyType.warehouse, PropertyType.investmentLand}.contains(t),
       };
   String get image => switch (this) {
         PropCategory.residential => 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',

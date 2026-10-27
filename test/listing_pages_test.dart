@@ -217,7 +217,7 @@ void main() {
           (t) async {
             await t.binding.setSurfaceSize(Size(w, 1100));
             await t.pumpWidget(
-              _app(const AQPropertyTypesScreen(), width: w, scale: scale),
+              _app(const AQCategoryStepScreen(tx: 'buy'), width: w, scale: scale),
             );
             await _settle(t);
             expect(t.takeException(), isNull);
@@ -255,7 +255,9 @@ void main() {
             listingLabel: 'Muscat',
             listingTitle: 'Al Noor Realty',
           ),
-          const AQPropertyTypesScreen(),
+          const AQPropertiesHubScreen(),
+          const AQCategoryStepScreen(tx: 'rent'),
+          const AQTypeStepScreen(tx: 'rent', cat: 'commercial'),
         ]) {
           await t.pumpWidget(_app(w, dark: true, lang: lang, scale: 1.3));
           await _settle(t);

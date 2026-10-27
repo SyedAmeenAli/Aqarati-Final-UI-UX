@@ -1,3 +1,5 @@
+import '../../core/aq/aq_help.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +11,7 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/models/enums.dart';
 import '../viewing/widgets/viewing_format.dart';
 import '../workspace/aq_home.dart';
-import 'aq_filters.dart';
+import 'browse_taxonomy.dart';
 
 String _catIcon(PropCategory k) => switch (k) {
   PropCategory.residential => 'home',
@@ -18,98 +20,213 @@ String _catIcon(PropCategory k) => switch (k) {
   PropCategory.industrial => 'construction',
 };
 
-/// Sub-types shown once a category is picked: (type, photo).
-List<(PropertyType, String)> _subTypes(PropCategory k) => switch (k) {
-  PropCategory.residential => const [
-    (
-      PropertyType.villa,
-      'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
-    ),
-    (
-      PropertyType.apartment,
-      'assets/properties/p5/03_Contemporary_apartment_property_.jpg',
-    ),
-    (
-      PropertyType.residentialLand,
-      'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
-    ),
-  ],
-  PropCategory.commercial => const [
-    (
-      PropertyType.office,
-      'assets/properties/p6/04_Modern_commercial_building_exterior.jpg',
-    ),
-    (
-      PropertyType.shop,
-      'assets/properties/p6/05_Rear_utility_area_of_shop.jpg',
-    ),
-    (
-      PropertyType.showroom,
-      'assets/properties/p6/04_Modern_commercial_building_exterior.jpg',
-    ),
-  ],
-  PropCategory.agriculture => const [
-    (
-      PropertyType.agriculturalLand,
-      'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
-    ),
-    (
-      PropertyType.farm,
-      'assets/location/05_Desert_landscape_with_rugged_mou.jpg',
-    ),
-  ],
-  PropCategory.industrial => const [
-    (
-      PropertyType.warehouse,
-      'assets/properties/p6/05_Rear_utility_area_of_shop.jpg',
-    ),
-    (
-      PropertyType.industrial,
-      'assets/properties/p6/05_Rear_utility_area_of_shop.jpg',
-    ),
-  ],
-};
+// ---------------------------------------------------------------- Properties hub
 
-/// First step of browsing properties: what kind, then what for.
-class AQPropertyTypesScreen extends StatefulWidget {
-  const AQPropertyTypesScreen({super.key});
+/// First step of Properties: Buy, Rent, Sell or My Favorites. Nothing sits between Home and this.
+class AQPropertiesHubScreen extends StatelessWidget {
+  const AQPropertiesHubScreen({super.key});
+
   @override
-  State<AQPropertyTypesScreen> createState() => _AQPropertyTypesScreenState();
-}
-
-class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
-  PropCategory _sel = PropCategory.residential;
-
-  String _typeLabel(FlowStrings f, PropertyType t) =>
-      FlowStrings.keys.contains('ptype.${t.name}')
-      ? f.t('ptype.${t.name}')
-      : t.label;
-
-  Widget _card(BuildContext context, FlowStrings f, PropCategory k, double w) {
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
     final c = AQColors.of(context);
     final large = aqLargeText(context);
-    final on = k == _sel;
+    Widget option(String icon, String key, String path) => _HubCard(
+      icon: icon,
+      title: f.t('hub.$key'),
+      sub: f.t('hub.$key.s'),
+      onTap: () {
+        AQHaptics.selection();
+        context.push(path);
+      },
+    );
+    final cards = [
+      option('home', 'buy', '/properties/categories?tx=buy'),
+      option('calendar', 'rent', '/properties/categories?tx=rent'),
+      option('verified', 'sell', '/sell'),
+      option('star', 'fav', '/saved'),
+    ];
+    return Scaffold(
+      backgroundColor: c.background,
+      body: aqPage(
+        context,
+        hero: AQHero(
+          image: 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
+          title: f.t('hub.title'),
+          sub: f.t('hub.sub'),
+          onBack: () => aqBack(context, '/app/home'),
+        ),
+        children: [
+          const Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: AQHelpButton(),
+          ),
+          if (large)
+            for (final w in cards) ...[w, const SizedBox(height: AQSpacing.x3)]
+          else
+            LayoutBuilder(
+              builder: (context, box) {
+                const gap = AQSpacing.x3;
+                final w = (box.maxWidth - gap) / 2;
+                return Wrap(
+                  spacing: gap,
+                  runSpacing: gap,
+                  children: [
+                    for (final card in cards) SizedBox(width: w, child: card),
+                  ],
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HubCard extends StatelessWidget {
+  final String icon, title, sub;
+  final VoidCallback onTap;
+  const _HubCard({
+    required this.icon,
+    required this.title,
+    required this.sub,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AQColors.of(context);
+    return Semantics(
+      button: true,
+      label: '$title. $sub',
+      excludeSemantics: true,
+      onTap: onTap,
+      child: AQPressable(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 132),
+          padding: const EdgeInsets.all(AQSpacing.x4),
+          decoration: BoxDecoration(
+            color: c.surfaceRaised,
+            borderRadius: BorderRadius.circular(AQRadius.medium),
+            border: Border.all(color: c.hairline),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: c.surfaceSelected,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: AQIcon(icon, size: 22, color: c.accent),
+                    ),
+                  ),
+                  const Spacer(),
+                  AQIcon(
+                    'chevron-right',
+                    size: 16,
+                    color: c.inkSoft,
+                    directional: true,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AQSpacing.x3),
+              Text(title, style: AQTypography.of(context, AQText.titleMedium)),
+              const SizedBox(height: 2),
+              Text(
+                sub,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: AQTypography.of(context, AQText.bodySmall, soft: true),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------- category and type steps
+
+TransactionType _txOf(String? v) =>
+    v == 'rent' ? TransactionType.rent : TransactionType.buy;
+
+/// Buy or Rent, step two: the four categories. Choosing one opens its property types directly.
+class AQCategoryStepScreen extends StatelessWidget {
+  final String? tx;
+  const AQCategoryStepScreen({super.key, this.tx});
+
+  @override
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
+    final c = AQColors.of(context);
+    final t = _txOf(tx);
+    return Scaffold(
+      backgroundColor: c.background,
+      body: aqPage(
+        context,
+        hero: AQHero(
+          image: 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
+          title: f.t('hubcat.${t.name}'),
+          sub: f.t('hubcat.sub'),
+          onBack: () => aqBack(context, '/properties'),
+        ),
+        children: [
+          LayoutBuilder(
+            builder: (context, box) {
+              const gap = AQSpacing.x2;
+              const cols = 2;
+              final w = (box.maxWidth - gap * (cols - 1)) / cols;
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (final k in PropCategory.values)
+                    _categoryCard(context, f, k, w, t),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _categoryCard(
+    BuildContext context,
+    FlowStrings f,
+    PropCategory k,
+    double w,
+    TransactionType t,
+  ) {
+    final c = AQColors.of(context);
+    final large = aqLargeText(context);
+    void open() {
+      AQHaptics.selection();
+      context.push('/properties/types?tx=${t.name}&cat=${k.name}');
+    }
+
     return SizedBox(
       width: w,
       child: Semantics(
         button: true,
-        selected: on,
         label: '${f.t(k.key)}. ${f.t('pt.c.${k.name}')}',
         excludeSemantics: true,
+        onTap: open,
         child: AQPressable(
-          onTap: () {
-            AQHaptics.selection();
-            setState(() => _sel = k);
-          },
-          child: AnimatedContainer(
-            duration: AQMotion.scaled(context, AQMotion.fast),
+          onTap: open,
+          child: Container(
             decoration: BoxDecoration(
               color: c.surfaceRaised,
               borderRadius: BorderRadius.circular(AQRadius.medium),
-              border: Border.all(
-                color: on ? c.accent : c.hairline,
-                width: on ? 2 : 1,
-              ),
+              border: Border.all(color: c.hairline),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AQRadius.medium - 1),
@@ -139,7 +256,9 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
                           ),
                         ),
                         ConstrainedBox(
-                          constraints: BoxConstraints(minHeight: large ? 0 : 54),
+                          constraints: BoxConstraints(
+                            minHeight: large ? 0 : 54,
+                          ),
                           child: Text(
                             f.t('pt.c.${k.name}'),
                             maxLines: 4,
@@ -148,29 +267,6 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
                               context,
                               AQText.bodySmall,
                               soft: true,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AQSpacing.x2),
-                        Align(
-                          alignment: AlignmentDirectional.centerEnd,
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: on ? c.accent : Colors.transparent,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: on ? c.accent : c.hairline,
-                              ),
-                            ),
-                            child: Center(
-                              child: AQIcon(
-                                'chevron-right',
-                                size: 16,
-                                color: on ? c.onAccent : c.inkSoft,
-                                directional: true,
-                              ),
                             ),
                           ),
                         ),
@@ -185,333 +281,143 @@ class _AQPropertyTypesScreenState extends State<AQPropertyTypesScreen> {
       ),
     );
   }
+}
 
-  Widget _goal(
-    BuildContext context,
-    FlowStrings f,
-    String icon,
-    String label,
-    String sub,
-    String path,
-  ) {
-    final c = AQColors.of(context);
-    return Semantics(
-      button: true,
-      label: '$label. $sub',
-      excludeSemantics: true,
-      child: AQPressable(
-        onTap: () {
-          AQHaptics.selection();
-          context.push(path);
-        },
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 96),
-          padding: const EdgeInsets.all(AQSpacing.x3),
-          decoration: BoxDecoration(
-            color: c.surface,
-            borderRadius: BorderRadius.circular(AQRadius.medium),
-            border: Border.all(color: c.hairline),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  AQIcon(icon, size: 24, color: c.accent),
-                  const Spacer(),
-                  AQIcon(
-                    'chevron-right',
-                    size: 16,
-                    color: c.inkSoft,
-                    directional: true,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AQSpacing.x2),
-              Text(label, style: AQTypography.of(context, AQText.titleSmall)),
-              Text(
-                sub,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: AQTypography.of(context, AQText.labelSmall, soft: true),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+/// Buy or Rent, step three: the property types of the chosen category. For Rent only the types
+/// that can be rented are shown. Choosing one opens the results with everything chosen so far.
+class AQTypeStepScreen extends StatelessWidget {
+  final String? tx, cat;
+  const AQTypeStepScreen({super.key, this.tx, this.cat});
 
   @override
   Widget build(BuildContext context) {
     final f = FlowStrings.of(context);
     final c = AQColors.of(context);
+    final t = _txOf(tx);
+    final k = PropCategory.values.firstWhere(
+      (e) => e.name == cat,
+      orElse: () => PropCategory.residential,
+    );
+    final types = browseTypesFor(k, t);
     final large = aqLargeText(context);
-    final subs = _subTypes(_sel);
     return Scaffold(
       backgroundColor: c.background,
       body: aqPage(
         context,
         hero: AQHero(
-          image: 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
-          eyebrow: f.t('pt.eyebrow'),
-          title: f.t('pt.title'),
-          sub: f.t('pt.sub'),
-          onBack: () => aqBack(context, '/app/explore'),
+          image: k.image,
+          eyebrow: f.t('hubty.sub.${t.name}'),
+          title: f.t(k.key),
+          sub: f.t('pt.sec.${k.name}'),
+          onBack: () => aqBack(context, '/properties/categories?tx=${t.name}'),
         ),
         children: [
-          AQSearchEntry(hint: f.t('props.search')),
-          const SizedBox(height: AQSpacing.x4),
+          if (t == TransactionType.rent)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+              child: Text(
+                f.t('hubty.rentNote'),
+                style: AQTypography.of(context, AQText.bodySmall, soft: true),
+              ),
+            ),
           LayoutBuilder(
             builder: (context, box) {
               const gap = AQSpacing.x2;
-              // Four cards in one row leave ~80 px each; two by two gives every description room to read.
-              const cols = 2;
+              final cols = large ? 1 : 2;
               final w = (box.maxWidth - gap * (cols - 1)) / cols;
               return Wrap(
                 spacing: gap,
                 runSpacing: gap,
                 children: [
-                  for (final k in PropCategory.values) _card(context, f, k, w),
+                  for (final s in types) _typeCard(context, f, s, w, t, k),
                 ],
               );
             },
           ),
-          const SizedBox(height: AQSpacing.x5),
-          AnimatedSwitcher(
-            duration: AQMotion.scaled(context, AQMotion.standard),
-            child: Container(
-              key: ValueKey(_sel),
-              padding: const EdgeInsets.all(AQSpacing.x3),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: AQTextButton(
+              label: f.t('hubty.all'),
+              color: c.accentDeep,
+              trailingIcon: 'chevron-right',
+              onPressed: () =>
+                  context.push('/properties/all?tx=${t.name}&cat=${k.name}'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _typeCard(
+    BuildContext context,
+    FlowStrings f,
+    (PropertyType, String) s,
+    double w,
+    TransactionType t,
+    PropCategory k,
+  ) {
+    final c = AQColors.of(context);
+    final label = f.t('bt.${s.$1.name}');
+    void open() {
+      AQHaptics.selection();
+      context.push(
+        '/properties/all?tx=${t.name}&cat=${k.name}&types=${s.$1.name}',
+      );
+    }
+
+    return SizedBox(
+      width: w,
+      child: Semantics(
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        onTap: open,
+        child: AQPressable(
+          onTap: open,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AQRadius.medium),
+            child: DecoratedBox(
               decoration: BoxDecoration(
-                color: c.surfaceRaised,
-                borderRadius: BorderRadius.circular(AQRadius.large),
+                color: c.surface,
                 border: Border.all(color: c.hairline),
+                borderRadius: BorderRadius.circular(AQRadius.medium),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: c.surfaceSelected,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: AQIcon(
-                            _catIcon(_sel),
-                            size: 22,
-                            color: c.accent,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AQSpacing.x3),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Semantics(
-                              header: true,
-                              child: Text(
-                                f.t('pt.section', {'c': f.t(_sel.key)}),
-                                style: AQTypography.of(
-                                  context,
-                                  AQText.titleLarge,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              f.t('pt.sec.${_sel.name}'),
-                              style: AQTypography.of(
-                                context,
-                                AQText.bodySmall,
-                                soft: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: AQTextButton(
-                      label: f.t('pt.viewAll'),
-                      color: c.accentDeep,
-                      trailingIcon: 'chevron-right',
-                      onPressed: () =>
-                          context.push('/properties/all?cat=${_sel.name}'),
+                  AspectRatio(
+                    aspectRatio: 1.25,
+                    child: ExcludeSemantics(
+                      child: aqImg(s.$2, cacheWidth: 380),
                     ),
                   ),
-                  LayoutBuilder(
-                    builder: (context, box) {
-                      const gap = AQSpacing.x2;
-                      final cols = large ? 2 : 3;
-                      final w = (box.maxWidth - gap * (cols - 1)) / cols;
-                      return Wrap(
-                        spacing: gap,
-                        runSpacing: gap,
-                        children: [
-                          for (final s in subs)
-                            SizedBox(
-                              width: w,
-                              child: Semantics(
-                                button: true,
-                                label: _typeLabel(f, s.$1),
-                                excludeSemantics: true,
-                                child: AQPressable(
-                                  onTap: () {
-                                    AQHaptics.selection();
-                                    context.push(
-                                      '/properties/all?types=${s.$1.name}',
-                                    );
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      AQRadius.medium,
-                                    ),
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        color: c.surface,
-                                        border: Border.all(color: c.hairline),
-                                        borderRadius: BorderRadius.circular(
-                                          AQRadius.medium,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          AspectRatio(
-                                            aspectRatio: 1.25,
-                                            child: ExcludeSemantics(
-                                              child: aqImg(
-                                                s.$2,
-                                                cacheWidth: 320,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: AQSpacing.x2,
-                                              vertical: AQSpacing.x2,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: FittedBox(
-                                                    fit: BoxFit.scaleDown,
-                                                    alignment:
-                                                        AlignmentDirectional
-                                                            .centerStart,
-                                                    child: Text(
-                                                      _typeLabel(f, s.$1),
-                                                      maxLines: 1,
-                                                      style: AQTypography.of(
-                                                        context,
-                                                        AQText.labelMedium,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                AQIcon(
-                                                  'chevron-right',
-                                                  size: 14,
-                                                  color: c.inkSoft,
-                                                  directional: true,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.all(AQSpacing.x3),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            label,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AQTypography.of(context, AQText.titleSmall),
+                          ),
+                        ),
+                        AQIcon(
+                          'chevron-right',
+                          size: 14,
+                          color: c.inkSoft,
+                          directional: true,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: AQSpacing.x5),
-          Semantics(
-            header: true,
-            child: Text(
-              f.t('explore.todo'),
-              style: AQTypography.of(context, AQText.headlineMedium),
-            ),
-          ),
-          Text(
-            f.t('pt.todo.sub'),
-            style: AQTypography.of(context, AQText.bodySmall, soft: true),
-          ),
-          const SizedBox(height: AQSpacing.x3),
-          large
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _goal(
-                      context,
-                      f,
-                      'home',
-                      f.t('home.buy'),
-                      f.t('pt.buy.s'),
-                      '/properties/all?tx=buy',
-                    ),
-                    const SizedBox(height: AQSpacing.x2),
-                    _goal(
-                      context,
-                      f,
-                      'calendar',
-                      f.t('home.rent'),
-                      f.t('pt.rent.s'),
-                      '/properties/all?tx=rent',
-                    ),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _goal(
-                        context,
-                        f,
-                        'home',
-                        f.t('home.buy'),
-                        f.t('pt.buy.s'),
-                        '/properties/all?tx=buy',
-                      ),
-                    ),
-                    const SizedBox(width: AQSpacing.x2),
-                    Expanded(
-                      child: _goal(
-                        context,
-                        f,
-                        'calendar',
-                        f.t('home.rent'),
-                        f.t('pt.rent.s'),
-                        '/properties/all?tx=rent',
-                      ),
-                    ),
-                  ],
-                ),
-          const SizedBox(height: AQSpacing.x5),
-          AQBanner(
-            image: 'assets/location/09_Modern_villa_exterior_in_Seeb.jpg',
-            title: f.t('pt.sell.t'),
-            body: f.t('pt.sell.b'),
-            cta: f.t('pt.sell.cta'),
-            onTap: () => context.push('/professionals?cat=realEstateAgent'),
-          ),
-        ],
+        ),
       ),
     );
   }

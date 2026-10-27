@@ -80,9 +80,9 @@ class AgentHome extends ConsumerWidget {
       RoleReveal(
         index: 4,
         child: _Grid(children: [
-          RoleTile(icon: 'list', label: f.t('rh.agent.listings'), sub: f.t('rh.agent.listings.sub'), unavailable: true, note: f.t('rh.agent.listings.note'), accent: accent),
+          RoleTile(icon: 'list', label: f.t('rh.agent.listings'), sub: f.t('rh.agent.listings.sub'), onTap: () => context.push('/agent/listings'), accent: accent),
           RoleTile(icon: 'calendar', label: f.t('rh.agent.viewings'), sub: f.t('rh.agent.viewings.sub'), onTap: () => context.go('/app/activity'), accent: accent),
-          RoleTile(icon: 'phone', label: f.t('rh.contact'), sub: f.t('rh.contact.sub'), unavailable: true, note: f.t('rh.agent.contact.note'), accent: accent),
+          RoleTile(icon: 'phone', label: f.t('ld.agent.title'), sub: f.t('ld.agent.sub'), onTap: () => context.push('/agent/leads'), accent: accent),
           RoleTile(icon: 'user', label: f.t('rh.agent.profileTile'), sub: f.t('rh.agent.profileTile.sub'), onTap: () => context.push('/verification/details'), accent: accent),
         ]),
       ),

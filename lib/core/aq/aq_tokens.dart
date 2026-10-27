@@ -8,12 +8,16 @@ import 'package:flutter/material.dart';
 @immutable
 class AQColors {
   final Brightness brightness;
+
   /// Page background (calm ivory / deep warm near-black).
   final Color background;
+
   /// Resting tonal surface on the background (fields, choice tiles).
   final Color surface;
+
   /// Raised tonal surface (sheets, selected tint).
   final Color surfaceRaised;
+
   /// Selected / pressed tint.
   final Color surfaceSelected;
   final Color ink;
@@ -26,6 +30,7 @@ class AQColors {
   final Color accentDisabled;
   final Color danger;
   final Color success;
+
   /// Restrained amber for attention states (decline, reschedule); never an alarm red.
   final Color warning;
 
@@ -142,15 +147,20 @@ class AQThemeTransition extends StatefulWidget {
   State<AQThemeTransition> createState() => _AQThemeTransitionState();
 }
 
-class _AQThemeTransitionState extends State<AQThemeTransition> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: AQMotion.theme);
+class _AQThemeTransitionState extends State<AQThemeTransition>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: AQMotion.theme,
+  );
   bool _first = true;
 
   double _target(BuildContext context) => switch (widget.mode) {
-        ThemeMode.dark => 1,
-        ThemeMode.light => 0,
-        ThemeMode.system => MediaQuery.platformBrightnessOf(context) == Brightness.dark ? 1 : 0,
-      };
+    ThemeMode.dark => 1,
+    ThemeMode.light => 0,
+    ThemeMode.system =>
+      MediaQuery.platformBrightnessOf(context) == Brightness.dark ? 1 : 0,
+  };
 
   @override
   void didChangeDependencies() {
@@ -161,7 +171,11 @@ class _AQThemeTransitionState extends State<AQThemeTransition> with SingleTicker
       _c.value = target;
     } else if (_c.value != target) {
       final reduced = AQMotion.reduced(context);
-      _c.animateTo(target, duration: reduced ? AQMotion.themeReduced : AQMotion.theme, curve: Curves.easeInOutCubic);
+      _c.animateTo(
+        target,
+        duration: reduced ? AQMotion.themeReduced : AQMotion.theme,
+        curve: Curves.easeInOutCubic,
+      );
     }
   }
 
@@ -179,18 +193,31 @@ class _AQThemeTransitionState extends State<AQThemeTransition> with SingleTicker
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _c,
-        child: widget.child,
-        builder: (context, child) => AQColorScope(colors: AQColors.lerp(AQColors.light, AQColors.dark, _c.value), child: child!),
-      );
+    animation: _c,
+    child: widget.child,
+    builder: (context, child) => AQColorScope(
+      colors: AQColors.lerp(AQColors.light, AQColors.dark, _c.value),
+      child: child!,
+    ),
+  );
 }
 
 /// 4-pt rhythm.
 class AQSpacing {
   AQSpacing._();
-  static const double x1 = 4, x2 = 8, x3 = 12, x4 = 16, x5 = 20, x6 = 24, x8 = 32, x10 = 40, x12 = 48;
+  static const double x1 = 4,
+      x2 = 8,
+      x3 = 12,
+      x4 = 16,
+      x5 = 20,
+      x6 = 24,
+      x8 = 32,
+      x10 = 40,
+      x12 = 48;
+
   /// Horizontal page margin.
   static const double gutter = 24;
+
   /// Content never gets wider than this (tablet / web).
   static const double maxContent = 520;
 }
@@ -198,10 +225,13 @@ class AQSpacing {
 /// Three radii only. Everything is built from these.
 class AQRadius {
   AQRadius._();
+
   /// chips, small tags, icon tiles
   static const double small = 10;
+
   /// buttons, fields, choice tiles
   static const double medium = 18;
+
   /// sheets, large surfaces
   static const double large = 28;
 }
@@ -210,9 +240,15 @@ class AQRadius {
 class AQElevation {
   AQElevation._();
   static const List<BoxShadow> none = [];
-  static const List<BoxShadow> subtle = [BoxShadow(color: Color(0x0F2D2823), blurRadius: 6, offset: Offset(0, 1))];
-  static const List<BoxShadow> floating = [BoxShadow(color: Color(0x1A2D2823), blurRadius: 16, offset: Offset(0, 6))];
-  static const List<BoxShadow> modal = [BoxShadow(color: Color(0x262D2823), blurRadius: 28, offset: Offset(0, 10))];
+  static const List<BoxShadow> subtle = [
+    BoxShadow(color: Color(0x0F2D2823), blurRadius: 6, offset: Offset(0, 1)),
+  ];
+  static const List<BoxShadow> floating = [
+    BoxShadow(color: Color(0x1A2D2823), blurRadius: 16, offset: Offset(0, 6)),
+  ];
+  static const List<BoxShadow> modal = [
+    BoxShadow(color: Color(0x262D2823), blurRadius: 28, offset: Offset(0, 10)),
+  ];
 }
 
 class AQIconSize {
@@ -222,6 +258,7 @@ class AQIconSize {
 
 class AQControl {
   AQControl._();
+
   /// Minimum interactive target (WCAG / platform guidance).
   static const double tap = 48;
   static const double button = 56;
@@ -236,6 +273,7 @@ class AQMotion {
   static const Duration fast = Duration(milliseconds: 180);
   static const Duration standard = Duration(milliseconds: 260);
   static const Duration slow = Duration(milliseconds: 380);
+
   /// Standard route push (pop uses [standard]).
   static const Duration page = Duration(milliseconds: 300);
 
@@ -250,6 +288,7 @@ class AQMotion {
   static const Duration theme = Duration(milliseconds: 340);
   static const Duration themeReduced = Duration(milliseconds: 100);
   static const Duration state = Duration(milliseconds: 220);
+
   /// Horizontal travel for route and step changes, in logical pixels (mirrors in RTL).
   static const double routeTravel = 20;
   static const double stepTravel = 14;
@@ -259,18 +298,26 @@ class AQMotion {
   static const Curve standardCurve = Curves.easeOutCubic;
   static const Curve decelerate = Curves.decelerate;
   static const Curve emphasized = Cubic(0.2, 0.0, 0.0, 1.0);
+
   /// Soft spring-like settle (no overshoot beyond ~3%).
   static const Curve spring = Cubic(0.22, 1.0, 0.36, 1.0);
 
-  static bool reduced(BuildContext c) => MediaQuery.maybeDisableAnimationsOf(c) ?? false;
-  static Duration scaled(BuildContext c, Duration d) => reduced(c) ? Duration.zero : d;
+  static bool reduced(BuildContext c) =>
+      MediaQuery.maybeDisableAnimationsOf(c) ?? false;
+  static Duration scaled(BuildContext c, Duration d) =>
+      reduced(c) ? Duration.zero : d;
 }
 
 /// Responsive helpers: adjust, do not just scale.
 class AQLayout {
   AQLayout._();
   static bool compact(BuildContext c) => MediaQuery.sizeOf(c).height < 760;
-  static double contentWidth(BuildContext c) => MediaQuery.sizeOf(c).width.clamp(0, AQSpacing.maxContent + AQSpacing.gutter * 2).toDouble();
+  static double contentWidth(BuildContext c) =>
+      MediaQuery.sizeOf(c).width
+          .clamp(0, AQSpacing.maxContent + AQSpacing.gutter * 2)
+          .toDouble();
+
   /// 0.92..1.08 around a 393 pt reference width.
-  static double scale(BuildContext c) => (contentWidth(c) / 393).clamp(0.92, 1.08).toDouble();
+  static double scale(BuildContext c) =>
+      (contentWidth(c) / 393).clamp(0.92, 1.08).toDouble();
 }

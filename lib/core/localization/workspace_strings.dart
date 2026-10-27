@@ -1,0 +1,302 @@
+/// Agent listings, leads and sponsored-banner copy. Merged into FlowStrings via extra_strings.
+/// ARABIC IS DRAFT COPY and needs native review before launch.
+const Map<String, (String, String)> workspaceStrings = {
+  // ---- property types the listing form needs beyond the project wizard
+  'ptype.house': ('House', 'منزل'),
+  'ptype.penthouse': ('Penthouse', 'بنتهاوس'),
+  'ptype.hotel': ('Hotel', 'فندق'),
+  'ptype.resort': ('Resort', 'منتجع'),
+  'ptype.chalet': ('Chalet', 'شاليه'),
+  'ptype.guesthouse': ('Guesthouse', 'بيت ضيافة'),
+
+  // ---- sponsored banner
+  'ad.sponsored': ('Sponsored', 'إعلان ممول'),
+
+  // ---- My listings: list
+  'ls.title': ('My listings', 'عقاراتي المعروضة'),
+  'ls.sub': (
+    'Properties you have listed on AQARATI.',
+    'العقارات التي عرضتها على عقاراتي.',
+  ),
+  'ls.add': ('Add listing', 'إضافة عقار'),
+  'ls.f.all': ('All', 'الكل'),
+  'ls.f.live': ('Live', 'منشور'),
+  'ls.f.review': ('In review', 'قيد المراجعة'),
+  'ls.f.changes': ('Needs changes', 'يحتاج تعديلاً'),
+  'ls.f.paused': ('Paused', 'متوقف مؤقتاً'),
+  'ls.f.closed': ('Closed', 'مغلق'),
+  'ls.st.draft': ('Draft', 'مسودة'),
+  'ls.st.pendingVerification': ('In review', 'قيد المراجعة'),
+  'ls.st.approved': ('Live', 'منشور'),
+  'ls.st.resubmissionRequired': ('Needs changes', 'يحتاج تعديلاً'),
+  'ls.st.rejected': ('Not approved', 'غير معتمد'),
+  'ls.st.hidden': ('Hidden', 'مخفي'),
+  'ls.st.expired': ('Expired', 'منتهي'),
+  'ls.st.paused': ('Paused', 'متوقف مؤقتاً'),
+  'ls.st.withdrawn': ('Withdrawn', 'مسحوب'),
+  'ls.st.sold': ('Sold', 'مباع'),
+  'ls.st.rented': ('Rented', 'مؤجر'),
+  'ls.card.updated': ('Updated {d}', 'حُدّث {d}'),
+  'ls.card.changes': ('Changes in review', 'التعديلات قيد المراجعة'),
+  'ls.empty.t': ('No listings yet', 'لا توجد عقارات بعد'),
+  'ls.empty.b': (
+    'Add your first property. It is reviewed before it appears to buyers.',
+    'أضف أول عقار. تتم مراجعته قبل ظهوره للمشترين.',
+  ),
+  'ls.empty.filter.t': ('Nothing with this status', 'لا شيء بهذه الحالة'),
+  'ls.empty.filter.b': (
+    'Try another filter to see your other listings.',
+    'جرّب تصفية أخرى لعرض بقية عقاراتك.',
+  ),
+  'ls.error': ('We could not load your listings.', 'تعذّر تحميل عقاراتك.'),
+  'ls.noAccess.t': ('Agent workspace only', 'لمساحة الوكيل فقط'),
+  'ls.noAccess.b': (
+    'Listings are managed from an approved real estate agent account.',
+    'تُدار العقارات من حساب وكيل عقاري معتمد.',
+  ),
+  'ls.denied.t': ('This listing is not yours', 'هذا العقار ليس لك'),
+  'ls.denied.b': (
+    'You can only open listings that belong to your own account.',
+    'يمكنك فتح العقارات التابعة لحسابك فقط.',
+  ),
+  'ls.notFound': (
+    'We could not find this listing.',
+    'تعذّر العثور على هذا العقار.',
+  ),
+  'ls.back': ('Back to my listings', 'العودة إلى عقاراتي'),
+
+  // ---- My listings: detail
+  'ls.d.title': ('Listing', 'العقار'),
+  'ls.d.edit': ('Edit', 'تعديل'),
+  'ls.d.pause': ('Pause', 'إيقاف مؤقت'),
+  'ls.d.resume': ('Resume', 'استئناف'),
+  'ls.d.renew': ('Renew', 'تجديد'),
+  'ls.d.feedback': ('Reviewer feedback', 'ملاحظات المراجع'),
+  'ls.d.facts': ('Details', 'التفاصيل'),
+  'ls.d.photos': ('Photos', 'الصور'),
+  'ls.d.noPhotos': ('No photos on this listing.', 'لا توجد صور لهذا العقار.'),
+  'ls.d.deed': ('Title deed', 'سند الملكية'),
+  'ls.d.market': ('Market', 'السوق'),
+  'ls.d.type': ('Type', 'النوع'),
+  'ls.d.size': ('Size', 'المساحة'),
+  'ls.d.beds': ('Bedrooms', 'غرف النوم'),
+  'ls.d.baths': ('Bathrooms', 'دورات المياه'),
+  'ls.d.parking': ('Parking', 'مواقف'),
+  'ls.d.location': ('Location', 'الموقع'),
+  'ls.d.desc': ('Description', 'الوصف'),
+  'ls.exp.draft': (
+    'This listing has not been sent for review yet.',
+    'لم يُرسل هذا العقار للمراجعة بعد.',
+  ),
+  'ls.exp.pendingVerification': (
+    'Our team is reviewing this listing. It is not visible to buyers until it is approved.',
+    'يراجع فريقنا هذا العقار. لا يظهر للمشترين حتى تتم الموافقة عليه.',
+  ),
+  'ls.exp.approved': (
+    'This listing is live and visible to buyers.',
+    'هذا العقار منشور ويظهر للمشترين.',
+  ),
+  'ls.exp.resubmissionRequired': (
+    'The reviewer asked for changes. Edit the listing and send it again.',
+    'طلب المراجع تعديلات. عدّل العقار وأرسله مرة أخرى.',
+  ),
+  'ls.exp.rejected': (
+    'This listing was not approved and is not visible to buyers.',
+    'لم تتم الموافقة على هذا العقار ولا يظهر للمشترين.',
+  ),
+  'ls.exp.hidden': (
+    'This listing is hidden while your account is not active.',
+    'هذا العقار مخفي طالما حسابك غير نشط.',
+  ),
+  'ls.exp.expired': (
+    'This listing expired. Renew it to send it for review again.',
+    'انتهت مدة هذا العقار. جدّده لإرساله للمراجعة مرة أخرى.',
+  ),
+  'ls.exp.paused': (
+    'Paused. Buyers cannot see this listing until you resume it.',
+    'متوقف مؤقتاً. لا يراه المشترون حتى تستأنفه.',
+  ),
+  'ls.exp.withdrawn': ('You withdrew this listing.', 'سحبت هذا العقار.'),
+  'ls.exp.sold': (
+    'This property is marked as sold.',
+    'هذا العقار مُعلّم كمباع.',
+  ),
+  'ls.exp.rented': (
+    'This property is marked as rented.',
+    'هذا العقار مُعلّم كمؤجر.',
+  ),
+  'ls.exp.pending': (
+    'Your latest edits are being reviewed. The approved version stays live meanwhile.',
+    'تعديلاتك الأخيرة قيد المراجعة. تبقى النسخة المعتمدة منشورة خلال ذلك.',
+  ),
+
+  // ---- pause / resume / renew
+  'ls.pause.t': ('Pause this listing?', 'إيقاف هذا العقار مؤقتاً؟'),
+  'ls.pause.b': (
+    'Buyers will not see it while it is paused. You can resume it later.',
+    'لن يراه المشترون أثناء الإيقاف. يمكنك استئنافه لاحقاً.',
+  ),
+  'ls.pause.keep': ('Keep it live', 'إبقاؤه منشوراً'),
+  'ls.pause.yes': ('Pause listing', 'إيقاف العقار'),
+  'ls.pause.done': ('Listing paused', 'تم إيقاف العقار مؤقتاً'),
+  'ls.resume.done': ('Listing resumed', 'تم استئناف العقار'),
+  'ls.pause.unsupported': (
+    'Pausing and resuming is not connected yet, so nothing was changed. It needs a pause option from the service.',
+    'الإيقاف المؤقت والاستئناف غير متصلين بعد، لذلك لم يتغير شيء. يحتاج خيار الإيقاف من الخدمة.',
+  ),
+  'ls.renew.done': ('Renewal sent for review', 'أُرسل التجديد للمراجعة'),
+  'ls.pause.err': (
+    'We could not pause this listing. Its status did not change.',
+    'تعذّر إيقاف هذا العقار. لم تتغير حالته.',
+  ),
+  'ls.resume.err': (
+    'We could not resume this listing. Its status did not change.',
+    'تعذّر استئناف هذا العقار. لم تتغير حالته.',
+  ),
+  'ls.renew.err': (
+    'We could not renew this listing. Its status did not change.',
+    'تعذّر تجديد هذا العقار. لم تتغير حالته.',
+  ),
+  'ls.conflict': (
+    'This action is not available for the listing\'s current status.',
+    'هذا الإجراء غير متاح لحالة العقار الحالية.',
+  ),
+
+  // ---- form
+  'ls.form.add': ('Add listing', 'إضافة عقار'),
+  'ls.form.edit': ('Edit listing', 'تعديل العقار'),
+  'ls.form.addSub': (
+    'It is reviewed before it appears to buyers.',
+    'تتم مراجعته قبل ظهوره للمشترين.',
+  ),
+  'ls.form.editSub': (
+    'Photos and details you do not change stay as they are.',
+    'الصور والتفاصيل التي لا تغيّرها تبقى كما هي.',
+  ),
+  'ls.fs.property': ('Property', 'العقار'),
+  'ls.fs.details': ('Description', 'الوصف'),
+  'ls.fs.location': ('Location', 'الموقع'),
+  'ls.fs.facts': ('Facts', 'الحقائق'),
+  'ls.fs.price': ('Price', 'السعر'),
+  'ls.fs.deed': ('Ownership', 'الملكية'),
+  'ls.fs.photos': ('Photos', 'الصور'),
+  'ls.fl.market': ('Market', 'السوق'),
+  'ls.fl.type': ('Property type', 'نوع العقار'),
+  'ls.fl.tx': ('Transaction', 'نوع الصفقة'),
+  'ls.market.residential': ('Residential', 'سكني'),
+  'ls.market.commercial': ('Commercial', 'تجاري'),
+  'ls.market.agriculture': ('Agriculture', 'زراعي'),
+  'ls.market.industrial': ('Industrial', 'صناعي'),
+  'ls.tx.buy': ('For sale', 'للبيع'),
+  'ls.tx.rent': ('For rent', 'للإيجار'),
+  'ls.tx.lease': ('For lease', 'للتأجير'),
+  'ls.fl.title': ('Title', 'العنوان'),
+  'ls.fl.title.hint': ('Short, factual title', 'عنوان قصير وواقعي'),
+  'ls.fl.desc': ('Description', 'الوصف'),
+  'ls.fl.desc.hint': ('What buyers should know', 'ما يجب أن يعرفه المشترون'),
+  'ls.fl.gov': ('Governorate', 'المحافظة'),
+  'ls.fl.wilayat': ('Wilayat', 'الولاية'),
+  'ls.fl.area': (
+    'Area or neighbourhood (optional)',
+    'المنطقة أو الحي (اختياري)',
+  ),
+  'ls.fl.size': ('Size (m²)', 'المساحة (م²)'),
+  'ls.fl.beds': ('Bedrooms', 'غرف النوم'),
+  'ls.fl.baths': ('Bathrooms', 'دورات المياه'),
+  'ls.fl.parking': ('Parking spaces', 'مواقف السيارات'),
+  'ls.fl.price': ('Price (OMR)', 'السعر (ر.ع.)'),
+  'ls.fl.price.hint': ('Up to 3 decimals', 'حتى 3 خانات عشرية'),
+  'ls.fl.deed': ('Title deed number', 'رقم سند الملكية'),
+  'ls.fl.deed.hint': (
+    'Letters and digits, 6 to 20 characters',
+    'أحرف وأرقام، من 6 إلى 20 خانة',
+  ),
+  'ls.fl.deed.note': (
+    'Used to check the listing against duplicates. The deed document is requested during review.',
+    'يُستخدم للتحقق من تكرار العقار. تُطلب وثيقة السند أثناء المراجعة.',
+  ),
+  'ls.fl.noFacts': (
+    'No room details apply to this property type.',
+    'لا تنطبق تفاصيل الغرف على هذا النوع من العقارات.',
+  ),
+  'ls.ph.add': ('Add photo', 'إضافة صورة'),
+  'ls.ph.count': ('{n} photos', '{n} صور'),
+  'ls.ph.none': ('No photos added yet.', 'لم تتم إضافة صور بعد.'),
+  'ls.ph.remove': ('Remove photo {n}', 'إزالة الصورة {n}'),
+  'ls.ph.hint': ('JPG or PNG.', 'JPG أو PNG.'),
+  'ls.ph.err.type': (
+    'Only JPG or PNG photos can be added.',
+    'يمكن إضافة صور JPG أو PNG فقط.',
+  ),
+  'ls.ph.err.size': ('That photo is too large.', 'هذه الصورة كبيرة جداً.'),
+  'ls.ph.err.pick': (
+    'We could not open that photo. Try another.',
+    'تعذّر فتح هذه الصورة. جرّب أخرى.',
+  ),
+  'ls.err.title': ('Enter a title.', 'أدخل عنواناً.'),
+  'ls.err.desc': ('Add a short description.', 'أضف وصفاً قصيراً.'),
+  'ls.err.market': ('Choose a market.', 'اختر السوق.'),
+  'ls.err.type': ('Choose a property type.', 'اختر نوع العقار.'),
+  'ls.err.tx': ('Choose a transaction.', 'اختر نوع الصفقة.'),
+  'ls.err.gov': ('Choose a governorate.', 'اختر المحافظة.'),
+  'ls.err.wilayat': ('Choose a wilayat.', 'اختر الولاية.'),
+  'ls.err.size': (
+    'Enter the size as a number above zero.',
+    'أدخل المساحة كرقم أكبر من الصفر.',
+  ),
+  'ls.err.count': (
+    'Enter a whole number, zero or more.',
+    'أدخل عدداً صحيحاً صفراً أو أكثر.',
+  ),
+  'ls.err.price': (
+    'Enter the price as a number above zero, up to 3 decimals.',
+    'أدخل السعر كرقم أكبر من الصفر حتى 3 خانات عشرية.',
+  ),
+  'ls.err.deed': (
+    'Use 6 to 20 letters or digits.',
+    'استخدم من 6 إلى 20 حرفاً أو رقماً.',
+  ),
+  'ls.form.submitAdd': ('Send for review', 'إرسال للمراجعة'),
+  'ls.form.submitEdit': ('Save changes', 'حفظ التعديلات'),
+  'ls.form.submitReturned': (
+    'Send again for review',
+    'إرسال مرة أخرى للمراجعة',
+  ),
+  'ls.form.error': (
+    'We could not save this listing. Your entries are kept. Try again.',
+    'تعذّر حفظ هذا العقار. تم الاحتفاظ بإدخالاتك. حاول مرة أخرى.',
+  ),
+  'ls.form.dup': (
+    'A listing with this title deed and transaction already exists.',
+    'يوجد عقار بنفس سند الملكية ونوع الصفقة.',
+  ),
+  'ls.form.photoFail': (
+    'A photo could not be uploaded, so nothing was saved. Try again.',
+    'تعذّر رفع صورة، لذلك لم يُحفظ شيء. حاول مرة أخرى.',
+  ),
+  'ls.form.demo': (
+    'Demo: the listing is kept in this session only and photos are not uploaded.',
+    'تجريبي: يُحفظ العقار في هذه الجلسة فقط ولا تُرفع الصور.',
+  ),
+  'ls.sent.t': ('Sent for review', 'أُرسل للمراجعة'),
+  'ls.sent.b': (
+    'This listing is not live. Buyers will see it only after it is approved.',
+    'هذا العقار غير منشور. سيراه المشترون بعد الموافقة عليه فقط.',
+  ),
+  'ls.saved.t': ('Changes saved', 'تم حفظ التعديلات'),
+  'ls.saved.live': (
+    'The approved version stays live while your changes are reviewed.',
+    'تبقى النسخة المعتمدة منشورة أثناء مراجعة تعديلاتك.',
+  ),
+  'ls.saved.review': (
+    'The listing is back in review.',
+    'عاد العقار إلى المراجعة.',
+  ),
+  'ls.leave.t': ('Leave without saving?', 'المغادرة دون حفظ؟'),
+  'ls.leave.b': (
+    'Your entries on this form will be lost.',
+    'ستفقد إدخالاتك في هذا النموذج.',
+  ),
+  'ls.leave.stay': ('Keep editing', 'متابعة التعديل'),
+  'ls.leave.yes': ('Leave', 'مغادرة'),
+};

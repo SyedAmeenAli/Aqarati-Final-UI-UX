@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,8 @@ import '../../core/aq/aq_tokens.dart';
 import '../../core/aq/aq_typography.dart';
 import '../../core/localization/flow_strings.dart';
 import '../../data/models/enums.dart';
+import '../../core/aq/aq_help.dart';
+import '../ads/sponsored_banner.dart';
 import '../../data/models/property.dart';
 import '../../data/repositories/app_state_providers.dart'
     show savedPropertyIdsProvider;
@@ -59,6 +63,9 @@ class AQHero extends StatelessWidget {
 
   /// The property-area chip is a Home/Explore preference; pages it does not filter hide it.
   final bool showLocation;
+
+  /// Optional block between the header row and the greeting (Home: the sponsored banner).
+  final Widget? belowHeader;
   const AQHero({
     super.key,
     required this.image,
@@ -67,6 +74,7 @@ class AQHero extends StatelessWidget {
     required this.sub,
     this.onBack,
     this.showLocation = true,
+    this.belowHeader,
   });
 
   @override
@@ -180,6 +188,7 @@ class AQHero extends StatelessWidget {
                     ),
                   ],
                 ),
+                ?belowHeader,
                 const SizedBox(height: AQSpacing.x5),
                 if (eyebrow != null)
                   Padding(
@@ -366,7 +375,16 @@ class AQSectionHeader extends StatelessWidget {
   final String? sub;
   final String? action;
   final VoidCallback? onAction;
-  const AQSectionHeader(this.title, {this.sub, this.action, this.onAction});
+
+  /// Shows the question-mark real-estate explainer beside the title.
+  final bool help;
+  const AQSectionHeader(
+    this.title, {
+    this.sub,
+    this.action,
+    this.onAction,
+    this.help = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -374,12 +392,19 @@ class AQSectionHeader extends StatelessWidget {
     final heading = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Semantics(
-          header: true,
-          child: Text(
-            title,
-            style: AQTypography.of(context, AQText.headlineMedium),
-          ),
+        Row(
+          children: [
+            Flexible(
+              child: Semantics(
+                header: true,
+                child: Text(
+                  title,
+                  style: AQTypography.of(context, AQText.headlineMedium),
+                ),
+              ),
+            ),
+            if (help) const AQHelpButton(),
+          ],
         ),
         if (sub != null)
           Padding(
@@ -406,11 +431,17 @@ class AQSectionHeader extends StatelessWidget {
       child: stacked && button != null
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [heading, Align(alignment: AlignmentDirectional.centerEnd, child: button)],
+              children: [
+                heading,
+                Align(alignment: AlignmentDirectional.centerEnd, child: button),
+              ],
             )
           : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Expanded(child: heading), ?button],
+              children: [
+                Expanded(child: heading),
+                ?button,
+              ],
             ),
     );
   }
@@ -505,11 +536,15 @@ class _TileRow extends StatelessWidget {
 /// Wide photographic banner with a title, line of copy and one pill action.
 class AQBanner extends StatelessWidget {
   final String image;
+
+  /// A creative held in memory (admin previews). Takes precedence over [image].
+  final Uint8List? imageBytes;
   final String eyebrow, title, body, cta;
   final VoidCallback onTap;
   const AQBanner({
     super.key,
     required this.image,
+    this.imageBytes,
     this.eyebrow = '',
     required this.title,
     required this.body,
@@ -529,7 +564,22 @@ class AQBanner extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  aqImg(image, cacheWidth: 900),
+                  if (imageBytes != null)
+                    Image.memory(
+                      imageBytes!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) =>
+                          const ColoredBox(color: Color(0x22000000)),
+                    )
+                  else if (image.startsWith('https://'))
+                    Image.network(
+                      image,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) =>
+                          const ColoredBox(color: Color(0x22000000)),
+                    )
+                  else
+                    aqImg(image, cacheWidth: 900),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -707,6 +757,10 @@ class AQSlideSwitch extends StatelessWidget {
                     selected: i == index,
                     label: labels[i],
                     excludeSemantics: true,
+                    onTap: () {
+                      AQHaptics.selection();
+                      onChanged(i);
+                    },
                     child: AQPressable(
                       onTap: () {
                         AQHaptics.selection();
@@ -1167,7 +1221,7 @@ Widget _brokerLoan(BuildContext context) {
     'assets/location/10_Muscat_corniche_at_warm_evening.jpg',
     f.t('home.broker'),
     f.t('home.broker.sub'),
-    () => context.push('/professionals'),
+    () => context.push('/broker'),
   );
   final loan = card(
     'assets/properties/p5/03_Contemporary_apartment_property_.jpg',
@@ -1236,6 +1290,98 @@ Widget aqPage(
 
 // ---------------------------------------------------------------- Home
 
+/// The six modules of User to Shop, in the approved order. One entry point to each; the
+/// sections below stay as they were.
+class AQModuleGrid extends StatelessWidget {
+  const AQModuleGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
+    final c = AQColors.of(context);
+    final large = aqLargeText(context);
+    final modules = <(String, String, String)>[
+      ('home', 'properties', '/properties'),
+      ('development', 'development', '/app/explore/build/results?cat=developer'),
+      (
+        'interior',
+        'interior',
+        '/app/explore/build/results?cat=interiorExterior',
+      ),
+      (
+        'construction',
+        'construction',
+        '/app/explore/build/results?cat=construction',
+      ),
+      ('area', 'loan', '/calculators'),
+      ('shield', 'maintenance', '/professionals?cat=maintenance'),
+    ];
+    Widget tile((String, String, String) m) {
+      final label = f.t('hm6.${m.$2}');
+      void open() {
+        AQHaptics.selection();
+        context.push(m.$3);
+      }
+
+      return Semantics(
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        onTap: open,
+        child: AQPressable(
+          onTap: open,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 104),
+            padding: const EdgeInsets.all(AQSpacing.x3),
+            decoration: BoxDecoration(
+              color: c.surfaceRaised,
+              borderRadius: BorderRadius.circular(AQRadius.medium),
+              border: Border.all(color: c.hairline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: c.surfaceSelected,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(child: AQIcon(m.$1, size: 18, color: c.accent)),
+                ),
+                const SizedBox(height: AQSpacing.x2),
+                Text(
+                  label,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: AQTypography.of(context, AQText.titleSmall),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AQSpacing.x4),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          const gap = AQSpacing.x2;
+          final cols = large ? 1 : 2;
+          final w = (box.maxWidth - gap * (cols - 1)) / cols;
+          return Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: [for (final m in modules) SizedBox(width: w, child: tile(m))],
+          );
+        },
+      ),
+    );
+  }
+}
+
 class AQHomeScreen extends ConsumerWidget {
   /// Optional first block under the hero: the Buyer / Agent switcher for an approved agent, or
   /// the status banner for an application that is not approved yet.
@@ -1265,12 +1411,15 @@ class AQHomeScreen extends ConsumerWidget {
         eyebrow: _greeting(f),
         title: f.t('home.lead'),
         sub: '',
+        belowHeader: const SponsoredBannerSlot(),
       ),
       children: [
         ?topSlot,
         AQSearchEntry(hint: f.t('home.search.hint')),
+        const AQModuleGrid(),
         AQSectionHeader(
           f.t('home.browse'),
+          help: true,
           action: f.t('home.seeAll'),
           onAction: () => context.push('/properties'),
         ),
@@ -1429,7 +1578,10 @@ class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
     category: PropCategory.values
         .where((c) => c.name == widget.category)
         .firstOrNull,
-    types: {for (final n in (widget.types ?? '').split(',')) ...PropertyType.values.where((t) => t.name == n)},
+    types: {
+      for (final n in (widget.types ?? '').split(','))
+        ...PropertyType.values.where((t) => t.name == n),
+    },
     tx: switch (widget.tx) {
       'buy' => TransactionType.buy,
       'rent' => TransactionType.rent,
@@ -1584,9 +1736,14 @@ class _AQPropertiesScreenState extends ConsumerState<AQPropertiesScreen> {
 
 class AQResultCard extends ConsumerWidget {
   final Property property;
+
   /// Extra room at the trailing edge when something is overlaid there (e.g. a compare mark).
   final double trailingInset;
-  const AQResultCard({super.key, required this.property, this.trailingInset = 0});
+  const AQResultCard({
+    super.key,
+    required this.property,
+    this.trailingInset = 0,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1627,7 +1784,12 @@ class AQResultCard extends ConsumerWidget {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 132),
                     child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(AQSpacing.x3, AQSpacing.x3, AQSpacing.x3 + trailingInset, AQSpacing.x3),
+                      padding: EdgeInsetsDirectional.fromSTEB(
+                        AQSpacing.x3,
+                        AQSpacing.x3,
+                        AQSpacing.x3 + trailingInset,
+                        AQSpacing.x3,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,

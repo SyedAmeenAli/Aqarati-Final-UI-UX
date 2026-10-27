@@ -114,6 +114,7 @@ class ConstructionHome extends ConsumerWidget {
       RoleSection(f.t('rh.con.info'), action: f.t('rh.edit'), onAction: profile, accent: accent),
       RoleRow(label: f.t('rh.con.cr'), value: f.t('rh.con.cr.s'), onTap: () => context.push('/verification/details')),
       RoleRow(label: f.t('rh.con.office'), value: f.t('rh.view'), onTap: profile),
+      RoleRow(label: f.t('rh.leads.svc'), value: f.t('rh.view'), onTap: () => context.push('/workspace/requests')),
       RoleRow(label: f.t('rh.contact'), value: f.t('rh.unavailable'), onTap: () => context.push('/app/account/workspace/leads')),
     ]);
   }

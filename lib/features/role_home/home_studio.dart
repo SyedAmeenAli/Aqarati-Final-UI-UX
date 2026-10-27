@@ -118,6 +118,7 @@ class ArchitectureHome extends ConsumerWidget {
       RoleRow(leadingNumber: '04', label: f.t('rh.arc.verification'), onTap: () => context.go('/verification')),
       RoleRow(leadingNumber: '05', label: f.t('rh.arc.reviews'), onTap: reviews),
       RoleRow(leadingNumber: '06', label: f.t('rh.arc.contact'), value: f.t('rh.unavailable'), onTap: () => context.push('/app/account/workspace/leads')),
+      RoleRow(leadingNumber: '07', label: f.t('rh.leads.svc'), value: f.t('rh.view'), onTap: () => context.push('/workspace/requests')),
       const SizedBox(height: AQSpacing.x4),
       RoleReveal(
         index: 4,
@@ -256,6 +257,7 @@ class InteriorHome extends ConsumerWidget {
       RoleRow(label: f.t('rh.int.serviceType'), value: service == null ? f.t('rh.notAdded') : f.t('service.${service.name}'), onTap: profile),
       RoleRow(label: f.t('rh.int.bioLoc'), value: o != null && o.locationLabel.isNotEmpty ? o.locationLabel : f.t('rh.notAdded'), onTap: profile),
       RoleRow(label: f.t('rh.int.reviews'), onTap: () => context.push('/app/account/workspace/reviews')),
+      RoleRow(label: f.t('rh.leads.svc'), value: f.t('rh.view'), onTap: () => context.push('/workspace/requests')),
       RoleRow(label: f.t('rh.verification'), value: f.t('rh.verification.sub'), onTap: () => context.go('/verification')),
       const SizedBox(height: AQSpacing.x4),
       DbNotice('${f.t('rh.int.showcase')}: ${f.t('rh.int.showcase.b')}', icon: 'lock'),

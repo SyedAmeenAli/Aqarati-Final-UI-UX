@@ -113,7 +113,7 @@ class AQExploreScreen extends StatelessWidget {
           title: f.t('ex.broker.t'),
           body: f.t('ex.broker.b'),
           cta: f.t('ex.broker.cta'),
-          onTap: () => go('/professionals?cat=realEstateAgent'),
+          onTap: () => go('/broker'),
         ),
         AQSectionHeader(f.t('home.maint'), sub: f.t('ex.maint.sub'), action: f.t('explore.exploreAll'), onAction: () => go('/professionals?cat=maintenance')),
         _iconTiles(context, [

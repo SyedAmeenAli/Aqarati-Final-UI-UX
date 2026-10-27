@@ -40,7 +40,7 @@ const Map<String, (String, String)> roleHomeStrings = {
   'rh.agent.profile.sub': ('Licensed role · Approved', 'وسيط مرخّص · معتمد'),
   'rh.agent.tools': ('Your tools', 'أدواتك'),
   'rh.agent.listings': ('My listings', 'إعلاناتي'),
-  'rh.agent.listings.sub': ('Listing service not connected', 'خدمة الإعلانات غير متصلة'),
+  'rh.agent.listings.sub': ('Add, edit and pause your properties', 'أضف عقاراتك وعدّلها وأوقفها مؤقتاً'),
   'rh.agent.listings.note': (
     'Creating and managing listings needs the approved listing service, which is not connected to this app yet. Nothing is shown until it is.',
     'إنشاء الإعلانات وإدارتها يحتاج إلى خدمة الإعلانات المعتمدة، وهي غير متصلة بالتطبيق بعد. لن يظهر شيء قبل ذلك.',

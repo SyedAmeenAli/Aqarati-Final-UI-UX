@@ -113,3 +113,25 @@ Evidence: T = automated test file; B = Chromium route or flow walk on 2026-10-15
 ## Totals (from the source, not estimates)
 
 78 routes in the Flutter router; 26 screens in the layout matrix; every route renders without error in the QA build. Screens that are `missing`: e-Broker sell flow and listing lifecycle, notification push and preferences, profile and organisation members and devices, invitation acceptance, version gate, admin console, provider-side maintenance workspace. Everything marked demo-only needs real services before release.
+
+## 10. Confirmed workflows (added 2026-10-27)
+
+See `CONFIRMED_WORKFLOWS_IMPLEMENTATION.md` for behaviour, assumptions and missing contracts.
+
+| Screen | Route | Status | Evidence |
+|---|---|---|---|
+| My listings (filters, cards, states) | `/agent/listings` | implemented, demo-only | T `agent_listings` |
+| Add / edit listing | `/agent/listings/new`, `/:id/edit` | implemented, demo-only | T |
+| Listing detail, pause, resume, renew | `/agent/listings/:id` | implemented, demo-only; pause needs a contract transition | T |
+| Agent leads and detail (Call, confirm / decline viewing) | `/agent/leads`, `/:id` | implemented, empty until a lead service exists | T `leads` |
+| Project enquiries | `/workspace/enquiries`, `/:id` | implemented, empty until a lead service exists | T |
+| Service requests | `/workspace/requests`, `/:id` | implemented, empty until a lead service exists | T |
+| Sponsored banner on Home | pinned under the hero | implemented; hidden when empty or unreachable | T `sponsored_banner` |
+| Admin sign-in, one-time code, step-up | `/login`, `/code` | implemented, demo-only (separate build) | T `admin_console` |
+| Verification queue and detail | `/verification`, `/:id` | implemented, demo-only | T |
+| Listing moderation and e-Broker review | `/moderation`, `/:id` | implemented, demo-only | T |
+| Ads & Sponsors list, create, edit, preview, review | `/ads`, `/new`, `/:id/edit` | implemented, demo-only | T |
+
+Admin Web Console: no longer "not built". It is a separate entry point in this package
+(`lib/admin_main.dart`); the monorepo's `apps/admin-web` folder is still a README scaffold and the
+console can move there once a shared design package exists.

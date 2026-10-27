@@ -1,3 +1,4 @@
+import '../entry/models/signup_purpose.dart' show SignupPurpose;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -194,6 +195,11 @@ class AccountTab extends ConsumerWidget {
               onPressed: () => context.push('/notifications'),
             );
           }),
+        ),
+      if (m != null && (m.purpose == SignupPurpose.userToShop || m.purpose == SignupPurpose.realEstateAgent))
+        Padding(
+          padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+          child: AQSecondaryButton(label: f.t('pf.row'), leadingIcon: 'user', trailingChevron: false, onPressed: () => context.push('/app/account/profile')),
         ),
       Padding(
         padding: const EdgeInsets.only(bottom: AQSpacing.x3),

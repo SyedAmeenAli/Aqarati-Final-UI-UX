@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'aq_tokens.dart';
 
 enum AQText {
@@ -22,7 +23,13 @@ enum AQText {
 class _Spec {
   final bool editorial; // Fraunces (Latin) vs Plus Jakarta Sans
   final double size, height, weight, tracking;
-  const _Spec(this.editorial, this.size, this.height, this.weight, this.tracking);
+  const _Spec(
+    this.editorial,
+    this.size,
+    this.height,
+    this.weight,
+    this.tracking,
+  );
 }
 
 /// Semantic type scale. Fraunces = editorial display, Plus Jakarta Sans = UI,
@@ -48,11 +55,18 @@ class AQTypography {
     AQText.labelSmall: _Spec(false, 11, 1.2, 600, 1.4),
   };
 
-  static FontWeight _w(double w) => FontWeight.values[((w / 100).round() - 1).clamp(0, 8)];
+  static FontWeight _w(double w) =>
+      FontWeight.values[((w / 100).round() - 1).clamp(0, 8)];
 
   /// [color] defaults to the semantic role colour (display/headline/title = ink,
   /// body = ink, label = ink). Pass `soft: true` for subordinate copy.
-  static TextStyle of(BuildContext context, AQText role, {Color? color, bool soft = false, bool italic = false}) {
+  static TextStyle of(
+    BuildContext context,
+    AQText role, {
+    Color? color,
+    bool soft = false,
+    bool italic = false,
+  }) {
     final c = AQColors.of(context);
     final rtl = Directionality.of(context) == TextDirection.rtl;
     final s = _spec[role]!;

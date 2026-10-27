@@ -284,16 +284,14 @@ void main() {
       expect(find.byType(AQHomeScreen), findsNothing);
     });
 
-    testWidgets('agent tools are honest: listings and contact explain what is missing, viewings opens Activity', (t) async {
-      final visited = <String>[];
-      await pumpHome(t, app(me(SignupPurpose.realEstateAgent, GrantState.approved), visited: visited));
-      expect(find.textContaining('Creating and managing listings needs'), findsNothing);
-      await tapText(t, 'My listings');
-      expect(find.textContaining('Creating and managing listings needs'), findsOneWidget);
-      expect(visited, isEmpty, reason: 'an unavailable tile never navigates');
-      expect(find.textContaining('no in-app chat'), findsWidgets);
-      await tapText(t, 'Viewings');
-      expect(visited, contains('/app/activity'));
+    testWidgets('agent tools open their own screens: listings, leads and viewings', (t) async {
+      for (final (label, route) in [('My listings', '/agent/listings'), ('Leads', '/agent/leads'), ('Viewings', '/app/activity')]) {
+        final visited = <String>[];
+        await pumpHome(t, app(me(SignupPurpose.realEstateAgent, GrantState.approved), visited: visited));
+        await tapText(t, label);
+        expect(visited, contains(route), reason: label);
+        await t.pumpWidget(const SizedBox());
+      }
     });
 
     testWidgets('an agent who is not approved never sees agent tools or the switcher', (t) async {

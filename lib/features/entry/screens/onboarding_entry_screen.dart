@@ -9,6 +9,11 @@ import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/auth/auth_repository.dart';
 import '../../../core/localization/entry_strings.dart';
+import '../../../core/localization/flow_strings.dart';
+import '../../../data/api/account_api.dart';
+import '../../flow/screens/auth_screens.dart' show routeForSession;
+import '../../workspace/aq_home.dart' show AQSlideSwitch;
+import '../models/entry_experience.dart';
 import '../../../core/startup/intro_state.dart';
 import '../../../core/startup/logo_handoff.dart';
 import '../models/onboarding_page.dart';
@@ -65,7 +70,15 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
     final style = AQTypography.of(context, AQText.bodyMedium, color: Colors.white);
     switch (result) {
       case AuthSuccess():
-        context.go('/app/home');
+        // The account decides where it belongs, not the door that was chosen.
+        try {
+          final me = await ref.read(accountApiProvider).getMe();
+          if (!mounted) return;
+          context.go(routeForSession(me));
+        } catch (_) {
+          if (!mounted) return;
+          messenger.showSnackBar(SnackBar(content: Text(s.providerUnavailable, style: style)));
+        }
       case AuthUnavailable():
         messenger.showSnackBar(SnackBar(content: Text(s.providerUnavailable, style: style)));
       case AuthFailure(:final message):
@@ -154,9 +167,12 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
                                 end: 0.9,
                                 dy: 8,
                                 child: Column(children: [
-                                  AQPrimaryButton(compact: compact, label: s.createAccount, onPressed: () => context.push(_page.primaryRoute)),
+                                  _ExperienceChooser(compact: compact),
+                                  SizedBox(height: compact ? AQSpacing.x2 : AQSpacing.x3),
+                                  AQPrimaryButton(compact: compact, label: s.createAccount, onPressed: () => context.push(ref.read(entryExperienceProvider).signupRoute)),
                                   SizedBox(height: compact ? 10 : AQSpacing.x3),
-                                  AQSecondaryButton(compact: compact, label: s.login, onPressed: () => context.push(_page.loginRoute)),
+                                  AQSecondaryButton(compact: compact, label: s.login, onPressed: () => context.push(ref.read(entryExperienceProvider).loginRoute)),
+                                  AQTextButton(label: FlowStrings.of(context).t('xp.more'), color: c.accent, onPressed: () => context.push(_page.primaryRoute)),
                                   SizedBox(height: compact ? AQSpacing.x3 : AQSpacing.x5),
                                   _OrLabel(text: s.orContinueWith),
                                   SizedBox(height: compact ? AQSpacing.x3 : AQSpacing.x4),
@@ -185,6 +201,25 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
         ]),
       ),
     );
+  }
+}
+
+/// User to Shop or Real Estate Agent. Chooses the journey that opens first; never a permission.
+class _ExperienceChooser extends ConsumerWidget {
+  final bool compact;
+  const _ExperienceChooser({required this.compact});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final f = FlowStrings.of(context);
+    final x = ref.watch(entryExperienceProvider);
+    return Column(children: [
+      AQSlideSwitch(
+        labels: [f.t('xp.user'), f.t('xp.agent')],
+        index: x.index,
+        onChanged: (i) => ref.read(entryExperienceProvider.notifier).state = EntryExperience.values[i],
+      ),
+    ]);
   }
 }
 

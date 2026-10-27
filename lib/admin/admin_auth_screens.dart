@@ -1,0 +1,293 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/aq/aq_demo.dart';
+import '../core/aq/aq_forms.dart';
+import '../core/aq/aq_primitives.dart';
+import '../core/aq/aq_tokens.dart';
+import '../core/aq/aq_typography.dart';
+import '../core/config/backend_mode.dart';
+import '../data/api/account_api.dart' show ApiException;
+import '../features/entry/widgets/entry_common.dart' show MasterLogo;
+import 'admin_auth.dart';
+import 'admin_models.dart';
+import 'admin_repository.dart';
+
+class _AuthFrame extends StatelessWidget {
+  final String title, subtitle;
+  final List<Widget> children;
+  const _AuthFrame({
+    required this.title,
+    required this.subtitle,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AQColors.of(context);
+    return Scaffold(
+      backgroundColor: c.background,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AQSpacing.gutter),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: MasterLogo(width: 140),
+                  ),
+                  const SizedBox(height: AQSpacing.x6),
+                  Container(
+                    padding: const EdgeInsets.all(AQSpacing.x6),
+                    decoration: BoxDecoration(
+                      color: c.surfaceRaised,
+                      borderRadius: BorderRadius.circular(AQRadius.large),
+                      border: Border.all(color: c.hairline),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Admin console',
+                          style: AQTypography.of(
+                            context,
+                            AQText.labelMedium,
+                            color: c.accentDeep,
+                          ),
+                        ),
+                        const SizedBox(height: AQSpacing.x1),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            title,
+                            style: AQTypography.of(
+                              context,
+                              AQText.headlineLarge,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AQSpacing.x2),
+                        Text(
+                          subtitle,
+                          style: AQTypography.of(
+                            context,
+                            AQText.bodyMedium,
+                            soft: true,
+                          ),
+                        ),
+                        const SizedBox(height: AQSpacing.x5),
+                        ...children,
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Step 1: separate admin credentials. The reason for coming back here (an ended session) is shown
+/// above the form. A wrong email or password gives one answer, never which of the two was wrong.
+class AdminLoginScreen extends ConsumerStatefulWidget {
+  const AdminLoginScreen({super.key});
+  @override
+  ConsumerState<AdminLoginScreen> createState() => _AdminLoginScreenState();
+}
+
+class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  bool _busy = false, _tried = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() => _tried = true);
+    if (_email.text.trim().isEmpty || _password.text.isEmpty || _busy) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(adminAuthProvider.notifier)
+          .signIn(_email.text.trim(), _password.text);
+    } on AdminAuthException {
+      if (mounted) {
+        setState(() => _error = 'The email or password is not right.');
+      }
+    } on ApiException {
+      if (mounted) {
+        setState(() => _error = 'We could not reach the service. Try again.');
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'We could not sign you in. Try again.');
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final notice = ref.watch(adminAuthProvider).notice;
+    return _AuthFrame(
+      title: 'Sign in',
+      subtitle:
+          'Use your admin account. You will be asked for a one-time code next.',
+      children: [
+        if (notice == 'expired')
+          const Padding(
+            padding: EdgeInsets.only(bottom: AQSpacing.x4),
+            child: AQErrorBanner(
+              tone: AQBannerTone.info,
+              text: 'Your session ended. Sign in again to continue.',
+            ),
+          ),
+        AutofillGroup(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AQTextField(
+                label: 'Email',
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                autofill: const [AutofillHints.username],
+                error: _tried && _email.text.trim().isEmpty
+                    ? 'Enter your admin email.'
+                    : null,
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: AQSpacing.x4),
+              AQPasswordField(
+                label: 'Password',
+                controller: _password,
+                showLabel: 'Show password',
+                hideLabel: 'Hide password',
+                action: TextInputAction.done,
+                error: _tried && _password.text.isEmpty
+                    ? 'Enter your password.'
+                    : null,
+                onSubmitted: (_) => _submit(),
+              ),
+            ],
+          ),
+        ),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AQSpacing.x4),
+            child: AQErrorBanner(text: _error!),
+          ),
+        const SizedBox(height: AQSpacing.x5),
+        AQPrimaryButton(
+          label: 'Continue',
+          loading: _busy,
+          onPressed: _busy ? null : _submit,
+        ),
+        if (kUseDemoBackend) ...[
+          const SizedBox(height: AQSpacing.x5),
+          const AQDemoNotice(),
+          const SizedBox(height: AQSpacing.x2),
+          Text(
+            'Demo accounts: reviewer@demo.test, senior@demo.test, super@demo.test, auditor@demo.test. Password ${DemoAdminStore.demoPassword}. One-time code ${DemoAdminStore.demoCode}.',
+            style: AQTypography.of(
+              context,
+              AQText.bodySmall,
+              color: AQColors.of(context).inkFaint,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Step 2: the one-time code. Without it nothing in the console opens.
+class AdminTotpScreen extends ConsumerStatefulWidget {
+  const AdminTotpScreen({super.key});
+  @override
+  ConsumerState<AdminTotpScreen> createState() => _AdminTotpScreenState();
+}
+
+class _AdminTotpScreenState extends ConsumerState<AdminTotpScreen> {
+  AQOtpState _state = AQOtpState.idle;
+  String? _error;
+  final _key = GlobalKey<AQOtpFieldState>();
+
+  Future<void> _submit(String code) async {
+    setState(() {
+      _state = AQOtpState.verifying;
+      _error = null;
+    });
+    try {
+      await ref.read(adminAuthProvider.notifier).verifyTotp(code);
+    } on AdminTotpException {
+      if (mounted) {
+        setState(() {
+          _state = AQOtpState.error;
+          _error = 'That code is not right. Enter the current code.';
+        });
+        _key.currentState?.clear();
+      }
+    } on AdminSessionExpiredException {
+      ref.read(adminAuthProvider.notifier).expire();
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _state = AQOtpState.error;
+          _error = 'We could not check the code. Try again.';
+        });
+        _key.currentState?.clear();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _AuthFrame(
+      title: 'One-time code',
+      subtitle: 'Enter the 6-digit code from your authenticator app.',
+      children: [
+        AQOtpField(
+          key: _key,
+          label: 'One-time code',
+          state: _state,
+          enabled: _state != AQOtpState.verifying,
+          onCompleted: _submit,
+        ),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AQSpacing.x4),
+            child: AQErrorBanner(text: _error!),
+          ),
+        const SizedBox(height: AQSpacing.x5),
+        AQSecondaryButton(
+          label: 'Back to sign in',
+          trailingChevron: false,
+          onPressed: _state == AQOtpState.verifying
+              ? null
+              : () => ref.read(adminAuthProvider.notifier).backToLogin(),
+        ),
+        if (kUseDemoBackend) ...[
+          const SizedBox(height: AQSpacing.x5),
+          const AQDemoNotice(),
+        ],
+      ],
+    );
+  }
+}

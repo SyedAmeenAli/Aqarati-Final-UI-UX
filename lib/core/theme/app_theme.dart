@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
@@ -63,7 +64,10 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.line, width: AppBorder.regular),
+          side: const BorderSide(
+            color: AppColors.line,
+            width: AppBorder.regular,
+          ),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
@@ -97,16 +101,25 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: const BorderSide(color: AppColors.primary, width: AppBorder.regular),
+          borderSide: const BorderSide(
+            color: AppColors.primary,
+            width: AppBorder.regular,
+          ),
         ),
-        hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(color: AppColors.mist),
+        hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
+          color: AppColors.mist,
+        ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.sand,
         selectedColor: AppColors.primary.withValues(alpha: 0.1),
         checkmarkColor: AppColors.primary,
-        labelStyle: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.charcoal),
-        secondaryLabelStyle: AppTypography.textTheme.labelLarge?.copyWith(color: AppColors.primary),
+        labelStyle: AppTypography.textTheme.labelLarge?.copyWith(
+          color: AppColors.charcoal,
+        ),
+        secondaryLabelStyle: AppTypography.textTheme.labelLarge?.copyWith(
+          color: AppColors.primary,
+        ),
         iconTheme: const IconThemeData(size: AppIconSize.compact),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -114,15 +127,23 @@ class AppTheme {
         ),
         side: WidgetStateBorderSide.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return BorderSide(color: selected ? AppColors.primary : AppColors.line, width: 1.2);
+          return BorderSide(
+            color: selected ? AppColors.primary : AppColors.line,
+            width: 1.2,
+          );
         }),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xl),
+          ),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(

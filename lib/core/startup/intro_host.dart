@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+
 import '../aq/aq_primitives.dart';
 import '../aq/aq_tokens.dart';
 import '../brand/brand_tokens.dart';
@@ -24,7 +26,8 @@ class IntroHost extends ConsumerStatefulWidget {
   final Widget child;
   final AqaratiIntroPreferences prefs;
 
-  IntroHost({super.key, required this.child, AqaratiIntroPreferences? prefs}) : prefs = prefs ?? AqaratiIntroPreferences();
+  IntroHost({super.key, required this.child, AqaratiIntroPreferences? prefs})
+    : prefs = prefs ?? AqaratiIntroPreferences();
 
   @override
   ConsumerState<IntroHost> createState() => _IntroHostState();
@@ -51,7 +54,9 @@ class _IntroHostState extends ConsumerState<IntroHost> {
     super.initState();
     widget.prefs.hasCompletedIntro().then((done) {
       if (!mounted) return;
-      ref.read(introStateProvider.notifier).state = done ? IntroState.completed : IntroState.required;
+      ref.read(introStateProvider.notifier).state = done
+          ? IntroState.completed
+          : IntroState.required;
       setState(() => _decided = true);
     });
   }
@@ -59,7 +64,8 @@ class _IntroHostState extends ConsumerState<IntroHost> {
   /// [persist] is true ONLY for a finished film or the reduced-motion bypass.
   Future<void> _complete({required bool persist}) async {
     if (persist) await widget.prefs.markIntroCompleted();
-    if (mounted) ref.read(introStateProvider.notifier).state = IntroState.completed;
+    if (mounted)
+      ref.read(introStateProvider.notifier).state = IntroState.completed;
   }
 
   @override
@@ -76,7 +82,8 @@ class _IntroHostState extends ConsumerState<IntroHost> {
           Positioned.fill(
             child: _IntroFilm(
               reducedMotion: reduced,
-              onReveal: () => ref.read(introStateProvider.notifier).state = IntroState.revealing,
+              onReveal: () => ref.read(introStateProvider.notifier).state =
+                  IntroState.revealing,
               onDone: (persist) => _complete(persist: persist),
             ),
           ),
@@ -89,13 +96,18 @@ class _IntroFilm extends StatefulWidget {
   final bool reducedMotion;
   final VoidCallback onReveal;
   final void Function(bool persist) onDone;
-  const _IntroFilm({required this.reducedMotion, required this.onReveal, required this.onDone});
+  const _IntroFilm({
+    required this.reducedMotion,
+    required this.onReveal,
+    required this.onDone,
+  });
 
   @override
   State<_IntroFilm> createState() => _IntroFilmState();
 }
 
-class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+class _IntroFilmState extends State<_IntroFilm>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   VideoPlayerController? _video;
   late final AnimationController _move;
   bool _finishing = false;
@@ -113,7 +125,9 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
     _move = AnimationController(vsync: this, duration: _kHandoff);
     if (widget.reducedMotion) {
       // Deliberate accessibility bypass: no film, short fade, counts as complete.
-      WidgetsBinding.instance.addPostFrameCallback((_) => _finish(persist: true, hold: Duration.zero));
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _finish(persist: true, hold: Duration.zero),
+      );
     } else {
       _start();
       // A quiet way out appears once the film is clearly underway.
@@ -132,7 +146,10 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
   }
 
   Future<void> _start() async {
-    final c = VideoPlayerController.asset(_kFilm, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+    final c = VideoPlayerController.asset(
+      _kFilm,
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+    );
     _video = c;
     try {
       await c.initialize();
@@ -158,14 +175,18 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
   void _tick() {
     final v = _video?.value;
     if (v == null || _finishing) return;
-    if (!_firstFrame && v.position > Duration.zero) setState(() => _firstFrame = true);
+    if (!_firstFrame && v.position > Duration.zero)
+      setState(() => _firstFrame = true);
     if (v.hasError) {
       debugPrint('AQARATI intro error: ${v.errorDescription}');
       _fail();
       return;
     }
     // Ended: position reached the duration (final frame is on screen).
-    if (v.isInitialized && v.duration > Duration.zero && (v.isCompleted || v.position >= v.duration - const Duration(milliseconds: 120))) {
+    if (v.isInitialized &&
+        v.duration > Duration.zero &&
+        (v.isCompleted ||
+            v.position >= v.duration - const Duration(milliseconds: 120))) {
       _finish(persist: true, hold: _kHold);
     }
   }
@@ -187,7 +208,10 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
     }
     widget.onReveal();
     final simple = widget.reducedMotion || _failed || _skipped;
-    await _move.animateTo(1, duration: simple ? const Duration(milliseconds: 220) : _kHandoff);
+    await _move.animateTo(
+      1,
+      duration: simple ? const Duration(milliseconds: 220) : _kHandoff,
+    );
     if (!mounted) return;
     widget.onDone(persist);
   }
@@ -226,15 +250,30 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
       fit: StackFit.expand,
       children: [
         // Frame 0 as a still: instant, and the fallback if playback fails.
-        Image.asset(_kPoster, fit: BoxFit.cover, gaplessPlayback: true, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+        Image.asset(
+          _kPoster,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+          errorBuilder: (_, _, _) => const SizedBox.shrink(),
+        ),
         if (_handoff)
-          Image.asset(_kLast, fit: BoxFit.cover, gaplessPlayback: true, filterQuality: FilterQuality.medium, errorBuilder: (_, _, _) => const SizedBox.shrink())
+          Image.asset(
+            _kLast,
+            fit: BoxFit.cover,
+            gaplessPlayback: true,
+            filterQuality: FilterQuality.medium,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          )
         else if (ready)
           Opacity(
             opacity: _firstFrame ? 1 : 0,
             child: FittedBox(
               fit: BoxFit.cover,
-              child: SizedBox(width: v.value.size.width, height: v.value.size.height, child: VideoPlayer(v)),
+              child: SizedBox(
+                width: v.value.size.width,
+                height: v.value.size.height,
+                child: VideoPlayer(v),
+              ),
             ),
           ),
       ],
@@ -251,7 +290,11 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
         builder: (context, film) {
           final t = Curves.easeInOutCubic.transform(_move.value);
           // Fade starts once the mark is most of the way home.
-          final fade = simple ? t : Curves.easeOut.transform(((_move.value - 0.55) / 0.45).clamp(0.0, 1.0));
+          final fade = simple
+              ? t
+              : Curves.easeOut.transform(
+                  ((_move.value - 0.55) / 0.45).clamp(0.0, 1.0),
+                );
           final scale = simple ? 1.0 : 1 + (geo.scaleFor(size) - 1) * t;
           final shift = simple ? Offset.zero : geo.shiftFor(size) * t;
           final pivot = geo.videoLogoCenter(size);
@@ -262,9 +305,16 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
               child: Transform.translate(
                 offset: shift,
                 child: Transform(
-                  alignment: Alignment((pivot.dx / size.width) * 2 - 1, (pivot.dy / size.height) * 2 - 1),
+                  alignment: Alignment(
+                    (pivot.dx / size.width) * 2 - 1,
+                    (pivot.dy / size.height) * 2 - 1,
+                  ),
                   transform: Matrix4.diagonal3Values(scale, scale, 1),
-                  child: SizedBox(width: size.width, height: math.max(size.height, 1), child: film),
+                  child: SizedBox(
+                    width: size.width,
+                    height: math.max(size.height, 1),
+                    child: film,
+                  ),
                 ),
               ),
             ),
@@ -272,14 +322,28 @@ class _IntroFilmState extends State<_IntroFilm> with WidgetsBindingObserver, Sin
         },
       ),
     );
-    return Stack(fit: StackFit.expand, children: [
-      stage,
-      if (_showSkip && !_finishing)
-        PositionedDirectional(
-          top: mq.padding.top + 4,
-          end: AQSpacing.x4,
-          child: Semantics(container: true, child: Material(type: MaterialType.transparency, child: AQTextButton(label: strings.skip, trailingIcon: 'chevron-right', color: c.inkSoft, onPressed: _skip))),
-        ),
-    ]);
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        stage,
+        if (_showSkip && !_finishing)
+          PositionedDirectional(
+            top: mq.padding.top + 4,
+            end: AQSpacing.x4,
+            child: Semantics(
+              container: true,
+              child: Material(
+                type: MaterialType.transparency,
+                child: AQTextButton(
+                  label: strings.skip,
+                  trailingIcon: 'chevron-right',
+                  color: c.inkSoft,
+                  onPressed: _skip,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }

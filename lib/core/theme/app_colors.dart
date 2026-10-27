@@ -8,7 +8,9 @@ class AppColors {
   // Brand
   // The AQARATI accent (warm brown). Any Material widget that falls back to the theme uses this, never the old red.
   static const Color primary = Color(0xFF825C3F);
-  static const Color secondary = Color(0xFF2D6B4A); // Omani Green (verified/success)
+  static const Color secondary = Color(
+    0xFF2D6B4A,
+  ); // Omani Green (verified/success)
   static const Color accent = Color(0xFFA8895E); // Sand
 
   // Neutral scale (0-950)
@@ -81,7 +83,8 @@ class AppColors {
   static const Color slate = neutral600;
   static const Color mist = neutral400;
   static const Color line = neutral200;
-  static const Color sand = neutral50; // warm off-white surface, not the sand ramp
+  static const Color sand =
+      neutral50; // warm off-white surface, not the sand ramp
   static const Color surface = neutral0;
   static const Color background = neutral25;
   static const Color divider = neutral100;

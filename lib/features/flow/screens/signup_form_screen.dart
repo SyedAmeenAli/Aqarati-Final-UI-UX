@@ -12,6 +12,8 @@ import '../../../core/aq/aq_typography.dart';
 import '../../../core/domain/account_models.dart';
 import '../../../core/localization/entry_strings.dart';
 import '../../../core/localization/flow_strings.dart';
+import '../../../core/config/demo_mode.dart';
+import '../../entry/demo_entry.dart';
 import '../../entry/models/signup_purpose.dart';
 import '../state/signup_state.dart';
 import '../widgets/journey.dart';
@@ -239,6 +241,9 @@ class _SignupFormScreenState extends ConsumerState<SignupFormScreen> {
         else if (st.bannerKey != null)
           AQErrorBanner(text: f.t(st.bannerKey!)),
         AQPrimaryButton(label: ctl.isLast ? f.t('signup.create') : f.t('common.next'), loading: st.submitting, onPressed: _primary),
+        // Presentation shortcut for the two customer-facing roles; demo builds only.
+        if (kDemoMode && (widget.purpose == SignupPurpose.userToShop || widget.purpose == SignupPurpose.realEstateAgent))
+          AQTextButton(label: f.t('demo.skip'), color: c.inkSoft, onPressed: () => demoSkipInto(context, ref, widget.purpose)),
         const SizedBox(height: AQSpacing.x2),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           AQIcon('lock', size: AQIconSize.small, color: c.inkFaint),

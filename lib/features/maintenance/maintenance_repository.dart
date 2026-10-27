@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/config/backend_mode.dart';
+import '../../core/config/qa_faults.dart';
 import '../../data/api/account_api.dart' show ApiErrorCode, ApiException;
 import 'maintenance_models.dart';
 
@@ -45,6 +46,7 @@ class DemoMaintenanceRepository implements MaintenanceRepository {
 
   Future<void> _lag() async {
     if (latency > Duration.zero) await Future<void>.delayed(latency);
+    if (qaCallsFail()) throw const ApiException(ApiErrorCode.network);
   }
 
   static DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
@@ -93,6 +95,30 @@ class DemoMaintenanceRepository implements MaintenanceRepository {
   Future<MaintenanceBooking?> get(String id) async {
     await _lag();
     return _items.where((b) => b.id == id).firstOrNull;
+  }
+
+  // ---- provider side (the same store, so the customer sees the provider's answer)
+  Future<List<MaintenanceBooking>> forProvider(String providerId) async {
+    await _lag();
+    return List.unmodifiable(_items.reversed.where((b) => b.providerId == providerId));
+  }
+
+  /// requested -> confirmed | declined. Any other state is a conflict and nothing changes.
+  Future<MaintenanceBooking> respond(String id, {required bool confirm}) async {
+    await _lag();
+    final i = _items.indexWhere((b) => b.id == id);
+    if (i < 0) throw const ApiException(ApiErrorCode.server);
+    if (_items[i].status != MaintenanceStatus.requested) throw const ApiException(ApiErrorCode.conflict);
+    return _items[i] = _items[i].copyWith(status: confirm ? MaintenanceStatus.confirmed : MaintenanceStatus.declined);
+  }
+
+  /// confirmed -> completed.
+  Future<MaintenanceBooking> complete(String id) async {
+    await _lag();
+    final i = _items.indexWhere((b) => b.id == id);
+    if (i < 0) throw const ApiException(ApiErrorCode.server);
+    if (_items[i].status != MaintenanceStatus.confirmed) throw const ApiException(ApiErrorCode.conflict);
+    return _items[i] = _items[i].copyWith(status: MaintenanceStatus.completed);
   }
 
   /// QA only: simulates the provider's answer.

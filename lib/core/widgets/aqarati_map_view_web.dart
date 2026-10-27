@@ -10,8 +10,14 @@ final Set<String> _registeredViewTypes = {};
 /// mechanism as Google's own "Share > Embed a map" iframe, generalized to
 /// take any lat/lng so every property gets a real, live map, not a fixed
 /// one-location embed.
-Widget buildWebEmbedMap({required double lat, required double lng, required double zoom, bool interactive = true}) {
-  final src = 'https://maps.google.com/maps?q=$lat,$lng&z=${zoom.round()}&output=embed';
+Widget buildWebEmbedMap({
+  required double lat,
+  required double lng,
+  required double zoom,
+  bool interactive = true,
+}) {
+  final src =
+      'https://maps.google.com/maps?q=$lat,$lng&z=${zoom.round()}&output=embed';
   final viewType = 'aqarati-map-$lat-$lng-${zoom.round()}-$interactive';
 
   // registerViewFactory throws if called twice for the same viewType, and

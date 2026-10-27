@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../domain/account_models.dart';
 import '../localization/flow_strings.dart';
 import 'aq_primitives.dart';
@@ -13,7 +14,9 @@ class AQStatusBadge extends StatelessWidget {
   const AQStatusBadge({super.key, required this.grant, this.stage});
 
   static String labelKey(GrantState g, ReviewStage? stage) {
-    if (g == GrantState.pendingVerification && stage == ReviewStage.awaitingSecondApproval) return 'badge.awaitingSecond';
+    if (g == GrantState.pendingVerification &&
+        stage == ReviewStage.awaitingSecondApproval)
+      return 'badge.awaitingSecond';
     return switch (g) {
       GrantState.draft => 'badge.draft',
       GrantState.pendingVerification => 'badge.pendingVerification',
@@ -40,13 +43,25 @@ class AQStatusBadge extends StatelessWidget {
       label: f.t(labelKey(grant, stage)),
       excludeSemantics: true,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x3, vertical: AQSpacing.x2),
-        decoration: BoxDecoration(color: fg.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AQRadius.small + 8)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          AQIcon(icon, size: AQIconSize.small, color: fg),
-          const SizedBox(width: AQSpacing.x2),
-          Text(f.t(labelKey(grant, stage)), style: AQTypography.of(context, AQText.labelMedium, color: fg)),
-        ]),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AQSpacing.x3,
+          vertical: AQSpacing.x2,
+        ),
+        decoration: BoxDecoration(
+          color: fg.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(AQRadius.small + 8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AQIcon(icon, size: AQIconSize.small, color: fg),
+            const SizedBox(width: AQSpacing.x2),
+            Text(
+              f.t(labelKey(grant, stage)),
+              style: AQTypography.of(context, AQText.labelMedium, color: fg),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -62,16 +77,25 @@ class AQTimelineStep {
 /// "breathes"), upcoming steps are faint. Never spins.
 class AQVerificationTimeline extends StatefulWidget {
   final List<AQTimelineStep> steps;
+
   /// Index of the current step. Steps before it are done.
   final int current;
-  const AQVerificationTimeline({super.key, required this.steps, required this.current});
+  const AQVerificationTimeline({
+    super.key,
+    required this.steps,
+    required this.current,
+  });
 
   @override
   State<AQVerificationTimeline> createState() => _AQVerificationTimelineState();
 }
 
-class _AQVerificationTimelineState extends State<AQVerificationTimeline> with SingleTickerProviderStateMixin {
-  late final AnimationController _breathe = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400));
+class _AQVerificationTimelineState extends State<AQVerificationTimeline>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _breathe = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  );
 
   @override
   void didChangeDependencies() {
@@ -92,41 +116,88 @@ class _AQVerificationTimelineState extends State<AQVerificationTimeline> with Si
   @override
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
-    return Column(children: [
-      for (var i = 0; i < widget.steps.length; i++)
-        Semantics(
-          container: true,
-          label: '${widget.steps[i].label}${i < widget.current ? ', done' : i == widget.current ? ', current' : ''}',
-          excludeSemantics: true,
-          child: IntrinsicHeight(
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              SizedBox(
-                width: 28,
-                child: Column(children: [
-                  const SizedBox(height: 4),
-                  _dot(c, i),
-                  if (i < widget.steps.length - 1) Expanded(child: Container(width: 2, margin: const EdgeInsets.symmetric(vertical: 4), color: i < widget.current ? c.accent : c.hairline)),
-                ]),
+    return Column(
+      children: [
+        for (var i = 0; i < widget.steps.length; i++)
+          Semantics(
+            container: true,
+            label:
+                '${widget.steps[i].label}${i < widget.current
+                    ? ', done'
+                    : i == widget.current
+                    ? ', current'
+                    : ''}',
+            excludeSemantics: true,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: 28,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 4),
+                        _dot(c, i),
+                        if (i < widget.steps.length - 1)
+                          Expanded(
+                            child: Container(
+                              width: 2,
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              color: i < widget.current ? c.accent : c.hairline,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AQSpacing.x3),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: AQSpacing.x5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.steps[i].label,
+                            style: AQTypography.of(
+                              context,
+                              i == widget.current
+                                  ? AQText.titleMedium
+                                  : AQText.bodyMedium,
+                              color: i > widget.current ? c.inkFaint : c.ink,
+                            ),
+                          ),
+                          if (widget.steps[i].detail != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                widget.steps[i].detail!,
+                                style: AQTypography.of(
+                                  context,
+                                  AQText.bodySmall,
+                                  soft: true,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: AQSpacing.x3),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: AQSpacing.x5),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(widget.steps[i].label, style: AQTypography.of(context, i == widget.current ? AQText.titleMedium : AQText.bodyMedium, color: i > widget.current ? c.inkFaint : c.ink)),
-                    if (widget.steps[i].detail != null) Padding(padding: const EdgeInsets.only(top: 2), child: Text(widget.steps[i].detail!, style: AQTypography.of(context, AQText.bodySmall, soft: true))),
-                  ]),
-                ),
-              ),
-            ]),
+            ),
           ),
-        ),
-    ]);
+      ],
+    );
   }
 
   Widget _dot(AQColors c, int i) {
     if (i < widget.current) {
-      return Container(width: 18, height: 18, decoration: BoxDecoration(color: c.accent, shape: BoxShape.circle), child: Center(child: AQIcon('check', size: 12, color: c.onAccent)));
+      return Container(
+        width: 18,
+        height: 18,
+        decoration: BoxDecoration(color: c.accent, shape: BoxShape.circle),
+        child: Center(child: AQIcon('check', size: 12, color: c.onAccent)),
+      );
     }
     if (i == widget.current) {
       return AnimatedBuilder(
@@ -135,12 +206,31 @@ class _AQVerificationTimelineState extends State<AQVerificationTimeline> with Si
           width: 18,
           height: 18,
           child: DecoratedBox(
-            decoration: BoxDecoration(color: c.accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: c.accent.withValues(alpha: 0.12 + 0.2 * _breathe.value), blurRadius: 3 + 8 * _breathe.value, spreadRadius: 1 + 4 * _breathe.value)]),
+            decoration: BoxDecoration(
+              color: c.accent,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: c.accent.withValues(
+                    alpha: 0.12 + 0.2 * _breathe.value,
+                  ),
+                  blurRadius: 3 + 8 * _breathe.value,
+                  spreadRadius: 1 + 4 * _breathe.value,
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
-    return Container(width: 18, height: 18, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: c.hairline, width: 1.5)));
+    return Container(
+      width: 18,
+      height: 18,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: c.hairline, width: 1.5),
+      ),
+    );
   }
 }
 
@@ -150,21 +240,50 @@ class AQReviewSection extends StatelessWidget {
   final String? editLabel;
   final VoidCallback? onEdit;
   final List<Widget> children;
-  const AQReviewSection({super.key, required this.title, this.editLabel, this.onEdit, required this.children});
+  const AQReviewSection({
+    super.key,
+    required this.title,
+    this.editLabel,
+    this.onEdit,
+    required this.children,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AQSpacing.x5),
       child: AQSurface(
-        padding: const EdgeInsets.fromLTRB(AQSpacing.x4, AQSpacing.x3, AQSpacing.x4, AQSpacing.x3),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: Semantics(header: true, child: Text(title, style: AQTypography.of(context, AQText.titleMedium)))),
-            if (onEdit != null && editLabel != null) AQTextButton(label: editLabel!, color: AQColors.of(context).accent, onPressed: onEdit),
-          ]),
-          ...children,
-        ]),
+        padding: const EdgeInsets.fromLTRB(
+          AQSpacing.x4,
+          AQSpacing.x3,
+          AQSpacing.x4,
+          AQSpacing.x3,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      title,
+                      style: AQTypography.of(context, AQText.titleMedium),
+                    ),
+                  ),
+                ),
+                if (onEdit != null && editLabel != null)
+                  AQTextButton(
+                    label: editLabel!,
+                    color: AQColors.of(context).accent,
+                    onPressed: onEdit,
+                  ),
+              ],
+            ),
+            ...children,
+          ],
+        ),
       ),
     );
   }
@@ -176,21 +295,42 @@ class AQKeyValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(flex: 2, child: Text(label, style: AQTypography.of(context, AQText.bodySmall, soft: true))),
-          Expanded(flex: 3, child: Text(value, style: AQTypography.of(context, AQText.titleSmall))),
-        ]),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            label,
+            style: AQTypography.of(context, AQText.bodySmall, soft: true),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(
+            value,
+            style: AQTypography.of(context, AQText.titleSmall),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// Compact read-only document row with status and expiry awareness.
 class AQDocumentRow extends StatelessWidget {
   final String title;
   final DocumentStatus status;
+
   /// Optional: tap the row to open the document preview.
   final VoidCallback? onTap;
-  const AQDocumentRow({super.key, required this.title, required this.status, this.onTap});
+  const AQDocumentRow({
+    super.key,
+    required this.title,
+    required this.status,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -209,9 +349,15 @@ class AQDocumentRow extends StatelessWidget {
     final expiryLine = status.expiry == null
         ? null
         : switch (ex) {
-            ExpiryStatus.expired => f.t('expiry.expired', {'d': loc.formatMediumDate(status.expiry!)}),
-            ExpiryStatus.expiringSoon => f.t('expiry.soon', {'d': loc.formatMediumDate(status.expiry!)}),
-            _ => f.t('ver.expires', {'d': loc.formatMediumDate(status.expiry!)}),
+            ExpiryStatus.expired => f.t('expiry.expired', {
+              'd': loc.formatMediumDate(status.expiry!),
+            }),
+            ExpiryStatus.expiringSoon => f.t('expiry.soon', {
+              'd': loc.formatMediumDate(status.expiry!),
+            }),
+            _ => f.t('ver.expires', {
+              'd': loc.formatMediumDate(status.expiry!),
+            }),
           };
     return Semantics(
       container: true,
@@ -222,21 +368,71 @@ class AQDocumentRow extends StatelessWidget {
         onTap: onTap,
         pressedScale: 0.995,
         child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AQSpacing.x2),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(padding: const EdgeInsets.only(top: 2), child: AQIcon(icon, size: AQIconSize.medium, color: color)),
-          const SizedBox(width: AQSpacing.x3),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: AQTypography.of(context, AQText.titleSmall)),
-              Text(text, style: AQTypography.of(context, AQText.bodySmall, color: color)),
-              if (meta.isNotEmpty) Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint)),
-              if (expiryLine != null) Text(expiryLine, style: AQTypography.of(context, AQText.bodySmall, color: ex == ExpiryStatus.expired ? c.danger : (ex == ExpiryStatus.expiringSoon ? c.accentDeep : c.inkSoft))),
-            ]),
+          padding: const EdgeInsets.symmetric(vertical: AQSpacing.x2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: AQIcon(icon, size: AQIconSize.medium, color: color),
+              ),
+              const SizedBox(width: AQSpacing.x3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AQTypography.of(context, AQText.titleSmall),
+                    ),
+                    Text(
+                      text,
+                      style: AQTypography.of(
+                        context,
+                        AQText.bodySmall,
+                        color: color,
+                      ),
+                    ),
+                    if (meta.isNotEmpty)
+                      Text(
+                        meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AQTypography.of(
+                          context,
+                          AQText.bodySmall,
+                          color: c.inkFaint,
+                        ),
+                      ),
+                    if (expiryLine != null)
+                      Text(
+                        expiryLine,
+                        style: AQTypography.of(
+                          context,
+                          AQText.bodySmall,
+                          color: ex == ExpiryStatus.expired
+                              ? c.danger
+                              : (ex == ExpiryStatus.expiringSoon
+                                    ? c.accentDeep
+                                    : c.inkSoft),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (onTap != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: AQIcon(
+                    'chevron-right',
+                    size: AQIconSize.small,
+                    directional: true,
+                    color: c.inkFaint,
+                  ),
+                ),
+            ],
           ),
-          if (onTap != null) Padding(padding: const EdgeInsets.only(top: 2), child: AQIcon('chevron-right', size: AQIconSize.small, directional: true, color: c.inkFaint)),
-        ]),
-      ),
+        ),
       ),
     );
   }
@@ -245,21 +441,58 @@ class AQDocumentRow extends StatelessWidget {
 /// Display vocabulary for one document: text key, icon and tone. Icon + text always, never colour alone.
 enum AQDocTone { quiet, neutral, good, attention }
 
-({String key, String icon, AQDocTone tone}) aqDocVisual(DocDisplay d) => switch (d) {
-      DocDisplay.empty => (key: 'docs.state.idle', icon: 'info', tone: AQDocTone.quiet),
-      DocDisplay.uploading => (key: 'docs.state.uploading', icon: 'activity', tone: AQDocTone.quiet),
-      DocDisplay.processing => (key: 'docs.state.processing', icon: 'activity', tone: AQDocTone.quiet),
-      DocDisplay.underReview => (key: 'docs.state.review', icon: 'activity', tone: AQDocTone.neutral),
-      DocDisplay.verified => (key: 'docs.state.accepted', icon: 'check', tone: AQDocTone.good),
-      DocDisplay.needsUpdate => (key: 'docs.state.rejected', icon: 'alert', tone: AQDocTone.attention),
-      DocDisplay.expired => (key: 'docs.state.expired', icon: 'alert', tone: AQDocTone.attention),
-      DocDisplay.missing => (key: 'docs.state.missing', icon: 'info', tone: AQDocTone.quiet),
-      DocDisplay.failed => (key: 'docs.state.failed', icon: 'alert', tone: AQDocTone.attention),
+({String key, String icon, AQDocTone tone}) aqDocVisual(DocDisplay d) =>
+    switch (d) {
+      DocDisplay.empty => (
+        key: 'docs.state.idle',
+        icon: 'info',
+        tone: AQDocTone.quiet,
+      ),
+      DocDisplay.uploading => (
+        key: 'docs.state.uploading',
+        icon: 'activity',
+        tone: AQDocTone.quiet,
+      ),
+      DocDisplay.processing => (
+        key: 'docs.state.processing',
+        icon: 'activity',
+        tone: AQDocTone.quiet,
+      ),
+      DocDisplay.underReview => (
+        key: 'docs.state.review',
+        icon: 'activity',
+        tone: AQDocTone.neutral,
+      ),
+      DocDisplay.verified => (
+        key: 'docs.state.accepted',
+        icon: 'check',
+        tone: AQDocTone.good,
+      ),
+      DocDisplay.needsUpdate => (
+        key: 'docs.state.rejected',
+        icon: 'alert',
+        tone: AQDocTone.attention,
+      ),
+      DocDisplay.expired => (
+        key: 'docs.state.expired',
+        icon: 'alert',
+        tone: AQDocTone.attention,
+      ),
+      DocDisplay.missing => (
+        key: 'docs.state.missing',
+        icon: 'info',
+        tone: AQDocTone.quiet,
+      ),
+      DocDisplay.failed => (
+        key: 'docs.state.failed',
+        icon: 'alert',
+        tone: AQDocTone.attention,
+      ),
     };
 
 Color aqDocToneColor(AQColors c, AQDocTone t) => switch (t) {
-      AQDocTone.quiet => c.inkSoft,
-      AQDocTone.neutral => c.accentDeep,
-      AQDocTone.good => c.success,
-      AQDocTone.attention => c.danger,
-    };
+  AQDocTone.quiet => c.inkSoft,
+  AQDocTone.neutral => c.accentDeep,
+  AQDocTone.good => c.success,
+  AQDocTone.attention => c.danger,
+};

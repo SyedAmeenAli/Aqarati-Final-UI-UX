@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import '../config/maps_config.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
-import 'aqarati_map_view_stub.dart' if (dart.library.js_interop) 'aqarati_map_view_web.dart' as web_map;
+import 'aqarati_map_view_stub.dart'
+    if (dart.library.js_interop) 'aqarati_map_view_web.dart'
+    as web_map;
 
 /// Single reusable Google Map surface for the whole app (Home "Near you"
 /// preview, full Map screen, and any future property-detail map). Callers
@@ -61,13 +64,19 @@ class _AqaratiMapViewState extends State<AqaratiMapView> {
     }
 
     if (!kGoogleMapsConfigured) {
-      return ClipRRect(borderRadius: radius, child: const _MapUnavailableView());
+      return ClipRRect(
+        borderRadius: radius,
+        child: const _MapUnavailableView(),
+      );
     }
 
     return ClipRRect(
       borderRadius: radius,
       child: GoogleMap(
-        initialCameraPosition: CameraPosition(target: widget.initialCenter, zoom: widget.initialZoom),
+        initialCameraPosition: CameraPosition(
+          target: widget.initialCenter,
+          zoom: widget.initialZoom,
+        ),
         markers: widget.markers,
         onMapCreated: (controller) {
           _controller = controller;
@@ -116,13 +125,15 @@ class _MapUnavailableView extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Map unavailable',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.charcoal),
+            style: Theme.of(context).textTheme.labelMedium
+                ?.copyWith(color: AppColors.charcoal),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 2),
           Text(
             'Google Maps configuration is required for this environment.',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.mist),
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: AppColors.mist),
             textAlign: TextAlign.center,
           ),
         ],

@@ -22,6 +22,8 @@ enum PropertyType {
   guesthouse,
   industrial,
   mixedUse,
+  commercialLand,
+  investmentLand,
 }
 
 enum TransactionType { buy, rent, lease }
@@ -110,6 +112,10 @@ extension PropertyTypeLabel on PropertyType {
         return 'Industrial';
       case PropertyType.mixedUse:
         return 'Mixed-use';
+      case PropertyType.commercialLand:
+        return 'Commercial Land';
+      case PropertyType.investmentLand:
+        return 'Land to Invest';
     }
   }
 }

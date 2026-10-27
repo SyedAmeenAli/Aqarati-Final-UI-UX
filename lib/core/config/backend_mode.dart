@@ -14,4 +14,5 @@ const bool kUseDemoBackend = true;
 /// Reviewer-only shortcuts (OTP hint, "mark documents received", decision simulator).
 /// Off by default so the product looks and behaves as shipped. Enable for QA with
 /// `--dart-define=REVIEW_TOOLS=true`.
-const bool kShowReviewTools = kUseDemoBackend && bool.fromEnvironment('REVIEW_TOOLS');
+const bool kShowReviewTools =
+    kUseDemoBackend && bool.fromEnvironment('REVIEW_TOOLS');

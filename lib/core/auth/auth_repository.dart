@@ -21,7 +21,15 @@ class AuthFailure extends AuthResult {
 
 /// Why a Firebase email/password call failed, in terms the UI can word.
 /// Never reveals whether an account exists (generic wording).
-enum AuthError { invalidCredentials, weakPassword, network, tooManyRequests, expiredCode, unavailable, unknown }
+enum AuthError {
+  invalidCredentials,
+  weakPassword,
+  network,
+  tooManyRequests,
+  expiredCode,
+  unavailable,
+  unknown,
+}
 
 class AuthException implements Exception {
   final AuthError error;
@@ -43,9 +51,11 @@ abstract class AuthRepository {
 
   /// Firebase client email verification (no second email system).
   Future<void> sendEmailVerification();
+
   /// Reloads the Firebase user and reports `emailVerified`.
   Future<bool> isEmailVerified();
   Future<String?> currentEmail();
+
   /// Firebase `verifyBeforeUpdateEmail`-style change; verification is sent to the new address.
   Future<void> updateEmail(String email);
 }
@@ -54,28 +64,38 @@ abstract class AuthRepository {
 class UnavailableAuthRepository implements AuthRepository {
   const UnavailableAuthRepository();
   @override
-  Future<AuthResult> signInWithProvider(AuthProviderKind kind) async => const AuthUnavailable();
+  Future<AuthResult> signInWithProvider(AuthProviderKind kind) async =>
+      const AuthUnavailable();
   @override
-  Future<void> signInWithEmail(String email, String password) => throw const AuthException(AuthError.unavailable);
+  Future<void> signInWithEmail(String email, String password) =>
+      throw const AuthException(AuthError.unavailable);
   @override
-  Future<void> createUserWithEmail(String email, String password) => throw const AuthException(AuthError.unavailable);
+  Future<void> createUserWithEmail(String email, String password) =>
+      throw const AuthException(AuthError.unavailable);
   @override
-  Future<void> sendPasswordResetEmail(String email) => throw const AuthException(AuthError.unavailable);
+  Future<void> sendPasswordResetEmail(String email) =>
+      throw const AuthException(AuthError.unavailable);
   @override
-  Future<void> confirmPasswordReset(String oobCode, String newPassword) => throw const AuthException(AuthError.unavailable);
+  Future<void> confirmPasswordReset(String oobCode, String newPassword) =>
+      throw const AuthException(AuthError.unavailable);
   @override
   Future<void> signOut() async {}
   @override
   Future<String?> currentIdToken() async => null;
   @override
-  Future<void> sendEmailVerification() => throw const AuthException(AuthError.unavailable);
+  Future<void> sendEmailVerification() =>
+      throw const AuthException(AuthError.unavailable);
   @override
-  Future<bool> isEmailVerified() => throw const AuthException(AuthError.unavailable);
+  Future<bool> isEmailVerified() =>
+      throw const AuthException(AuthError.unavailable);
   @override
   Future<String?> currentEmail() async => null;
   @override
-  Future<void> updateEmail(String email) => throw const AuthException(AuthError.unavailable);
+  Future<void> updateEmail(String email) =>
+      throw const AuthException(AuthError.unavailable);
 }
 
 /// Overridden in main by the demo or the real implementation.
-final authRepositoryProvider = Provider<AuthRepository>((ref) => const UnavailableAuthRepository());
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => const UnavailableAuthRepository(),
+);

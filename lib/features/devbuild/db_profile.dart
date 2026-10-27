@@ -1,3 +1,4 @@
+import '../reviews/review_flow_screens.dart' show showReportReviewSheet;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -903,7 +904,21 @@ class _DbReviewsScreenState extends ConsumerState<DbReviewsScreen> {
                 if (shown.isEmpty)
                   DbNotice(f.t('db.rev.filterEmpty'))
                 else
-                  for (final r in shown) DbReviewCard(r),
+                  for (final r in shown)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DbReviewCard(r),
+                        Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: AQTextButton(
+                            label: f.t('rp.action'),
+                            color: AQColors.of(context).inkSoft,
+                            onPressed: () => showReportReviewSheet(context, ref, r.id),
+                          ),
+                        ),
+                      ],
+                    ),
               ],
             );
           },

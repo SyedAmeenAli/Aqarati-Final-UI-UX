@@ -7,9 +7,9 @@ import '../../../core/aq/aq_scene.dart';
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/localization/entry_strings.dart';
-import '../../../data/api/account_api.dart' show meProvider;
+import '../../../core/config/demo_mode.dart';
 import '../../../data/demo/demo_providers.dart';
-import '../../role_home/role_home_model.dart' show homeWorkspaceProvider;
+import '../demo_entry.dart';
 import '../models/signup_purpose.dart';
 import '../widgets/entry_common.dart' show MasterLogo;
 
@@ -57,12 +57,7 @@ class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen>
 
   /// Demo builds only: jump straight into this role's home page (see [demoEnterAs]).
   void _skip(SignupPurposeOption o) {
-    final state = ref.read(demoBackendStateProvider);
-    if (state == null) return;
-    demoEnterAs(state, o.id);
-    ref.read(homeWorkspaceProvider.notifier).state = null;
-    ref.invalidate(meProvider);
-    context.go('/app/home');
+    demoSkipInto(context, ref, o.id);
   }
 
   void _continue(EntryStrings s) {
@@ -91,7 +86,7 @@ class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen>
     final rows = <Widget>[];
     for (var i = 0; i < signupPurposeOptions.length; i += 2) {
       final a = signupPurposeOptions[i], b = signupPurposeOptions[i + 1];
-      final demo = ref.watch(demoBackendStateProvider) != null;
+      final demo = kDemoMode && ref.watch(demoBackendStateProvider) != null;
       Widget tile(SignupPurposeOption o) => AQChoiceTile(
             icon: o.icon,
             title: o.title(s),

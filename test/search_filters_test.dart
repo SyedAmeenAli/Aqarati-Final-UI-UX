@@ -146,7 +146,7 @@ void main() {
 
     testWidgets('Property type chooser builds at text scale $scale', (t) async {
       await t.binding.setSurfaceSize(const Size(393, 852));
-      await t.pumpWidget(_app(const AQPropertyTypesScreen(), scale: scale));
+      await t.pumpWidget(_app(const AQPropertiesHubScreen(), scale: scale));
       await t.pump(const Duration(seconds: 1));
       await t.pump(const Duration(seconds: 1));
       expect(t.takeException(), isNull);

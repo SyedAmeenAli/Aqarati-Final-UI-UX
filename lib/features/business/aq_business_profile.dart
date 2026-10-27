@@ -10,7 +10,6 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/models/business.dart';
 import '../../data/models/enums.dart' show BusinessCategory;
 import '../../data/repositories/providers.dart';
-import '../reviews/review_screen.dart';
 import '../viewing/widgets/viewing_format.dart';
 import '../viewing/widgets/viewing_scaffold.dart';
 import '../workspace/aq_home.dart' show aqImg, aqAllPropertiesProvider, AQResultCard, AQSkeletonBox;
@@ -113,6 +112,10 @@ class _Profile extends ConsumerWidget {
         const SizedBox(height: AQSpacing.x4),
         _info(context, 'pin', b.locationLabel),
         if (b.serviceArea.isNotEmpty) _info(context, 'globe', f.t('bp.serves', {'area': b.serviceArea})),
+        if (_engagementType(b) != null) ...[
+          const SizedBox(height: AQSpacing.x3),
+          AQSecondaryButton(label: f.t('ce.engage.cta'), leadingIcon: 'verified', trailingChevron: false, onPressed: () => context.push('/business/${b.id}/engage?name=${Uri.encodeComponent(b.name)}&type=${_engagementType(b)}')),
+        ],
         if (b.categories.contains(BusinessCategory.maintenance)) ...[
           const SizedBox(height: AQSpacing.x3),
           AQPrimaryButton(label: f.t('mnt.book.cta'), leadingIcon: 'calendar', trailingChevron: false, onPressed: () => context.push('/business/${b.id}/book')),
@@ -148,10 +151,31 @@ class _Profile extends ConsumerWidget {
           _head(context, f.t('bp.listings')),
           for (final p in props) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: AQResultCard(property: p)),
         ],
-        _head(context, f.t('bp.reviews'), trailing: AQTextButton(label: f.t('bp.write'), color: c.accentDeep, onPressed: () => Navigator.of(context).push(AQRoute.route<void>(ReviewScreen(listingLabel: b.locationLabel, listingTitle: b.name, priceLabel: ''))))),
+        _head(context, f.t('bp.reviews'), trailing: AQTextButton(label: f.t('bp.write'), color: c.accentDeep, onPressed: () => context.push('/review/${b.categories.contains(BusinessCategory.maintenance) ? 'provider' : 'professional'}/${b.id}?name=${Uri.encodeComponent(b.name)}'))),
         Text(b.rating == null ? f.t('bp.noReviews') : f.t('bp.ratedBy', {'r': b.rating!.toStringAsFixed(1), 'n': VFmt.n(context, b.reviewCount ?? 0)}), style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
         const SizedBox(height: AQSpacing.x4),
       ],
     );
   }
+}
+
+/// The professional type key an engagement is requested under, or null when this business is not a
+/// professional (agents and maintenance providers use other flows).
+String? _engagementType(Business b) {
+  for (final c in b.categories) {
+    switch (c) {
+      case BusinessCategory.construction:
+        return 'construction';
+      case BusinessCategory.propertyDevelopment:
+        return 'development';
+      case BusinessCategory.architecture:
+        return 'architecture';
+      case BusinessCategory.interiorDesign:
+      case BusinessCategory.exteriorDesign:
+        return 'interior_exterior';
+      default:
+        break;
+    }
+  }
+  return null;
 }
