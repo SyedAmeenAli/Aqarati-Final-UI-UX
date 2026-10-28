@@ -10,7 +10,9 @@ import '../features/ads/ad_repository.dart';
 import 'admin_ads_screens.dart';
 import 'admin_auth.dart';
 import 'admin_auth_screens.dart';
+import 'admin_directory_screens.dart';
 import 'admin_models.dart';
+import 'admin_modules.dart';
 import 'admin_moderation_screens.dart';
 import 'admin_repository.dart';
 import 'admin_verification_screens.dart';
@@ -32,7 +34,7 @@ String? adminRedirect(AdminAuthStage stage, String location) {
     case AdminAuthStage.needsTotp:
       return onCode ? null : '/code';
     case AdminAuthStage.active:
-      if (onLogin || onCode || location == '/') return '/verification';
+      if (onLogin || onCode || location == '/') return '/overview';
       return null;
   }
 }
@@ -46,7 +48,51 @@ GoRouter buildAdminRouter(WidgetRef ref, AdminAuthListenable listenable) {
     redirect: (context, state) =>
         adminRedirect(ref.read(adminAuthProvider).stage, state.uri.path),
     routes: [
-      GoRoute(path: '/', redirect: (_, _) => '/verification'),
+      GoRoute(path: '/', redirect: (_, _) => '/overview'),
+      // Hosted at #/admin, the console starts from the browser's own path; send it to the root.
+      GoRoute(path: '/admin', redirect: (_, _) => '/'),
+      GoRoute(
+        path: '/overview',
+        pageBuilder: (c, s) => page(s, const AdminOverviewScreen()),
+      ),
+      GoRoute(
+        path: '/accounts',
+        pageBuilder: (c, s) => page(s, const AdminAccountsScreen()),
+      ),
+      GoRoute(
+        path: '/accounts/:id',
+        pageBuilder: (c, s) =>
+            page(s, AdminAccountDetailScreen(id: s.pathParameters['id']!)),
+      ),
+      GoRoute(
+        path: '/reports',
+        pageBuilder: (c, s) => page(s, const AdminReportsScreen()),
+      ),
+      GoRoute(
+        path: '/reports/:id',
+        pageBuilder: (c, s) =>
+            page(s, AdminReportDetailScreen(id: s.pathParameters['id']!)),
+      ),
+      GoRoute(
+        path: '/m/:key',
+        pageBuilder: (c, s) {
+          final k = ModKey.values.where((x) => x.name == s.pathParameters['key']).firstOrNull;
+          return page(s, k == null ? const AdminOverviewScreen() : AdminModuleListScreen(modKey: k));
+        },
+      ),
+      GoRoute(
+        path: '/m/:key/:id',
+        pageBuilder: (c, s) {
+          final k = ModKey.values.where((x) => x.name == s.pathParameters['key']).firstOrNull;
+          return page(s, k == null ? const AdminOverviewScreen() : AdminModuleDetailScreen(modKey: k, id: s.pathParameters['id']!));
+        },
+      ),
+      GoRoute(path: '/analytics', pageBuilder: (c, s) => page(s, const AdminAnalyticsScreen())),
+      GoRoute(path: '/settings', pageBuilder: (c, s) => page(s, const AdminSettingsScreen())),
+      GoRoute(
+        path: '/audit',
+        pageBuilder: (c, s) => page(s, const AdminAuditScreen()),
+      ),
       GoRoute(
         path: '/login',
         pageBuilder: (c, s) => page(s, const AdminLoginScreen()),
@@ -90,6 +136,28 @@ GoRouter buildAdminRouter(WidgetRef ref, AdminAuthListenable listenable) {
   );
 }
 
+/// A route provider that never writes to the browser address. Used when the console is hosted at
+/// `#/admin`: the outer router owns the address, and this inner one must not overwrite it, or a
+/// refresh would land outside the console.
+class _QuietRouteInformationProvider extends RouteInformationProvider with ChangeNotifier {
+  _QuietRouteInformationProvider(this._inner) {
+    _inner.addListener(notifyListeners);
+  }
+  final RouteInformationProvider _inner;
+
+  @override
+  RouteInformation get value => _inner.value;
+
+  @override
+  void routerReportsNewRouteInformation(RouteInformation routeInformation, {RouteInformationReportingType type = RouteInformationReportingType.none}) {}
+
+  @override
+  void dispose() {
+    _inner.removeListener(notifyListeners);
+    super.dispose();
+  }
+}
+
 /// The admin console. It shares the design system, motion and components with the customer app and
 /// ships as its own build; the customer app never imports this file.
 class AdminApp extends ConsumerStatefulWidget {
@@ -101,6 +169,9 @@ class AdminApp extends ConsumerStatefulWidget {
 class _AdminAppState extends ConsumerState<AdminApp> {
   final _listenable = AdminAuthListenable();
   late final GoRouter _router = buildAdminRouter(ref, _listenable);
+
+  /// Hosted inside the customer app, where the outer router owns the browser address (`#/admin`).
+  late final bool _hosted = ref.read(adminExitProvider) != null;
 
   @override
   void dispose() {
@@ -126,7 +197,12 @@ class _AdminAppState extends ConsumerState<AdminApp> {
         ),
       ),
       themeMode: ThemeMode.light,
-      routerConfig: _router,
+      routeInformationProvider: _hosted
+          ? _QuietRouteInformationProvider(_router.routeInformationProvider)
+          : _router.routeInformationProvider,
+      routeInformationParser: _router.routeInformationParser,
+      routerDelegate: _router.routerDelegate,
+      backButtonDispatcher: _router.backButtonDispatcher,
       builder: (context, child) => AQThemeTransition(
         mode: ThemeMode.light,
         child: child ?? const SizedBox.shrink(),

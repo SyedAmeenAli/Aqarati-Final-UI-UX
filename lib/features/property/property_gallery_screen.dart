@@ -43,9 +43,15 @@ class _PropertyGalleryScreenState extends State<PropertyGalleryScreen> {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: on,
       label: label,
       excludeSemantics: true,
+      onTap: () => setState(() {
+          _kind = k;
+          _index = 0;
+        }),
       child: AQPressable(
         onTap: () => setState(() {
           _kind = k;
@@ -339,10 +345,15 @@ class _VideoStageState extends State<_VideoStage> {
             child: ready
                 ? Semantics(
                     button: true,
+                    focusable: true,
+                    onFocus: () {},
                     label: v.value.isPlaying
                         ? f.t('gal.pause')
                         : f.t('gal.play'),
                     excludeSemantics: true,
+      onTap: () => setState(
+                        () => v.value.isPlaying ? v.pause() : v.play(),
+                      ),
                     child: AQPressable(
                       onTap: () => setState(
                         () => v.value.isPlaying ? v.pause() : v.play(),
@@ -397,9 +408,15 @@ class _VideoStageState extends State<_VideoStage> {
                 for (var i = 0; i < widget.videoUrls.length; i++)
                   Semantics(
                     button: true,
+                    focusable: true,
+                    onFocus: () {},
                     selected: i == _index,
                     label: f.t('gal.videoN', {'n': VFmt.n(context, i + 1)}),
                     excludeSemantics: true,
+      onTap: () => setState(() {
+                        _index = i;
+                        _load(i);
+                      }),
                     child: AQPressable(
                       onTap: () => setState(() {
                         _index = i;

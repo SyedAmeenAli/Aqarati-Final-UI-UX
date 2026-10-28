@@ -255,8 +255,14 @@ class _Dashboard extends ConsumerWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: sub == null ? label : '$label. $sub',
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();

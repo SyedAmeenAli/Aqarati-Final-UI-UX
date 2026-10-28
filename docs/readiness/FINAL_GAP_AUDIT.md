@@ -161,3 +161,120 @@ The one-time "Sent for review" message now shows only while the listing is still
 
 ## Format cleanup
 Still not restored: the permission rule blocks `git checkout`. The 20 files in `FORMAT_NOISE_VERIFIED.txt` are formatting-only (verified earlier) and are committed as they are; they can be restored later with `git checkout <last commit before> -- <files>`.
+
+---
+
+# Phase 1 (2026-10-29): entry, registration, first-time onboarding
+
+Not pushed, not deployed. Backend untouched.
+
+## Release check
+Commit `217db2d` deployment `dpl_8Kmq4HPqi18MgeKHgCmoTxJrH2xp`: state READY on production; the live `main.dart.js` contains the new Home strings ("Explore more with AQARATI", "Sell with Aqary e-Broker"). Verified by deployment API and by fetching the live bundle; the page itself was not opened in a browser.
+
+## Test-count reconciliation
+836 passed (+17 skipped) at `7912a0a` became 830 (+17) at `217db2d`: six fewer. Cause: the Properties hub was retired, which removed one test ("on the properties hub nothing is lost when help closes") and the hub entry in the screen matrix (about five variants). Nothing else was deleted; the hub-offers test and the six-module tests were rewritten for the new Home (stronger: equal-size cards, above search, photos). Now 846 passed, 17 skipped, with 16 new Phase 1 tests.
+
+## What Phase 1 added
+- Entry: a prominent **Register as a Business or Professional** button under Login; it opens `/signup/business` with the four professional cards (Development, Construction, Architecture, Interior & Exterior), selected state, Continue. The full six-role chooser stays at `/onboarding/purpose`.
+- Interests: new `/onboarding/interests` "What are you looking for?" (nine options, multi-select, Continue disabled until one is chosen, Skip for now). A new User to Shop account reaches it from "Your account is active"; businesses still go to documents. Saved locally (`aq.interests`), restored on the next start. It re-orders the services under Explore more; Buy, Rent, Sell and My Favorites never move.
+- Accessibility (found while testing): 92 tiles and cards declared a button with no tap action, so keyboard and screen-reader activation could not press them. About 80 were fixed in one pass (the tap action now mirrors the pointer action); 10 odd cases remain.
+- Agent: approved agent session lands on the agent workspace; a shopper session on customer Home (browser-checked). A new agent account still goes through documents and review before the workspace, as designed.
+
+## Browser evidence (`j24`, 17 checks pass)
+Entry at 320/360/390/412/430/1280: no overflow, both modes and the business button visible. Business selector, Interior & Exterior selection to its signup. User signup to "Your account is active" to interests to Home with the four primary actions; choice stored and survives a reload; Skip stores nothing. Agent Create an Account opens the agent signup.
+
+## Not verified
+Keyboard-only navigation: in headless Chromium Tab did not reach the buttons and Enter did not activate tiles; not resolved, so keyboard access is unverified. Interest cards low in the grid were unreliable to click because the semantics geometry lags, so the browser picked Buy and Loan only; ordering is covered by a widget test. Demo sessions were exercised in earlier checks, not re-walked after the accessibility pass.
+
+---
+
+# Fifth pass (2026-10-29): customer shell completion, tab differentiation, agent workspace
+
+Not pushed, not deployed. Backend untouched. Demo mode still off by default.
+
+## Gates
+`flutter test` 865 passed, 17 skipped. With `--dart-define=AQARATI_DEMO_MODE=true`, the demo, Phase 1, shell and agent test files pass (66, 2 skipped). `flutter analyze` 55 items, no errors. Builds: `build/web` (default), `build/web_review`, `build/web_demo`, `build/web_admin`, each with manifests.
+
+## Customer
+- Navbar on all 24 audited routes including Search and Map (browser, `j27`/`j29`). Sticky bars sit above it (`AQShellInset`).
+- Tabs differ (Activity now has Selling and Requests records; Account is grouped settings). Browser `j29`: four tabs give four different pages; Activity Selling and Requests open; dark mode persists from Account to Home; the Account Language row switches to Arabic and Home renders RTL with no overflow.
+- Distinct imagery per property type (12 different photos, previously several repeated).
+- The earlier "Arabic did not switch" was the entry-screen language sheet, whose rows are not exposed to the accessibility tree; the Account language row works and is how Arabic was verified.
+
+## Keyboard
+Tab order, focus ring, Enter and Space verified in the browser on Entry, business selector, signup, interests, Home, results, Search, Favorites and the login form (22 checks, `j25`). Reviewed the script: it only acts on focused accessibility nodes with a button-like role, stops the key from reaching Flutter's own handlers (one press, one activation), prevents Space scrolling, and never touches native browser controls. The login keyboard trap (Tab cycling Email and Password only) is fixed with an app-side hook that releases text focus first. Not verified: native screen reader, and a real (headed) browser; only headless Chromium was used. Two stale text checks in `j24` and `j25` look for the old agent heading and fail by wording only (the agent dashboard itself passes in `j28`).
+
+## Agent workspace (frontend demo, fictional data, on-device only)
+Browser `j28`, 48 checks: dashboard (counts computed from records), contacts (search, status filter, sort, 8 records), contact detail (notes timeline, status change, call, email, related listings, appointments), add contact (validation then saved), edit, calendar (Upcoming / Overdue / Done, appointment sheet with reschedule, mark done, cancel), More (profile, requests, enquiries, service requests, customer view, sign out), listings (the existing module inside the agent shell), role isolation (a shopper sees no agent navigation), no overflow at 320 to 1280 px.
+Not verified in the browser: the date and time pickers used by Schedule follow-up and Reschedule (the underlying rules are unit-tested), Arabic and dark walks of the agent pages (widget tests cover layout), and the agent Listings add and edit forms inside the new shell.
+Existing tests changed because the architecture changed (none removed): the agent no longer renders inside the customer Home, so the role-home tests now assert the redirect to `/agent` and the way back, and the agent rendering matrix moved to `agent_workspace_test.dart`.
+
+## Still missing
+Admin Console on the Vercel build; the four other professional workspaces beyond their existing homes; multi-step Aqary e-Broker form; results sort controls beyond what exists; Explore redesign beyond its existing structure; format-noise restore (blocked by the permission rule, list in `FORMAT_NOISE_VERIFIED.txt`).
+
+---
+
+# Sixth pass (2026-10-29): admin console, professional workspaces, e-Broker wizard, Explore
+
+Local only. Not committed, not pushed, not deployed. Backend untouched. Demo mode still off by default.
+
+## Gates
+`flutter test`: 898 passed, 17 skipped (demo-only). The demo-gated files (`demo_admin_test`, `demo_skip_test`, `pro_demo_data_test`) pass with `--dart-define=AQARATI_DEMO_MODE=true`; `admin_directory_test`, `admin_console_test`, `phase1_entry_test`, `flow_logic_test` also pass with it. `flutter analyze`: 56 items, all info, no errors. Builds `build/web` (default), `build/web_demo`, `build/web_admin` complete with manifests.
+
+## What this pass delivered
+- **Admin Console** at `#/admin` in the same build: sign-in with illustrative one-time code, Overview, Accounts (search, filters, detail, status change with confirmation), Verification, Listing moderation, Ads & Sponsors, Reports (resolve with note), Activity log. Demo accounts appear only in a preview build. See `ADMIN_ACCESS.md`.
+- **Four professional workspaces** inside `ProShell`: Development, Construction, Architecture, Interior & Exterior, each with its own five tabs and home; contact activity, engagements (confirm locally) and portfolio carry sample data in a preview build only.
+- **Aqary e-Broker** as a six-step wizard; the submission appears in Activity > Selling as "In review"; confirmation says "Prototype submission saved. No listing has been sent to a real service."
+- **Explore** reviewed and walked (search, results, filters, sort, category and professional directories, empty states); no new Explore build was needed.
+
+## Defects found by the browser walks and fixed
+1. A refresh on `#/admin` left the console: the inner admin router overwrote the browser address with `#/login`. It now never writes the address when hosted.
+2. `/sell/new` opened "We could not find this submission": the shell's `/sell/:id` captured `new`. It now redirects to the form (`/sell-new`). New test `sell_route_test.dart`.
+3. The Construction role's Projects tab opened a developer-only page. Its tab is now Portfolio.
+4. Contact activity and engagement pages said "not available" in the preview build because the sample repository returned nothing; sample data now exists (preview build only; normal build still says the service is not available). New test `pro_demo_data_test.dart`.
+5. `demo_skip_test.dart` expected business roles at `/app/home`; they now open `/pro` by design. Expectation updated; no assertion removed.
+
+## Browser evidence (headless Chromium, `docs/readiness/evidence/browser/`)
+- `j30` admin console: 22 checks pass (hosted route, refresh, login link, demo accounts only in preview, two-step sign-in, Overview, Accounts search/detail/confirm/status, Reports resolve with note, Activity log, moderation, ads, widths 320/390/768/1280).
+- `j32` professional workspaces: 38 checks pass (four roles at 390 and 1280: own tabs, no customer tabs, every tab opens, sample contact activity, portfolio, engagement confirmed locally, four different homes).
+- `j33` e-Broker: 13 checks pass (six steps, blocked Continue with reasons, Back keeps values, review with Edit, no overflow at 390, truthful confirmation, record in Activity > Selling).
+- `j35` Explore: 12 checks pass (sections, search, sort reorders, empty state, category and professional directories, no overflow at 320/390/1280).
+- Regression: agent workspace `j28` 48 pass; customer tabs `j29` 14 pass; route audit `j27` re-run.
+
+## Not verified / limits (said plainly)
+- Not opened on the deployed Vercel URL; no deployment was made and Vercel settings were not inspected.
+- Sign-in, one-time code, roles and approvals are simulated; no backend exists.
+- e-Broker submissions are not in the admin moderation queue. Admin status changes do not reach the customer or agent apps.
+- Construction, Architecture and Interior & Exterior cannot add portfolio work or projects (service not confirmed). Arabic and dark walks of the new screens are covered by widget tests (320 to 1280 px, RTL, 160-200% text), not by browser walks. Keyboard-only and screen-reader walks of the admin console and professional shell were not done in the browser.
+- The 20 formatting-only files in `FORMAT_NOISE_VERIFIED.txt` are not restored (permission rule); run `git checkout -- $(cat docs/readiness/FORMAT_NOISE_VERIFIED.txt)` yourself if wanted.
+- Review-report sheet, duplicate-deed, Ads pause/resume/reorder failure walks and the 76-image visual audit from earlier passes remain outstanding.
+
+---
+
+# Seventh pass (2026-10-29): sponsorship on every Home, admin modules, e-Broker to admin, release gate
+
+## Gates
+`flutter test`: 913 passed, 17 skipped, exit 0 (the earlier 898 baseline plus 15 new tests; nothing deleted or weakened). The 17 skips are the demo-only tests; with `--dart-define=AQARATI_DEMO_MODE=true` the demo-gated files (`demo_admin_test`, `demo_skip_test`, `pro_demo_data_test`, `admin_demo_entry_test`) and the admin, entry, flow and e-Broker-link files pass. `flutter analyze`: 55 info items, 0 warnings, 0 errors.
+
+## What was added
+- One shared sponsorship banner (`SponsoredBannerView` and `SponsoredBannerSlot`) on all six Homes, served by audience from sample campaigns (`kSampleCampaigns`); an unknown destination falls back to `/app/explore`; the whole card is one keyboard-operable button.
+- Admin console: Property listings, Agents and brokers, Development projects, Construction, Architecture and design, Maintenance, Viewings and requests, Categories and content, Announcements, Analytics, Profile and settings, plus audience, search and preview on Ads & Sponsors, and one shared Activity log.
+- e-Broker submissions appear in the admin moderation queue, a decision writes back to the customer's Activity, and a resubmission updates the same queue record.
+- Portfolio add, edit and remove for Construction, Architecture and Interior & Exterior (preview data only, in memory).
+- One-tap "Open the demo console" on the admin sign-in (demo builds only).
+- `vercel.json`: forwards `AQARATI_DEMO_MODE` from the environment into `--dart-define` (see `VERCEL_DEPLOYMENT.md`).
+
+## Defects found by the browser walks and fixed
+1. Signing in after opening `#/admin` directly landed on "Page Not Found" (inner router started at `/admin`).
+2. Admin table rows were not keyboard-focusable; the sponsorship banner's focus target was a 16 px chevron.
+3. Sorting, hash and `/sell/new` fixes from the previous pass remain in place.
+
+## Browser evidence (headless Chromium, `docs/readiness/evidence/browser/*_results.json`)
+Sponsorship six roles x six widths plus CTA and Back: 73 of 73. Admin walk (ads, modules, activity log, widths): 59 of 59. e-Broker to admin round trip: 8 of 8. Portfolio: 15 of 15. Keyboard-only admin, professional shell and banners: 44 of 44 (one run in three showed intermittent timing failures in the sign-in typing; the rerun passed). Duplicate deed refused with a clear message and one record kept; Ads failed load, Try again, failed save and retry: 5 of 5. Regression: admin hosted 22, professional 38, e-Broker wizard 13, Explore 12, agent 48, customer tabs 14.
+
+## Not done, said plainly
+- Review-report sheet: the preview data has no published reviews for a business, so the sheet cannot be opened in the browser; it is covered by `engagement_reviews_test.dart`.
+- The 76-image reference visual audit was not performed. It needs a person to compare each reference image with its screen; no automated comparison exists. Screens were checked for overflow, cropping and overlap at 320 to 1280 px only.
+- No screen-reader walk. Keyboard and focus-ring checks were made in headless Chromium only.
+- Developer "update project status" has no local action; status changes come from the admin decision.
+- The 20 formatting-only files are committed as they are (verified formatting-only earlier); nothing was bulk-restored.

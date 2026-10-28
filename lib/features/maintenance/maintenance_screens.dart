@@ -45,9 +45,15 @@ class _Choice extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: selected,
       label: label,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -425,8 +431,11 @@ class _BookingRow extends StatelessWidget {
     final b = booking;
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${_service(f, b.service)}, ${b.providerName}, ${f.t('mnt.st.${b.status.name}')}',
       excludeSemantics: true,
+      onTap: () => context.push('/bookings/${b.id}'),
       child: AQPressable(
         onTap: () => context.push('/bookings/${b.id}'),
         child: Container(

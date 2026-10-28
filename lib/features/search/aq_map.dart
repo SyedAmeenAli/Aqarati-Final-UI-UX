@@ -1,3 +1,4 @@
+import '../viewing/widgets/viewing_scaffold.dart' show AQShellInset;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,9 +39,15 @@ class AQViewToggle extends StatelessWidget {
     Widget seg(String icon, String label, bool on, VoidCallback tap) =>
         Semantics(
           button: true,
+          focusable: true,
+          onFocus: () {},
           selected: on,
           label: label,
           excludeSemantics: true,
+      onTap: () {
+              if (!on) AQHaptics.selection();
+              if (!on) tap();
+            },
           child: AQPressable(
             onTap: () {
               if (!on) AQHaptics.selection();
@@ -314,8 +321,11 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
                     const SizedBox(height: AQSpacing.x3),
                     Semantics(
                       button: true,
+                      focusable: true,
+                      onFocus: () {},
                       label: f.t('map.search'),
                       excludeSemantics: true,
+      onTap: () => context.push('/search/start'),
                       child: AQPressable(
                         onTap: () => context.push('/search/start'),
                         child: Container(
@@ -442,15 +452,20 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
               final p = located[i];
               return Semantics(
                 button: true,
+                focusable: true,
+                onFocus: () {},
                 selected: selected?.id == p.id,
                 label: '${p.title}, ${p.price.compact}',
                 excludeSemantics: true,
+      onTap: () => _select(shown, p),
                 child: AQPressable(onTap: () => _select(shown, p), child: _Pin(label: p.price.compact, selected: selected?.id == p.id)),
               );
             },
           ),
         );
     final showStrip = !pinOverlay && located.isNotEmpty;
+    // The shared customer navigation floats over the bottom of the screen: leave it room.
+    final navInset = AQShellInset.of(context);
 
     // Large text: the screen scrolls as one column so nothing is covered.
     if (large) {
@@ -468,7 +483,7 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
                   ...sheetBody,
                   if (selected == null) emptyOrLoading() else Padding(padding: const EdgeInsets.symmetric(horizontal: AQSpacing.gutter), child: AQResultCard(property: selected)),
                   note,
-                  const SizedBox(height: AQSpacing.x4),
+                  SizedBox(height: AQSpacing.x4 + navInset),
                 ]),
               ),
             ),
@@ -483,13 +498,16 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
         Positioned.fill(child: mapView),
         ...pins,
         Positioned(left: 0, right: 0, top: 0, child: top),
-        if (showStrip) Positioned(left: 0, right: 0, bottom: bottomH + MediaQuery.paddingOf(context).bottom + AQSpacing.x3, child: strip()),
+        if (showStrip) Positioned(left: 0, right: 0, bottom: bottomH + navInset + (navInset == 0 ? MediaQuery.paddingOf(context).bottom : 0) + AQSpacing.x3, child: strip()),
         Align(
           alignment: Alignment.bottomCenter,
-          child: DecoratedBox(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: navInset),
+            child: DecoratedBox(
             decoration: BoxDecoration(color: c.surfaceRaised, borderRadius: const BorderRadius.vertical(top: Radius.circular(AQRadius.large)), boxShadow: AQElevation.modal),
             child: SafeArea(
               top: false,
+              bottom: navInset == 0,
               child: SizedBox(
                 height: bottomH,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -510,6 +528,7 @@ class _AQMapScreenState extends ConsumerState<AQMapScreen> {
               ),
             ),
           ),
+          ),
         ),
       ]),
     );
@@ -526,8 +545,14 @@ class _FilterButton extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: count > 0 ? '${f.t('flt.button')}, $count' : f.t('flt.button'),
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();

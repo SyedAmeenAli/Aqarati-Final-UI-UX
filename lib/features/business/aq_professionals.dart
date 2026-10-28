@@ -43,9 +43,11 @@ class _AQProfessionalsScreenState extends ConsumerState<AQProfessionalsScreen> {
     final c = AQColors.of(context);
     final async = ref.watch(businessesProvider);
     final q = _ctl.text.trim().toLowerCase();
+    // The page says what was asked for: Maintenance is not the generic professionals list.
+    final maint = _cat == BusinessCategory.maintenance;
     return AQViewingScaffold(
-      title: f.t('pro.title'),
-      subtitle: f.t('pro.sub'),
+      title: maint ? f.t('pro.maint.t') : (_cat == null ? f.t('pro.title') : f.t('bcat.${_cat!.name}')),
+      subtitle: maint ? f.t('pro.maint.s') : f.t('pro.sub'),
       backLabel: f.t('common.back'),
       onBack: () => aqBack(context, '/app/explore'),
       children: [
@@ -99,8 +101,11 @@ class _ProCard extends StatelessWidget {
     final rating = b.rating == null ? null : '${b.rating!.toStringAsFixed(1)} · ${f.t('pro.reviews', {'n': VFmt.n(context, b.reviewCount ?? 0)})}';
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${b.name}, $cats, ${b.locationLabel}${b.verification.isVerified ? ', ${f.t('disc.verified')}' : ''}${rating == null ? '' : ', $rating'}',
       excludeSemantics: true,
+      onTap: () => context.push('/business/${b.id}'),
       child: AQPressable(
         onTap: () => context.push('/business/${b.id}'),
         child: ClipRRect(

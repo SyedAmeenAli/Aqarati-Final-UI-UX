@@ -10,6 +10,17 @@ import 'viewing_format.dart';
 /// Shared shell for the viewing journey: brand context in the top bar, an editorial
 /// title (large and centred for emotional screens, smaller for task screens), a
 /// scrolling body, and a pinned action area that respects the safe area.
+/// How much of the bottom of the screen the shared customer navigation covers. Zero outside the
+/// shell (focused flows); inside it, scrolling pages leave room and sticky action bars sit above it.
+class AQShellInset extends InheritedWidget {
+  final double height;
+  const AQShellInset({super.key, required this.height, required super.child});
+  static double of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AQShellInset>()?.height ?? 0;
+  @override
+  bool updateShouldNotify(AQShellInset old) => old.height != height;
+}
+
 class AQViewingScaffold extends StatefulWidget {
   final String? title;
   final String? subtitle;
@@ -65,6 +76,7 @@ class _AQViewingScaffoldState extends State<AQViewingScaffold> with SingleTicker
     final c = AQColors.of(context);
     final centered = widget.emotional;
     final large = aqLargeText(context);
+    final inset = AQShellInset.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -98,7 +110,7 @@ class _AQViewingScaffoldState extends State<AQViewingScaffold> with SingleTicker
                       blendMode: BlendMode.dstIn,
                       shaderCallback: (r) => const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black, Colors.black, Colors.transparent], stops: [0, 0.96, 1]).createShader(r),
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x2, AQSpacing.gutter, AQSpacing.x6),
+                        padding: EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x2, AQSpacing.gutter, AQSpacing.x6 + (widget.bottom == null ? inset : 0)),
                         child: Column(crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start, children: [
                           if (widget.hero != null) ...[AQReveal(animation: _enter, begin: 0, end: 0.5, dy: 6, child: widget.hero!), const SizedBox(height: AQSpacing.x4)],
                           if (widget.title != null)
@@ -177,6 +189,7 @@ class AQBottomActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
+    final inset = AQShellInset.of(context);
     final stacked = stack || aqLargeText(context) || MediaQuery.sizeOf(context).width < 340;
     final buttons = secondary == null
         ? primary
@@ -191,9 +204,10 @@ class AQBottomActionBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
+        bottom: inset == 0,
         minimum: const EdgeInsets.only(bottom: AQSpacing.x2),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x4, AQSpacing.gutter, AQSpacing.x1),
+          padding: EdgeInsets.fromLTRB(AQSpacing.gutter, AQSpacing.x4, AQSpacing.gutter, AQSpacing.x1 + inset),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             if (summary != null) ...[summary!, const SizedBox(height: AQSpacing.x3)],
             buttons,

@@ -135,8 +135,11 @@ class AQTopBar extends StatelessWidget {
                 alignment: AlignmentDirectional.centerEnd,
                 child: Semantics(
                   button: true,
+                  focusable: true,
+                  onFocus: () {},
                   label: actionSemantics ?? actionLabel,
                   excludeSemantics: true,
+                  onTap: onAction,
                   child: AQTextButton(
                     label: actionLabel!,
                     trailingIcon: 'chevron-right',
@@ -188,8 +191,14 @@ class AQChoiceTile extends StatelessWidget {
           end: 0,
           child: Semantics(
             button: true,
+            focusable: true,
+            onFocus: () {},
             label: skipSemantics ?? skipLabel,
             excludeSemantics: true,
+      onTap: () {
+                AQHaptics.confirm();
+                onSkip!();
+              },
             child: AQPressable(
               onTap: () {
                 AQHaptics.confirm();
@@ -244,10 +253,16 @@ class AQChoiceTile extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: selected,
       label: title,
       hint: description,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -411,9 +426,15 @@ class AQSheetRow extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: selected,
       label: title,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -717,9 +738,15 @@ class AQGlassNav extends StatelessWidget {
                                     Expanded(
                                       child: Semantics(
                                         button: true,
+                                        focusable: true,
+                                        onFocus: () {},
                                         selected: i == index,
                                         label: items[i].label,
                                         excludeSemantics: true,
+      onTap: () {
+                                            AQHaptics.selection();
+                                            onSelected(i);
+                                          },
                                         child: AQPressable(
                                           onTap: () {
                                             AQHaptics.selection();

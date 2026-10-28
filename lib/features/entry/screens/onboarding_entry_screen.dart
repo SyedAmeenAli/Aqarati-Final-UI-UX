@@ -172,7 +172,8 @@ class _OnboardingEntryScreenState extends ConsumerState<OnboardingEntryScreen> w
                                   AQPrimaryButton(compact: compact, label: s.createAccount, onPressed: () => context.push(ref.read(entryExperienceProvider).signupRoute)),
                                   SizedBox(height: compact ? 10 : AQSpacing.x3),
                                   AQSecondaryButton(compact: compact, label: s.login, onPressed: () => context.push(ref.read(entryExperienceProvider).loginRoute)),
-                                  AQTextButton(label: FlowStrings.of(context).t('xp.more'), color: c.accent, onPressed: () => context.push(_page.primaryRoute)),
+                                  SizedBox(height: compact ? 10 : AQSpacing.x3),
+                                  AQSecondaryButton(compact: compact, label: FlowStrings.of(context).t('biz.cta'), leadingIcon: 'development', onPressed: () => context.push('/signup/business')),
                                   SizedBox(height: compact ? AQSpacing.x3 : AQSpacing.x5),
                                   _OrLabel(text: s.orContinueWith),
                                   SizedBox(height: compact ? AQSpacing.x3 : AQSpacing.x4),
@@ -276,8 +277,11 @@ class _ProviderButton extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: label,
       excludeSemantics: true,
+      onTap: loading ? null : onTap,
       child: AQPressable(
         onTap: loading ? null : onTap,
         child: Container(
@@ -307,9 +311,27 @@ class _LanguageButton extends ConsumerWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: s.selectLanguage,
       value: s.language,
       excludeSemantics: true,
+      onTap: () => showAQSheet<void>(context, builder: (sheet) {
+          final current = ref.read(localeProvider).languageCode;
+          void pick(String code) {
+            ref.read(localeProvider.notifier).state = Locale(code);
+            Navigator.of(sheet).pop();
+          }
+
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AQSpacing.x6, AQSpacing.x2, AQSpacing.x6, AQSpacing.x2),
+              child: Align(alignment: AlignmentDirectional.centerStart, child: Text(s.selectLanguage, style: AQTypography.of(context, AQText.labelSmall, soft: true))),
+            ),
+            AQSheetRow(title: 'English', selected: current == 'en', onTap: () => pick('en')),
+            AQSheetRow(title: 'العربية', selected: current == 'ar', onTap: () => pick('ar')),
+          ]);
+        }),
       child: AQPressable(
         pressedScale: 0.97,
         onTap: () => showAQSheet<void>(context, builder: (sheet) {

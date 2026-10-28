@@ -23,5 +23,9 @@ void demoSkipInto(BuildContext context, WidgetRef ref, SignupPurpose purpose) {
       content: Text(FlowStrings.of(context).t('demo.skip.note')),
     ),
   );
-  context.go('/app/home');
+  context.go(switch (purpose) {
+    SignupPurpose.userToShop => '/app/home',
+    SignupPurpose.realEstateAgent => '/agent',
+    _ => '/pro',
+  });
 }

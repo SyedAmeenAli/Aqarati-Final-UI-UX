@@ -1,0 +1,262 @@
+[
+ {
+  "name": "User to Shop: signup form opens for this role",
+  "pass": true,
+  "note": "BackUser to Shop · AccountLet's start with you.Find your place in Oman.NextYour "
+ },
+ {
+  "name": "User to Shop: an empty first step is refused with messages",
+  "pass": true,
+  "note": "BackUser to Shop · AccountLet's start with you.Find your place in Oman.This field is required.This field is required.Nex"
+ },
+ {
+  "name": "User to Shop: going Back keeps what was typed (Next goes on without re-typing)",
+  "pass": true,
+  "note": "BackUser to Shop · AccountWhere can we reach you?+968NextYour answers are saved on this device (never your pas"
+ },
+ {
+  "name": "User to Shop: reaches the end state",
+  "pass": true,
+  "note": "BackUser to Shop · PhonePhone verifiedTaking you to your account…Verif | User to Shop · ReadyYour account is activeYou can now browse, search a"
+ },
+ {
+  "name": "User to Shop: lands on the right screen",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountSPONSORED Sample banner one Review-build sample. Not a real advertiser. Learn moreGOOD MORNINGLet's find y"
+ },
+ {
+  "name": "User to Shop: sign out returns to the start",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professiona"
+ },
+ {
+  "name": "User to Shop: after sign out Home is the guest Home (no workspace, no banner)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Real Estate Agent: signup form opens for this role",
+  "pass": true,
+  "note": "BackReal Estate Agent · Your detailsLet's start with you.Build trust around ever"
+ },
+ {
+  "name": "Real Estate Agent: an empty first step is refused with messages",
+  "pass": true,
+  "note": "BackReal Estate Agent · Your detailsLet's start with you.Build trust around every property you represent.This field is r"
+ },
+ {
+  "name": "Real Estate Agent: going Back keeps what was typed (Next goes on without re-typing)",
+  "pass": true,
+  "note": "BackReal Estate Agent · Your detailsWhere can we reach you?+968NextYour answers are saved on this device (neve"
+ },
+ {
+  "name": "Real Estate Agent: reaches the end state",
+  "pass": true,
+  "note": "BackReal Estate Agent · ReviewAlmost there.Check everything before you | Real Estate Agent · ReviewApplication submittedYour application has be"
+ },
+ {
+  "name": "Real Estate Agent: end state is review, not approval",
+  "pass": true,
+  "note": "Real Estate Agent · ReviewApplication submittedYour application has been submitted for verification. We will notify you when there is an upd"
+ },
+ {
+  "name": "Real Estate Agent: lands on the right screen",
+  "pass": true,
+  "note": "Real Estate Agent · ReviewUnder reviewYour application is under reviewYour documents are with our reviewers. We will notify you when there i"
+ },
+ {
+  "name": "Real Estate Agent: approved-only screens stay closed while under review",
+  "pass": true,
+  "note": "BackMy listingsAgent workspace only Listings are managed from an approved real estate agent account."
+ },
+ {
+  "name": "Real Estate Agent: sign out returns to the start",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professiona"
+ },
+ {
+  "name": "Real Estate Agent: after sign out Home is the guest Home (no workspace, no banner)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Construction Company: signup form opens for this role",
+  "pass": true,
+  "note": "BackConstruction Company · Your detailsLet's start with you.Put your company whe"
+ },
+ {
+  "name": "Construction Company: an empty first step is refused with messages",
+  "pass": true,
+  "note": "BackConstruction Company · Your detailsLet's start with you.Put your company where Oman builds.This field is required.Th"
+ },
+ {
+  "name": "Construction Company: going Back keeps what was typed (Next goes on without re-typing)",
+  "pass": true,
+  "note": "BackConstruction Company · Your detailsWhere can we reach you?+968NextYour answers are saved on this device (n"
+ },
+ {
+  "name": "Construction Company: reaches the end state",
+  "pass": true,
+  "note": "BackConstruction Company · ReviewAlmost there.Check everything before  | Construction Company · ReviewApplication submittedYour application has"
+ },
+ {
+  "name": "Construction Company: end state is review, not approval",
+  "pass": true,
+  "note": "Construction Company · ReviewApplication submittedYour application has been submitted for verification. We will notify you when there is an "
+ },
+ {
+  "name": "Construction Company: lands on the right screen",
+  "pass": true,
+  "note": "Construction Company · ReviewUnder reviewYour application is under reviewYour documents are with our reviewers. We will notify you when ther"
+ },
+ {
+  "name": "Construction Company: approved-only screens stay closed while under review",
+  "pass": true,
+  "note": "BackMy listingsAgent workspace only Listings are managed from an approved real estate agent account."
+ },
+ {
+  "name": "Construction Company: sign out returns to the start",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professiona"
+ },
+ {
+  "name": "Construction Company: after sign out Home is the guest Home (no workspace, no banner)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Property Development Company: signup form opens for this role",
+  "pass": true,
+  "note": "BackProperty Development Company · Your detailsLet's start with you.Bring your d"
+ },
+ {
+  "name": "Property Development Company: an empty first step is refused with messages",
+  "pass": true,
+  "note": "BackProperty Development Company · Your detailsLet's start with you.Bring your developments into a trusted property ecos"
+ },
+ {
+  "name": "Property Development Company: going Back keeps what was typed (Next goes on without re-typing)",
+  "pass": true,
+  "note": "BackProperty Development Company · Your detailsWhere can we reach you?+968NextYour answers are saved on this d"
+ },
+ {
+  "name": "Property Development Company: reaches the end state",
+  "pass": true,
+  "note": "BackProperty Development Company · ReviewAlmost there.Check everything | Property Development Company · VerificationApplication submittedYour a"
+ },
+ {
+  "name": "Property Development Company: end state is review, not approval",
+  "pass": true,
+  "note": "Property Development Company · VerificationApplication submittedYour application has been submitted for verification. We will notify you whe"
+ },
+ {
+  "name": "Property Development Company: lands on the right screen",
+  "pass": true,
+  "note": "Property Development Company · VerificationUnder reviewYour application is under reviewYour documents are with our reviewers. We will notify"
+ },
+ {
+  "name": "Property Development Company: approved-only screens stay closed while under review",
+  "pass": true,
+  "note": "BackMy listingsAgent workspace only Listings are managed from an approved real estate agent account."
+ },
+ {
+  "name": "Property Development Company: sign out returns to the start",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professiona"
+ },
+ {
+  "name": "Property Development Company: after sign out Home is the guest Home (no workspace, no banner)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Building Architecture: signup form opens for this role",
+  "pass": true,
+  "note": "BackBuilding Architecture · Your detailsLet's start with you.Let your practice b"
+ },
+ {
+  "name": "Building Architecture: an empty first step is refused with messages",
+  "pass": true,
+  "note": "BackBuilding Architecture · Your detailsLet's start with you.Let your practice be discovered.This field is required.This"
+ },
+ {
+  "name": "Building Architecture: going Back keeps what was typed (Next goes on without re-typing)",
+  "pass": true,
+  "note": "BackBuilding Architecture · Your detailsWhere can we reach you?+968NextYour answers are saved on this device ("
+ },
+ {
+  "name": "Building Architecture: reaches the end state",
+  "pass": true,
+  "note": "BackBuilding Architecture · ReviewAlmost there.Check everything before | Building Architecture · ReviewApplication submittedYour application ha"
+ },
+ {
+  "name": "Building Architecture: end state is review, not approval",
+  "pass": true,
+  "note": "Building Architecture · ReviewApplication submittedYour application has been submitted for verification. We will notify you when there is an"
+ },
+ {
+  "name": "Building Architecture: lands on the right screen",
+  "pass": true,
+  "note": "Building Architecture · ReviewUnder reviewYour application is under reviewYour documents are with our reviewers. We will notify you when the"
+ },
+ {
+  "name": "Building Architecture: approved-only screens stay closed while under review",
+  "pass": true,
+  "note": "BackMy listingsAgent workspace only Listings are managed from an approved real estate agent account."
+ },
+ {
+  "name": "Building Architecture: sign out returns to the start",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professiona"
+ },
+ {
+  "name": "Building Architecture: after sign out Home is the guest Home (no workspace, no banner)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Interior & Exterior Design: signup form opens for this role",
+  "pass": true,
+  "note": "BackInterior & Exterior Design · Your detailsLet's start with you.Show the work "
+ },
+ {
+  "name": "Interior & Exterior Design: an empty first step is refused with messages",
+  "pass": true,
+  "note": "BackInterior & Exterior Design · Your detailsLet's start with you.Show the work behind the spaces.This field is required"
+ },
+ {
+  "name": "Interior & Exterior Design: going Back keeps what was typed (Next goes on without re-typing)",
+  "pass": true,
+  "note": "BackInterior & Exterior Design · Your detailsWhere can we reach you?+968NextYour answers are saved on this dev"
+ },
+ {
+  "name": "Interior & Exterior Design: reaches the end state",
+  "pass": true,
+  "note": "BackInterior & Exterior Design · ReviewAlmost there.Check everything b | Interior & Exterior Design · ReviewApplication submittedYour applicati"
+ },
+ {
+  "name": "Interior & Exterior Design: end state is review, not approval",
+  "pass": true,
+  "note": "Interior & Exterior Design · ReviewApplication submittedYour application has been submitted for verification. We will notify you when there "
+ },
+ {
+  "name": "Interior & Exterior Design: lands on the right screen",
+  "pass": true,
+  "note": "Interior & Exterior Design · ReviewUnder reviewYour application is under reviewYour documents are with our reviewers. We will notify you whe"
+ },
+ {
+  "name": "Interior & Exterior Design: approved-only screens stay closed while under review",
+  "pass": true,
+  "note": "BackMy listingsAgent workspace only Listings are managed from an approved real estate agent account."
+ },
+ {
+  "name": "Interior & Exterior Design: sign out returns to the start",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professiona"
+ },
+ {
+  "name": "Interior & Exterior Design: after sign out Home is the guest Home (no workspace, no banner)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ }
+]

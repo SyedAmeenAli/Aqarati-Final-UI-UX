@@ -555,9 +555,15 @@ class AQSegmented<T> extends StatelessWidget {
                   Expanded(
                     child: Semantics(
                       button: true,
+                      focusable: true,
+                      onFocus: () {},
                       selected: o.value == selected,
                       label: o.label,
                       excludeSemantics: true,
+      onTap: () {
+                          AQHaptics.selection();
+                          onChanged(o.value);
+                        },
                       child: AQPressable(
                         pressedScale: 0.98,
                         onTap: () {

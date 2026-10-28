@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/aq/aq_tokens.dart';
 import '../../data/api/account_api.dart' show meProvider;
 import '../devbuild/db_widgets.dart' show DbSkeleton;
 import '../workspace/aq_home.dart' show AQHomeScreen;
-import 'home_agent.dart';
-import 'home_construction.dart';
-import 'home_developer.dart';
-import 'home_studio.dart';
 import 'role_home_model.dart';
 import 'role_home_widgets.dart';
 
@@ -16,6 +13,26 @@ import 'role_home_widgets.dart';
 /// Everything that is not an approved role (guests, buyers, drafts, pending, rejected,
 /// suspended) gets the buyer home; a business or agent application that is not approved adds a
 /// status banner that links to the real verification screens.
+class _GoToWorkspace extends StatefulWidget {
+  final String path;
+  const _GoToWorkspace(this.path);
+  @override
+  State<_GoToWorkspace> createState() => _GoToWorkspaceState();
+}
+
+class _GoToWorkspaceState extends State<_GoToWorkspace> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.go(widget.path);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
 class RoleHomeScreen extends ConsumerWidget {
   const RoleHomeScreen({super.key});
 
@@ -36,11 +53,13 @@ class RoleHomeScreen extends ConsumerWidget {
     }
     final Widget home = switch (r.role) {
       HomeRole.buyer => AQHomeScreen(topSlot: _buyerTop(ref, r)),
-      HomeRole.agent => const AgentHome(),
-      HomeRole.developer => const DeveloperHome(),
-      HomeRole.construction => const ConstructionHome(),
-      HomeRole.architecture => const ArchitectureHome(),
-      HomeRole.interiorExterior => const InteriorHome(),
+      // An approved agent works in the agent workspace, which has its own navigation.
+      HomeRole.agent => const _GoToWorkspace('/agent'),
+      // Business accounts work in their own workspace, which has its own navigation.
+      HomeRole.developer ||
+      HomeRole.construction ||
+      HomeRole.architecture ||
+      HomeRole.interiorExterior => const _GoToWorkspace('/pro'),
     };
     // Role changes: a short fade with a small rise, then the new home. Reduced motion removes the rise.
     final reduced = AQMotion.reduced(context);

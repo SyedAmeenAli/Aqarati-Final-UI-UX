@@ -69,9 +69,21 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                     top: 6,
                     child: Semantics(
                       button: true,
+                      focusable: true,
+                      onFocus: () {},
                       selected: _compare.contains(p.id),
                       label: f.t('saved.select', {'t': p.title}),
                       excludeSemantics: true,
+      onTap: () {
+                          AQHaptics.selection();
+                          setState(() {
+                            if (_compare.contains(p.id)) {
+                              _compare.remove(p.id);
+                            } else if (_compare.length < _maxCompare) {
+                              _compare.add(p.id);
+                            }
+                          });
+                        },
                       child: AQPressable(
                         onTap: () {
                           AQHaptics.selection();
@@ -123,8 +135,11 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
               Expanded(
                 child: Semantics(
                   button: true,
+                  focusable: true,
+                  onFocus: () {},
                   label: f.t('saved.s.open', {'q': s.label}),
                   excludeSemantics: true,
+      onTap: () => context.push('/search?q=${Uri.encodeQueryComponent(s.filters['q'] ?? '')}'),
                   child: AQPressable(
                     onTap: () => context.push('/search?q=${Uri.encodeQueryComponent(s.filters['q'] ?? '')}'),
                     pressedScale: 0.99,

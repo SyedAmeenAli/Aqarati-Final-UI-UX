@@ -16,6 +16,7 @@ import '../features/flow/state/document_state.dart' show documentPickerProvider;
 import '../features/viewing/domain/viewing_presentation.dart' show AQTone;
 import '../features/viewing/widgets/viewing_format.dart';
 import 'admin_auth.dart';
+import 'admin_directory.dart' show adminLog, decisionVerb;
 import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_widgets.dart';
@@ -43,6 +44,43 @@ String adStatusLabel(AdStatus s) => switch (s) {
 String placementLabel(AdPlacement p) =>
     p == AdPlacement.homeTop ? 'Home, top' : 'Search results';
 
+String audienceLabel(AdAudience a) => switch (a) {
+  AdAudience.customer => 'User to Shop',
+  AdAudience.agent => 'Real Estate Agent',
+  AdAudience.developer => 'Development',
+  AdAudience.construction => 'Construction',
+  AdAudience.architecture => 'Architecture',
+  AdAudience.interior => 'Interior & Exterior',
+};
+
+String audiencesText(Set<AdAudience> s) => AdAudience.values
+    .where(s.contains)
+    .map(audienceLabel)
+    .join(', ');
+
+/// What a tap on the banner would do, in words. Used by the preview so a bad destination is
+/// visible before the banner is saved.
+String destinationOutcome(String destination) {
+  final d = destination.trim();
+  if (d.isEmpty) return 'No destination yet.';
+  if (!destinationValid(d)) {
+    return 'This destination is not valid, so the banner could not be saved.';
+  }
+  final route = adInAppRoute(d);
+  if (route == null) return 'Opens the external address $d in a new tab.';
+  if (route != d) {
+    return 'The app does not have a screen at $d. A tap would open $route instead.';
+  }
+  return 'Opens the app screen $d.';
+}
+
+/// Sample figures only, derived from the banner id so they stay the same between visits.
+(int, int) sampleFigures(String id) {
+  final n = id.codeUnits.fold<int>(11, (a, b) => (a * 31 + b) % 9000);
+  final views = 1200 + n;
+  return (views, (views * (0.02 + (n % 7) / 200)).round());
+}
+
 String _schedule(BuildContext context, SponsoredAd a) {
   if (a.startsAt == null && a.endsAt == null) return 'No schedule';
   String d(DateTime? x) => x == null ? 'open' : VFmt.shortDate(context, x);
@@ -60,6 +98,14 @@ class AdsListScreen extends ConsumerStatefulWidget {
 class _AdsListScreenState extends ConsumerState<AdsListScreen> {
   String? _busyId, _error, _done;
   AdStatus? _filter;
+  AdAudience? _audience;
+  final _q = TextEditingController();
+
+  @override
+  void dispose() {
+    _q.dispose();
+    super.dispose();
+  }
 
   Future<void> _run(
     String id,
@@ -74,6 +120,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
     });
     try {
       await op(ref.read(adAdminRepositoryProvider));
+      adminLog(ref, 'Banner: $done', id);
       ref.invalidate(adminAdsProvider);
       ref.invalidate(adminAdProvider(id));
       if (mounted) setState(() => _done = done);
@@ -149,12 +196,36 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                     : null,
               );
             }
+            final needle = _q.text.trim().toLowerCase();
             final shown = all
                 .where((a) => _filter == null || a.status == _filter)
+                .where((a) => _audience == null || a.audiences.contains(_audience))
+                .where(
+                  (a) =>
+                      needle.isEmpty ||
+                      '${a.sponsor} ${a.headline} ${a.body} ${a.destination}'
+                          .toLowerCase()
+                          .contains(needle),
+                )
                 .toList();
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                AdminSearchField(
+                  controller: _q,
+                  hint: 'Search sponsor, headline or destination',
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: AQSpacing.x3),
+                adminFilterRow(context, 'Audience', [
+                  ('All', _audience == null, () => setState(() => _audience = null)),
+                  for (final a in AdAudience.values)
+                    (
+                      audienceLabel(a),
+                      _audience == a,
+                      () => setState(() => _audience = _audience == a ? null : a),
+                    ),
+                ]),
                 adminFilterRow(context, 'Status', [
                   (
                     'All',
@@ -171,8 +242,8 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                 if (shown.isEmpty)
                   const AdminNotice(
                     icon: 'search',
-                    title: 'Nothing with this status',
-                    body: 'Choose another status to see the rest.',
+                    title: 'No banner matches',
+                    body: 'Change the search or the filters to see the rest.',
                   )
                 else
                   AdminTable(
@@ -218,12 +289,28 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                                 ),
                               ],
                             ),
-                            Text(
-                              placementLabel(a.placement),
-                              style: AQTypography.of(
-                                context,
-                                AQText.bodyMedium,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  placementLabel(a.placement),
+                                  style: AQTypography.of(
+                                    context,
+                                    AQText.bodyMedium,
+                                  ),
+                                ),
+                                Text(
+                                  audiencesText(a.audiences),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AQTypography.of(
+                                    context,
+                                    AQText.bodySmall,
+                                    color: c.inkSoft,
+                                  ),
+                                ),
+                              ],
                             ),
                             Text(
                               _schedule(context, a),
@@ -330,12 +417,14 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
   final _cta = TextEditingController();
   final _destination = TextEditingController();
   AdPlacement _placement = AdPlacement.homeTop;
+  Set<AdAudience> _audiences = {AdAudience.customer};
   DateTime? _start, _end;
   Uint8List? _bytes;
   String? _imageName, _imageRef;
   bool _loaded = false, _tried = false, _saving = false, _picking = false;
   String? _error, _done, _imageError;
   SponsoredAd? _existing;
+  String? _tapNote;
 
   bool get _editing => widget.editId != null;
 
@@ -361,6 +450,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
     _cta.text = a.cta;
     _destination.text = a.destination;
     _placement = a.placement;
+    _audiences = {...a.audiences};
     _start = a.startsAt;
     _end = a.endsAt;
     _bytes = a.imageBytes;
@@ -379,6 +469,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
     imageBytes: _bytes,
     imageName: _imageName,
     placement: _placement,
+    audiences: _audiences,
     startsAt: _start,
     endsAt: _end,
   );
@@ -449,6 +540,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
           ? await repo.update(widget.editId!, _draft())
           : await repo.create(_draft());
       if (submit) ad = await repo.submitForReview(ad.id);
+      adminLog(ref, _editing ? 'Edited banner' : 'Created banner', ad.headline);
       ref.invalidate(adminAdsProvider);
       ref.invalidate(adminAdProvider(ad.id));
       if (!mounted) return;
@@ -538,6 +630,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
           : _destination.text.trim(),
       imageRef: _bytes == null ? (_imageRef ?? '') : null,
       imageBytes: _bytes,
+      audiences: _audiences,
       status: AdStatus.draft,
       updatedAt: DateTime.now(),
     );
@@ -613,6 +706,26 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
                   placementLabel(p),
                   _placement == p,
                   () => setState(() => _placement = p),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AQSpacing.x4),
+        DbFieldFrame(
+          label: 'Shown on the Home of',
+          required: true,
+          error: e('audience'),
+          child: DbPillRow(
+            pills: [
+              for (final a in AdAudience.values)
+                (
+                  audienceLabel(a),
+                  _audiences.contains(a),
+                  () => setState(() {
+                    final next = {..._audiences};
+                    next.contains(a) ? next.remove(a) : next.add(a);
+                    _audiences = next;
+                  }),
                 ),
             ],
           ),
@@ -759,8 +872,38 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
         const SizedBox(height: AQSpacing.x3),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
-          child: SponsoredBannerView(ads: [preview], onTap: (_) {}),
+          child: SponsoredBannerView(
+            ads: [preview],
+            onTap: (_) => setState(
+              () => _tapNote = destinationOutcome(_destination.text),
+            ),
+          ),
         ),
+        const SizedBox(height: AQSpacing.x2),
+        Text(
+          _tapNote ?? 'Tap the preview to see where the button goes.',
+          style: AQTypography.of(
+            context,
+            AQText.bodySmall,
+            color: AQColors.of(context).inkSoft,
+          ),
+        ),
+        if (ex != null) ...[
+          const SizedBox(height: AQSpacing.x3),
+          Builder(
+            builder: (context) {
+              final (views, taps) = sampleFigures(ex.id);
+              return Text(
+                'Sample figures, not real measurements: $views views, $taps taps. Shown on: ${audiencesText(ex.audiences)}.',
+                style: AQTypography.of(
+                  context,
+                  AQText.bodySmall,
+                  color: AQColors.of(context).inkSoft,
+                ),
+              );
+            },
+          ),
+        ],
         if (ex != null &&
             ex.status == AdStatus.pendingVerification &&
             role.canReviewAds) ...[
@@ -831,6 +974,7 @@ class _AdReview extends ConsumerWidget {
               reasonCode: reason == null ? null : reasonWire(reason),
               note: note,
             );
+        adminLog(ref, '${decisionVerb(d)} banner', ad.headline);
         ref.invalidate(adminAdsProvider);
         ref.invalidate(adminAdProvider(ad.id));
       },

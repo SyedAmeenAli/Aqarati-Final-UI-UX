@@ -31,6 +31,7 @@ String adminMsg(String key) => switch (key) {
   'adm.err.imageType' => 'The banner image must be a JPG or PNG file.',
   'adm.err.imageSize' => 'The banner image must be 5 MB or smaller.',
   'adm.err.schedule' => 'The start date must be before the end date.',
+  'adm.err.audience' => 'Choose at least one Home screen for this banner.',
   _ => key,
 };
 
@@ -141,9 +142,24 @@ class _NavItem {
 }
 
 const _nav = [
+  _NavItem('Overview', 'home', '/overview'),
+  _NavItem('Accounts', 'account', '/accounts'),
   _NavItem('Verification', 'verified', '/verification'),
-  _NavItem('Listing moderation', 'home', '/moderation'),
+  _NavItem('Listing moderation', 'development', '/moderation'),
+  _NavItem('Property listings', 'home', '/m/listings'),
+  _NavItem('Agents and brokers', 'agent', '/m/brokers'),
+  _NavItem('Development projects', 'development', '/m/projects'),
+  _NavItem('Construction', 'construction', '/m/construction'),
+  _NavItem('Architecture and design', 'architecture', '/m/design'),
+  _NavItem('Maintenance', 'construction', '/m/maintenance'),
+  _NavItem('Viewings and requests', 'calendar', '/m/viewings'),
   _NavItem('Ads & Sponsors', 'star', '/ads'),
+  _NavItem('Categories and content', 'globe', '/m/content'),
+  _NavItem('Announcements', 'alert', '/m/announcements'),
+  _NavItem('Analytics', 'activity', '/analytics'),
+  _NavItem('Reports', 'alert', '/reports'),
+  _NavItem('Activity log', 'clock', '/audit'),
+  _NavItem('Profile and settings', 'account', '/settings'),
 ];
 
 /// One frame for every console page: a sidebar on wide screens, a top bar and tabs on narrow ones.
@@ -300,9 +316,17 @@ class AdminFrame extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AQSpacing.x6),
-                  for (final n in _nav)
-                    _SideItem(item: n, selected: section == n.route),
-                  const Spacer(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (final n in _nav)
+                            _SideItem(item: n, selected: section == n.route),
+                        ],
+                      ),
+                    ),
+                  ),
                   account(),
                 ],
               ),
@@ -376,9 +400,12 @@ class _SideItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AQSpacing.x1),
       child: Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         selected: selected,
         label: item.label,
         excludeSemantics: true,
+      onTap: () => context.go(item.route),
         child: AQPressable(
           onTap: () => context.go(item.route),
           child: AnimatedContainer(
@@ -446,6 +473,9 @@ Widget _rowSemantics(AdminTableRow r, Widget child) => KeyedSubtree(
     container: true,
     explicitChildNodes: r.actionCells.isNotEmpty,
     button: r.onTap != null,
+    focusable: r.onTap != null,
+    onFocus: r.onTap == null ? null : () {},
+    onTap: r.onTap,
     label: r.semantics,
     excludeSemantics: r.actionCells.isEmpty,
     child: child,

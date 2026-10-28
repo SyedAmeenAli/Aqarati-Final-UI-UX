@@ -17,8 +17,11 @@ class AQHelpButton extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: f.t('help.label'),
       excludeSemantics: true,
+      onTap: () => showAQHelp(context),
       child: AQPressable(
         onTap: () => showAQHelp(context),
         child: SizedBox(

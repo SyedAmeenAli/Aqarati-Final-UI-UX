@@ -61,9 +61,15 @@ class SponsoredBannerView extends StatelessWidget {
     return MediaQuery.withClampedTextScaling(
       maxScaleFactor: 1.2,
       child: Semantics(
+        // One control for the whole banner, so the keyboard focus ring and a tap by a screen reader
+        // cover the card and not just the chevron.
         container: true,
-        explicitChildNodes: true,
-        label: '${f.t('ad.sponsored')}: ${ad.sponsor}',
+        button: true,
+        focusable: true,
+        onFocus: () {},
+        onTap: () => onTap(ad),
+        label: '${f.t('ad.sponsored')}: ${ad.sponsor}. ${ad.headline}. ${ad.cta}',
+        excludeSemantics: true,
         child: SizedBox(
           height: kSponsoredBannerHeight,
           child: AnimatedSwitcher(
@@ -140,10 +146,7 @@ class SponsoredBannerView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: AQSpacing.x2),
-                          Semantics(
-                            button: true,
-                            label: ad.cta,
-                            excludeSemantics: true,
+                          ExcludeSemantics(
                             child: ConstrainedBox(
                               constraints: const BoxConstraints(maxWidth: 92),
                               child: Row(
@@ -191,7 +194,14 @@ class SponsoredBannerView extends StatelessWidget {
 /// while the screen is visible.
 class SponsoredBannerSlot extends ConsumerStatefulWidget {
   final AdPlacement placement;
-  const SponsoredBannerSlot({super.key, this.placement = AdPlacement.homeTop});
+
+  /// Which Home this is: the campaigns served are the ones aimed at this audience.
+  final AdAudience audience;
+  const SponsoredBannerSlot({
+    super.key,
+    this.placement = AdPlacement.homeTop,
+    this.audience = AdAudience.customer,
+  });
   @override
   ConsumerState<SponsoredBannerSlot> createState() =>
       _SponsoredBannerSlotState();
@@ -210,7 +220,9 @@ class _SponsoredBannerSlotState extends ConsumerState<SponsoredBannerSlot> {
 
   List<SponsoredAd> _ads() {
     if (!ref.watch(meProvider).hasValue) return const <SponsoredAd>[];
-    return ref.watch(servedAdsProvider(widget.placement)).valueOrNull ??
+    return ref
+            .watch(servedAdsProvider((widget.placement, widget.audience)))
+            .valueOrNull ??
         const <SponsoredAd>[];
   }
 
@@ -242,8 +254,9 @@ class _SponsoredBannerSlotState extends ConsumerState<SponsoredBannerSlot> {
         .recordEvent(ad.id, AdEventKind.tap)
         .catchError((_) {});
     final d = ad.destination.trim();
-    if (d.startsWith('/')) {
-      if (mounted) context.push(d);
+    final route = adInAppRoute(d);
+    if (route != null) {
+      if (mounted) context.push(route);
       return;
     }
     final u = Uri.tryParse(d);

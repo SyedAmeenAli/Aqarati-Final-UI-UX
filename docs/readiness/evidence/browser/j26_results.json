@@ -1,0 +1,57 @@
+[
+ {
+  "name": "dark: entry renders",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted p"
+ },
+ {
+  "name": "dark: business renders",
+  "pass": true,
+  "note": "BackRegister as a Business or ProfessionalChoose the kind of business "
+ },
+ {
+  "name": "dark: home renders",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD EVENINGLet's find your next pla"
+ },
+ {
+  "name": "Arabic: entry shows Arabic text and the business button",
+  "pass": false,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all in one verified ecosystem.User "
+ },
+ {
+  "name": "Arabic: entry no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Arabic: business selector in Arabic, four roles",
+  "pass": false,
+  "note": "BackRegister as a Business or ProfessionalChoose the kind of business you run. Each one has its own sign-up and workspac"
+ },
+ {
+  "name": "Arabic: business selector no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Arabic: interests screen in Arabic",
+  "pass": false,
+  "note": "What are you looking for?Tell us what matters to you. We'll make your AQARATI experience more releva"
+ },
+ {
+  "name": "Arabic: interests no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Arabic: Home shows the four primary actions in Arabic",
+  "pass": false,
+  "note": "Choose a location: All OmanAccountGOOD EVENINGLet's find your next place in Oman.What would you like to do?Buy a propert"
+ },
+ {
+  "name": "Arabic: Home no overflow",
+  "pass": true,
+  "note": ""
+ }
+]

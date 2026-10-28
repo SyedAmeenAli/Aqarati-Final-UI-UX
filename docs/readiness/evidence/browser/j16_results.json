@@ -1,0 +1,217 @@
+[
+ {
+  "name": "entry: both experiences are offered",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all in one verified ecosystem.User to ShopReal Estate AgentCreate an Accoun"
+ },
+ {
+  "name": "entry: choosing the agent keeps both options and the actions",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "entry: Login opens the sign-in screen",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: says which experience it is",
+  "pass": true,
+  "note": "BackCreate accountWelcome backLog in to continue your property journey.Signing in as a Real Estate AgentShow passwordForgot password?Your data is secure. We use"
+ },
+ {
+  "name": "entry: Create an Account (agent) opens the agent signup",
+  "pass": true,
+  "note": "BackReal Estate Agent · Your detailsLet's start with you.Build trust around every property you represent.NextYour answer"
+ },
+ {
+  "name": "entry: Create an Account (user) opens the user signup",
+  "pass": true,
+  "note": "BackUser to Shop · AccountLet's start with you.Find your place in Oman.NextYour answers are saved on this device (never "
+ },
+ {
+  "name": "entry: other businesses reach all six signup roles",
+  "pass": true,
+  "note": "BackWhat brings you to AQARATI?Choose your main purpose to personalize your experience.Skip: User to ShopUser to ShopSkip: Real Estate AgentReal Estate AgentSkip: Construction CompanyConstruction CompanySkip: Property Development CompanyProperty Development CompanySkip: Building ArchitectureBuilding"
+ },
+ {
+  "name": "home 320: six modules present",
+  "pass": true,
+  "note": "[{\"n\":\"Properties\",\"x\":24,\"y\":357,\"w\":132},{\"n\":\"Development\",\"x\":164,\"y\":357,\"w\":132},{\"n\":\"Interior & Exterior Designer\",\"x\":24,\"y\":469,\"w\":132},{\"n\":\"Construction Company\",\"x\":164,\"y\":469,\"w\":132},{\"n\":\"Loan Calculator\",\"x\":24,\"y\":607,\"w\":132},{\"n\":\"Maintenance\",\"x\":164,\"y\":607,\"w\":132}]"
+ },
+ {
+  "name": "home 320: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "home 360: six modules present",
+  "pass": true,
+  "note": "[{\"n\":\"Properties\",\"x\":24,\"y\":357,\"w\":152},{\"n\":\"Development\",\"x\":184,\"y\":357,\"w\":152},{\"n\":\"Interior & Exterior Designer\",\"x\":24,\"y\":469,\"w\":152},{\"n\":\"Construction Company\",\"x\":184,\"y\":469,\"w\":152},{\"n\":\"Loan Calculator\",\"x\":24,\"y\":587,\"w\":152},{\"n\":\"Maintenance\",\"x\":184,\"y\":587,\"w\":152}]"
+ },
+ {
+  "name": "home 360: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "home 390: six modules present",
+  "pass": true,
+  "note": "[{\"n\":\"Properties\",\"x\":24,\"y\":363,\"w\":167},{\"n\":\"Development\",\"x\":199,\"y\":363,\"w\":167},{\"n\":\"Interior & Exterior Designer\",\"x\":24,\"y\":475,\"w\":167},{\"n\":\"Construction Company\",\"x\":199,\"y\":475,\"w\":167},{\"n\":\"Loan Calculator\",\"x\":24,\"y\":593,\"w\":167},{\"n\":\"Maintenance\",\"x\":199,\"y\":593,\"w\":167}]"
+ },
+ {
+  "name": "home 390: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "home 412: six modules present",
+  "pass": true,
+  "note": "[{\"n\":\"Properties\",\"x\":24,\"y\":367,\"w\":178},{\"n\":\"Development\",\"x\":210,\"y\":367,\"w\":178},{\"n\":\"Interior & Exterior Designer\",\"x\":24,\"y\":479,\"w\":178},{\"n\":\"Construction Company\",\"x\":210,\"y\":479,\"w\":178},{\"n\":\"Loan Calculator\",\"x\":24,\"y\":597,\"w\":178},{\"n\":\"Maintenance\",\"x\":210,\"y\":597,\"w\":178}]"
+ },
+ {
+  "name": "home 412: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "home 430: six modules present",
+  "pass": true,
+  "note": "[{\"n\":\"Properties\",\"x\":24,\"y\":369,\"w\":187},{\"n\":\"Development\",\"x\":219,\"y\":369,\"w\":187},{\"n\":\"Interior & Exterior Designer\",\"x\":24,\"y\":481,\"w\":187},{\"n\":\"Construction Company\",\"x\":219,\"y\":481,\"w\":187},{\"n\":\"Loan Calculator\",\"x\":24,\"y\":599,\"w\":187},{\"n\":\"Maintenance\",\"x\":219,\"y\":599,\"w\":187}]"
+ },
+ {
+  "name": "home 430: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Properties opens the hub directly",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountPropertiesWhat would you like to do?Help: what does real estate mean here?Buy. Find a property to buy.Rent. Find a propert"
+ },
+ {
+  "name": "Buy opens the four categories",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountBuy: choose a categoryPick the kind of property you are looking for.Residential. V"
+ },
+ {
+  "name": "a category opens its property types directly",
+  "pass": true,
+  "note": "#/app/home BackChoose a location: All OmanAccountBuy: choose a property typeCommercialOffices, shops, buildings and storage across Oman.ShopsOfficesBuildingStorageCommerci"
+ },
+ {
+  "name": "a type opens the results with everything chosen",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunities in every corner of Oman.Search properties in Oman…AllResidentialCommercialAgricultureIndustrialAllBuyRent0 propertiesF"
+ },
+ {
+  "name": "back from results returns to the same types step",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountBuy: choose a property typeCommercialOffices, shops, buildings and storage across "
+ },
+ {
+  "name": "back from types returns to the categories (still Buy)",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountBuy: choose a categoryPick the kind of property you are looking for.Residential. V"
+ },
+ {
+  "name": "back from categories returns to the hub",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountPropertiesWhat would you like to do?Help: what does real estate mean here?Buy. Fin"
+ },
+ {
+  "name": "Rent residential offers Villa and Apartment, not Residential Land",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountRent: choose a property typeResidentialVillas, apartments and land across Oman.Only property types that can be rented are shown here.VillaApartmentSee all in this"
+ },
+ {
+  "name": "Sell opens the Aqary e-Broker journey",
+  "pass": true,
+  "note": "BackSell with Aqary e-BrokerFor owners selling a property.How it works1Tell us about the property and the owner.2Add pho"
+ },
+ {
+  "name": "My Favorites opens the saved list",
+  "pass": true,
+  "note": "BackSavedProperties and searches you want to come back to.PropertiesSearchesSave properties you want to revisitTap the h"
+ },
+ {
+  "name": "#/properties @320: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/categories?tx=buy @320: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=buy&cat=commercial @320: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=rent&cat=agriculture @320: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties @360: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/categories?tx=buy @360: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=buy&cat=commercial @360: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=rent&cat=agriculture @360: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties @412: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/categories?tx=buy @412: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=buy&cat=commercial @412: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=rent&cat=agriculture @412: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties @430: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/categories?tx=buy @430: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=buy&cat=commercial @430: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "#/properties/types?tx=rent&cat=agriculture @430: nothing clipped at the edges",
+  "pass": true,
+  "note": ""
+ }
+]

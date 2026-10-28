@@ -1,0 +1,97 @@
+[
+ {
+  "name": "buyer is refused My listings",
+  "pass": true,
+  "note": "BackMy listingsAgent workspace only\nListings are managed from an approved real estate agent account.Back | BackMy listingsAgent workspace only\nListings are mana"
+ },
+ {
+  "name": "empty state",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "validation: required fields flagged",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "transaction chip selects",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "invalid input refused: short deed flagged, price field takes digits only",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "photo attached",
+  "pass": true,
+  "note": "Remove photo 1"
+ },
+ {
+  "name": "SAVE FAILURE: form stays, error shown, nothing submitted",
+  "pass": true,
+  "note": "BackAdd listingIt is reviewed before it appears to buyers.PropertyMarket *Market, ResidentialProperty type *Property type, VillaTransaction *For saleFor rentFor leaseDescriptionLocationGovernorate *Governorate, MuscatWil"
+ },
+ {
+  "name": "submission lands on the detail screen in review (not live)",
+  "pass": true,
+  "note": "Back⁨Sea view villa, Al Mouj⁩OMR 250,000Sent for review. This listing is not live. Buyers will see it only after it is approved.In review\nOur team is reviewing this listing. It is not visible to buyer"
+ },
+ {
+  "name": "honest confirmation: sent for review, demo labelled",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "after approval it is live and offers Pause",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "pause asks first",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Keep it live changes nothing",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PAUSE FAILURE: says it did not change, still live, Pause still offered",
+  "pass": true,
+  "note": "Back⁨Sea view villa, Al Mouj⁩OMR 250,000Sent for review. This listing is not live. Buyers will see it only after it is approved.We could not pause this listing. Its status did not change.Live\nThis listing is live and vis"
+ },
+ {
+  "name": "paused after the response, Resume offered",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "RESUME FAILURE: says it did not change, still paused",
+  "pass": true,
+  "note": "Back⁨Sea view villa, Al Mouj⁩OMR 250,000Sent for review. This listing is not live. Buyers will see it only after it is approved.We could not resume this listing. Its status did not change.Paused\nPaused. Buyers cannot see"
+ },
+ {
+  "name": "resumed, live again",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "EDIT FAILURE: stays on the edit form, nothing saved",
+  "pass": true,
+  "note": "BackEdit listingPhotos and details you do not change stay as they are.The approved version stays live while your changes are reviewed.PropertyMarket *Market, ResidentialProperty type *Property type, V"
+ },
+ {
+  "name": "edit of a live listing keeps it live with changes in review",
+  "pass": true,
+  "note": "Back⁨Sea view villa, Al Mouj (renovated)⁩OMR 250,000Changes saved. The approved version stays live while your changes are reviewed.Live\nThis listing is live and visible to buyers.Your latest edits are being reviewed. The"
+ },
+ {
+  "name": "list shows the listing",
+  "pass": true,
+  "note": ""
+ }
+]

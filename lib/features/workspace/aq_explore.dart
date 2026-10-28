@@ -25,8 +25,14 @@ class AQExploreScreen extends StatelessWidget {
             width: w,
             child: Semantics(
               button: true,
+              focusable: true,
+              onFocus: () {},
               label: t.$3,
               excludeSemantics: true,
+      onTap: () {
+                  AQHaptics.selection();
+                  t.$4();
+                },
               child: AQPressable(
                 onTap: () {
                   AQHaptics.selection();

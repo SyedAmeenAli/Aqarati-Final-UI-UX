@@ -11,15 +11,20 @@ enum AdEventKind { impression, tap }
 /// and best-effort impression / tap events (`POST /ads/:id/events`). A failure here must never be
 /// visible to the customer: no banner is shown instead of a broken one.
 abstract class AdRepository {
-  Future<List<SponsoredAd>> served(AdPlacement placement);
+  Future<List<SponsoredAd>> served(
+    AdPlacement placement, {
+    AdAudience audience = AdAudience.customer,
+  });
   Future<void> recordEvent(String adId, AdEventKind kind);
 }
 
 class UnavailableAdRepository implements AdRepository {
   const UnavailableAdRepository();
   @override
-  Future<List<SponsoredAd>> served(AdPlacement placement) async =>
-      throw const ApiException(ApiErrorCode.network);
+  Future<List<SponsoredAd>> served(
+    AdPlacement placement, {
+    AdAudience audience = AdAudience.customer,
+  }) async => throw const ApiException(ApiErrorCode.network);
   @override
   Future<void> recordEvent(String adId, AdEventKind kind) async =>
       throw const ApiException(ApiErrorCode.network);
@@ -84,12 +89,20 @@ class DemoAdRepository implements AdRepository, AdAdminRepository {
       _items[_items.indexWhere((x) => x.id == a.id)] = a;
 
   @override
-  Future<List<SponsoredAd>> served(AdPlacement placement) async {
+  Future<List<SponsoredAd>> served(
+    AdPlacement placement, {
+    AdAudience audience = AdAudience.customer,
+  }) async {
     await _lag();
     final now = _clock();
     final list =
         _items
-            .where((a) => a.placement == placement && a.servableAt(now))
+            .where(
+              (a) =>
+                  a.placement == placement &&
+                  a.audiences.contains(audience) &&
+                  a.servableAt(now),
+            )
             .toList()
           ..sort((a, b) => a.order.compareTo(b.order));
     return List.unmodifiable(list);
@@ -133,6 +146,7 @@ class DemoAdRepository implements AdRepository, AdAdminRepository {
       imageBytes: d.imageBytes,
       imageName: d.imageName,
       placement: d.placement,
+      audiences: d.audiences,
       status: AdStatus.draft,
       startsAt: d.startsAt,
       endsAt: d.endsAt,
@@ -163,6 +177,7 @@ class DemoAdRepository implements AdRepository, AdAdminRepository {
       imageBytes: d.imageBytes ?? (d.imageRef == null ? old.imageBytes : null),
       imageName: d.imageName ?? old.imageName,
       placement: d.placement,
+      audiences: d.audiences,
       status:
           old.status == AdStatus.approved ||
               old.status == AdStatus.paused ||
@@ -255,9 +270,13 @@ class DemoAdRepository implements AdRepository, AdAdminRepository {
   );
 
   /// QA / tests: adds a banner directly in any state.
-  SponsoredAd debugAdd(AdDraft d, {AdStatus status = AdStatus.approved}) {
+  SponsoredAd debugAdd(
+    AdDraft d, {
+    AdStatus status = AdStatus.approved,
+    String? id,
+  }) {
     final a = SponsoredAd(
-      id: 'ad${++_seq}',
+      id: id ?? 'ad${++_seq}',
       sponsor: d.sponsor,
       headline: d.headline,
       body: d.body,
@@ -267,6 +286,7 @@ class DemoAdRepository implements AdRepository, AdAdminRepository {
       imageBytes: d.imageBytes,
       imageName: d.imageName,
       placement: d.placement,
+      audiences: d.audiences,
       status: status,
       startsAt: d.startsAt,
       endsAt: d.endsAt,
@@ -278,31 +298,73 @@ class DemoAdRepository implements AdRepository, AdAdminRepository {
   }
 }
 
+/// Fictional sample campaigns, one per Home audience, so every Home shows a banner in the
+/// prototype. They are labelled "Sponsored"; the sponsors are invented and no advertising
+/// agreement or payment exists. Order is fixed, so the demo is deterministic.
+const kSampleCampaigns =
+    <(String, AdAudience, String, String, String, String, String, String)>[
+      ('s1', AdAudience.customer, 'Al Mouj Waterfront (sample)', 'Waterfront residences, now previewing', 'A sample developer campaign', 'View homes', '/properties?cat=residential', 'assets/properties/p1/02_Infinity_pool_overlooking_marina.jpg'),
+      ('s2', AdAudience.agent, 'Qurum Heights (sample)', 'Pre-launch units for your clients', 'Sample project for agents', 'See homes', '/properties?cat=residential', 'assets/location/11_Muscat_skyline_and_mountains.jpg'),
+      ('s3', AdAudience.developer, 'Gulf Materials (sample)', 'Bulk pricing for project developers', 'A sample supplier campaign', 'Find builders', '/app/explore/build/results?cat=construction', 'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg'),
+      ('s4', AdAudience.construction, 'Plant Hire Oman (sample)', 'Cranes and plant, ready in Muscat', 'A sample equipment campaign', 'Browse', '/professionals?cat=maintenance', 'assets/businesses/b2/03_Construction_equipment_at_buildi.jpg'),
+      ('s5', AdAudience.architecture, 'Studio Light (sample)', 'Visualisation tools for architects', 'A sample software campaign', 'Learn more', '/app/explore/build/results?cat=architecture', 'assets/businesses/b1/05_Contemporary_architectural_facad.jpg'),
+      ('s6', AdAudience.interior, 'Dar Fabrics (sample)', 'Linen, stone and timber samples', 'A sample materials campaign', 'Explore', '/app/explore/build/results?cat=interiorExterior', 'assets/businesses/b3/06_Styled_bedroom_interior_photography.jpg'),
+    ];
+
+/// Adds the sample campaigns (approved, always in schedule) and two more so the console has
+/// something to filter: one paused, one waiting for review.
+void seedSampleCampaigns(DemoAdRepository repo) {
+  for (final (id, aud, sponsor, headline, body, cta, dest, image)
+      in kSampleCampaigns) {
+    repo.debugAdd(
+      AdDraft(
+        sponsor: sponsor,
+        headline: headline,
+        body: body,
+        cta: cta,
+        destination: dest,
+        imageRef: image,
+        audiences: {aud},
+      ),
+      id: id,
+    );
+  }
+  repo.debugAdd(
+    const AdDraft(
+      sponsor: 'Muscat Furnishings (sample)',
+      headline: 'Autumn showroom event',
+      body: 'Paused sample campaign',
+      cta: 'Visit',
+      destination: '/professionals?cat=maintenance',
+      imageRef: 'assets/businesses/b3/04_Reading_and_work_nook.jpg',
+      audiences: {AdAudience.customer, AdAudience.interior},
+    ),
+    status: AdStatus.paused,
+    id: 's7',
+  );
+  repo.debugAdd(
+    const AdDraft(
+      sponsor: 'Seeb Land Fund (sample)',
+      headline: 'Plots near the new road',
+      body: 'Sample campaign waiting for review',
+      cta: 'See plots',
+      destination: '/properties?cat=agriculture',
+      imageRef: 'assets/location/12_Nizwa_Fort_and_mountains_landscape.jpg',
+      audiences: {AdAudience.customer, AdAudience.agent},
+    ),
+    status: AdStatus.pendingVerification,
+    id: 's8',
+  );
+}
+
 final adRepositoryProvider = Provider<AdRepository>((ref) {
   if (!kUseDemoBackend) return const UnavailableAdRepository();
   final repo = DemoAdRepository();
-  // QA bundles only (`REVIEW_TOOLS`): two clearly named sample banners so the pinned placement can
-  // be looked at. The public demo starts with none; real ads come from the admin console.
-  if (kShowReviewTools) {
-    for (final (name, line) in [
-      ('QA sample sponsor A', 'Sample banner one'),
-      ('QA sample sponsor B', 'Sample banner two'),
-    ]) {
-      repo.debugAdd(
-        AdDraft(
-          sponsor: name,
-          headline: line,
-          body: 'Review-build sample. Not a real advertiser.',
-          cta: 'Learn more',
-          destination: '/app/explore',
-          imageRef: 'assets/location/11_Muscat_skyline_and_mountains.jpg',
-        ),
-      );
-    }
-  }
+  seedSampleCampaigns(repo);
   return repo;
 });
 final servedAdsProvider = FutureProvider.autoDispose
-    .family<List<SponsoredAd>, AdPlacement>(
-      (ref, placement) => ref.watch(adRepositoryProvider).served(placement),
+    .family<List<SponsoredAd>, (AdPlacement, AdAudience)>(
+      (ref, key) =>
+          ref.watch(adRepositoryProvider).served(key.$1, audience: key.$2),
     );

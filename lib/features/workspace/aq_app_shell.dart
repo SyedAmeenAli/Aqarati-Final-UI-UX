@@ -1,3 +1,4 @@
+import '../viewing/widgets/viewing_scaffold.dart' show AQShellInset;
 import '../entry/models/signup_purpose.dart' show SignupPurpose;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,20 @@ import '../role_home/role_home_screen.dart';
 
 const _tabs = ['/app/home', '/app/explore', '/app/activity', '/app/account'];
 
+/// Which tab a location belongs to, so the selected item is always right: the four tab pages
+/// themselves, Account-side pages, and the browsing pages a Home action opens (Buy, Rent, Sell,
+/// Favorites, services) which stay under Home.
+int customerTabFor(String path) {
+  for (var i = 0; i < _tabs.length; i++) {
+    if (path.startsWith(_tabs[i])) return i;
+  }
+  const account = ['/notifications', '/engagements', '/reviews', '/account'];
+  if (account.any(path.startsWith)) return 3;
+  if (path.startsWith('/viewings')) return 2;
+  if (path.startsWith('/search') || path.startsWith('/map')) return 1;
+  return 0;
+}
+
 /// Authenticated shell: quiet backdrop, the page, and the floating glass nav.
 /// Only this shell hosts [AQGlassNav].
 class AQAppShell extends StatefulWidget {
@@ -46,7 +61,7 @@ class _AQAppShellState extends State<AQAppShell> {
     final f = FlowStrings.of(context);
     final c = AQColors.of(context);
     final location = GoRouterState.of(context).uri.path;
-    final index = _tabs.indexWhere(location.startsWith).clamp(0, _tabs.length - 1);
+    final index = customerTabFor(location);
     final items = [
       AQNavItem('home', f.t('nav.home')),
       AQNavItem('explore', f.t('nav.explore')),
@@ -57,7 +72,11 @@ class _AQAppShellState extends State<AQAppShell> {
       backgroundColor: c.background,
       body: Stack(fit: StackFit.expand, children: [
         const AQBackdrop(asset: 'assets/entry/oman_terrace_2k.jpg', quiet: true),
-        NotificationListener<ScrollNotification>(onNotification: _nav.onScroll, child: widget.child),
+        // Pages inside the shell leave room for the navigation and keep sticky bars above it.
+        AQShellInset(
+          height: 84 + MediaQuery.paddingOf(context).bottom,
+          child: NotificationListener<ScrollNotification>(onNotification: _nav.onScroll, child: widget.child),
+        ),
         Positioned(
           left: 0,
           right: 0,
@@ -170,94 +189,125 @@ class AccountTab extends ConsumerWidget {
     final me = ref.watch(meProvider);
     final current = ref.watch(localeProvider).languageCode;
     final m = me.valueOrNull;
-    final c = AQColors.of(context);
+    final unread = m == null ? 0 : ref.watch(unreadNotificationsProvider);
+    final theme = ref.watch(themeModeProvider);
+    final canProfile = m != null && (m.purpose == SignupPurpose.userToShop || m.purpose == SignupPurpose.realEstateAgent);
     return _TabPage(title: f.t('account.title'), children: [
       const AQDemoNotice(),
       if (kUseDemoBackend) const SizedBox(height: AQSpacing.x4),
       if (me.isLoading && m == null) const AQSkeleton(),
       if (m == null && me.hasError) _guestCard(context),
       if (m != null) ..._sessionSections(context, m),
+      if (m != null) _ProfileHeader(role: m.purpose == null ? null : roleTitle(context, m.purpose!), phoneLast4: m.phoneLast4),
       if (m != null)
-        AQReviewSection(title: f.t('account.title'), children: [
-          if (m.purpose != null) AQKeyValue(f.t('account.role'), roleTitle(context, m.purpose!)),
-          if (m.phoneLast4 != null) AQKeyValue(f.t('account.phone'), '•••• ${m.phoneLast4}'),
+        _SettingsGroup(title: f.t('acct.group.account'), rows: [
+          if (canProfile) _SettingsRow(icon: 'user', title: f.t('pf.row'), onTap: () => context.push('/app/account/profile')),
+          _SettingsRow(icon: 'activity', title: f.t('ntf.row'), value: unread > 0 ? '$unread' : null, onTap: () => context.push('/notifications')),
+          _SettingsRow(icon: 'star', title: f.t('account.saved'), onTap: () => context.push('/saved')),
         ]),
-      if (m != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: AQSpacing.x3),
-          child: Builder(builder: (context) {
-            final unread = ref.watch(unreadNotificationsProvider);
-            return AQSecondaryButton(
-              label: unread > 0 ? '${f.t('ntf.row')} ($unread)' : f.t('ntf.row'),
-              semanticsLabel: unread > 0 ? '${f.t('ntf.row')}. ${f.t('ntf.unread', {'n': '$unread'})}' : f.t('ntf.row'),
-              leadingIcon: 'activity',
-              trailingChevron: false,
-              onPressed: () => context.push('/notifications'),
-            );
-          }),
-        ),
-      if (m != null && (m.purpose == SignupPurpose.userToShop || m.purpose == SignupPurpose.realEstateAgent))
-        Padding(
-          padding: const EdgeInsets.only(bottom: AQSpacing.x3),
-          child: AQSecondaryButton(label: f.t('pf.row'), leadingIcon: 'user', trailingChevron: false, onPressed: () => context.push('/app/account/profile')),
-        ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: AQSpacing.x3),
-        child: AQSecondaryButton(label: f.t('account.saved'), leadingIcon: 'star', trailingChevron: false, onPressed: () => context.push('/saved')),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: AQSpacing.x3),
-        child: AQSecondaryButton(label: f.t('account.tools'), leadingIcon: 'calendar', trailingChevron: false, onPressed: () => context.push('/calculators')),
-      ),
-      AQReviewSection(title: f.t('account.language'), children: [
-        _LangRow(title: 'English', selected: current == 'en', onTap: () => ref.read(localeProvider.notifier).state = const Locale('en')),
-        _LangRow(title: 'العربية', selected: current == 'ar', onTap: () => ref.read(localeProvider.notifier).state = const Locale('ar')),
-      ]),
-      AQReviewSection(title: f.t('account.appearance'), children: [
-        _LangRow(title: f.t('account.light'), selected: ref.watch(themeModeProvider) == ThemeMode.light, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light),
-        _LangRow(title: f.t('account.dark'), selected: ref.watch(themeModeProvider) == ThemeMode.dark, onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark),
+      _SettingsGroup(title: f.t('acct.group.prefs'), rows: [
+        _SettingsRow(icon: 'globe', title: f.t('account.language'), value: current == 'ar' ? 'العربية' : 'English', onTap: () => ref.read(localeProvider.notifier).state = Locale(current == 'ar' ? 'en' : 'ar')),
+        _SettingsRow(icon: theme == ThemeMode.dark ? 'moon' : 'sun', title: f.t('account.appearance'), value: theme == ThemeMode.dark ? f.t('account.dark') : f.t('account.light'), onTap: () => ref.read(themeModeProvider.notifier).state = theme == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark),
       ]),
       if (m != null)
-        AQSecondaryButton(
-          label: f.t('account.signOut'),
-          trailingChevron: false,
-          onPressed: () async {
-            await ref.read(authRepositoryProvider).signOut();
-            ref.invalidate(meProvider);
-            ref.invalidate(verificationProvider);
-            if (context.mounted) context.go('/entry');
-          },
-        ),
-      if (m != null) ...[
-        const SizedBox(height: AQSpacing.x3),
-        Center(child: AQTextButton(label: f.t('del.row'), color: c.danger, onPressed: () => context.push('/account/delete'))),
-      ],
+        _SettingsGroup(title: f.t('acct.group.session'), rows: [
+          _SettingsRow(
+            icon: 'lock',
+            title: f.t('account.signOut'),
+            onTap: () async {
+              await ref.read(authRepositoryProvider).signOut();
+              ref.invalidate(meProvider);
+              ref.invalidate(verificationProvider);
+              if (context.mounted) context.go('/entry');
+            },
+          ),
+          _SettingsRow(icon: 'alert', title: f.t('del.row'), danger: true, onTap: () => context.push('/account/delete')),
+        ]),
     ]);
   }
 }
 
-class _LangRow extends StatelessWidget {
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
-  const _LangRow({required this.title, required this.selected, required this.onTap});
-
+/// Who is signed in: a plain header, not another card to tap.
+class _ProfileHeader extends StatelessWidget {
+  final String? role, phoneLast4;
+  const _ProfileHeader({this.role, this.phoneLast4});
   @override
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
+    final f = FlowStrings.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AQSpacing.x5),
+      child: Row(children: [
+        Container(width: 56, height: 56, decoration: BoxDecoration(color: c.surfaceSelected, shape: BoxShape.circle), child: Center(child: AQIcon('user', size: 26, color: c.accent))),
+        const SizedBox(width: AQSpacing.x4),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(role ?? f.t('account.title'), style: AQTypography.of(context, AQText.titleMedium)),
+            if (phoneLast4 != null) Text('${f.t('account.phone')} •••• $phoneLast4', style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+/// A titled group of settings rows on one surface, separated by hairlines.
+class _SettingsGroup extends StatelessWidget {
+  final String title;
+  final List<Widget> rows;
+  const _SettingsGroup({required this.title, required this.rows});
+  @override
+  Widget build(BuildContext context) {
+    final c = AQColors.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AQSpacing.x5),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x2, left: AQSpacing.x1), child: Semantics(header: true, child: Text(title, style: AQTypography.of(context, AQText.labelMedium, soft: true)))),
+        Container(
+          decoration: BoxDecoration(color: c.surfaceRaised, borderRadius: BorderRadius.circular(AQRadius.medium), border: Border.all(color: c.hairline)),
+          child: Column(children: [
+            for (var i = 0; i < rows.length; i++) ...[
+              if (i > 0) Divider(height: 1, thickness: 1, color: c.hairline, indent: AQSpacing.x4, endIndent: AQSpacing.x4),
+              rows[i],
+            ],
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+class _SettingsRow extends StatelessWidget {
+  final String icon, title;
+  final String? value;
+  final bool danger;
+  final VoidCallback onTap;
+  const _SettingsRow({required this.icon, required this.title, required this.onTap, this.value, this.danger = false});
+  @override
+  Widget build(BuildContext context) {
+    final c = AQColors.of(context);
+    final fg = danger ? c.danger : c.ink;
     return Semantics(
       button: true,
-      selected: selected,
-      label: title,
+      focusable: true,
+      onFocus: () {},
+      label: value == null ? title : '$title, $value',
       excludeSemantics: true,
+      onTap: onTap,
       child: AQPressable(
         onTap: onTap,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: AQControl.tap),
-          child: Row(children: [
-            Expanded(child: Text(title, style: AQTypography.of(context, AQText.bodyMedium))),
-            if (selected) AQIcon('check', size: AQIconSize.medium, color: c.accent),
-          ]),
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4, vertical: AQSpacing.x2),
+            child: Row(children: [
+              AQIcon(icon, size: 20, color: danger ? c.danger : c.accent),
+              const SizedBox(width: AQSpacing.x3),
+              Expanded(child: Text(title, style: AQTypography.of(context, AQText.bodyMedium, color: fg))),
+              if (value != null) Padding(padding: const EdgeInsetsDirectional.only(end: AQSpacing.x2), child: Text(value!, style: AQTypography.of(context, AQText.bodySmall, soft: true))),
+              AQIcon('chevron-right', size: 16, color: c.inkSoft, directional: true),
+            ]),
+          ),
         ),
       ),
     );

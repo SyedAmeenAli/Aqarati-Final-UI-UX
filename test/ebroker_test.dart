@@ -231,79 +231,137 @@ void main() {
       expect(find.text('Start a submission'), findsNothing);
     });
 
-    testWidgets('an empty form lists what is missing and sends nothing', (
-      t,
-    ) async {
+    Future<void> next(WidgetTester t) async {
+      await t.tap(find.text('Continue'));
+      await settle(t);
+    }
+
+    Future<void> pick(WidgetTester t, String field, String option) async {
+      await t.tap(find.text(field).first);
+      await settle(t);
+      await t.tap(find.text(option).last);
+      await settle(t);
+    }
+
+    /// Walks the wizard to the review step. The picker serves a photo, then the ID, then the deed.
+    Future<void> fillToReview(WidgetTester t) async {
+      await pick(t, 'Market', 'Residential');
+      await pick(t, 'Property type', 'Villa');
+      await next(t);
+      await t.enterText(find.widgetWithText(TextField, 'Title'), 'Sea villa');
+      await t.enterText(find.widgetWithText(TextField, 'Size (m²)'), '420');
+      await next(t);
+      await pick(t, 'Governorate', 'Muscat');
+      await pick(t, 'Wilayat', 'Bawshar');
+      await next(t);
+      await t.enterText(find.widgetWithText(TextField, 'Asking price (OMR)'), '250000');
+      await t.tap(find.text('Add photo'));
+      await settle(t);
+      await next(t);
+      await t.tap(find.text('Choose a file').first);
+      await settle(t);
+      await t.tap(find.text('Choose a file').first);
+      await settle(t);
+      await t.enterText(find.widgetWithText(TextField, 'Title deed number'), 'DEED778899');
+      await t.ensureVisible(find.byType(AQCheckRow));
+      await t.tap(find.byType(AQCheckRow));
+      await settle(t);
+      await next(t);
+    }
+
+    testWidgets('it is a six step wizard that starts with the property type', (t) async {
+      await big(t);
+      await t.pumpWidget(app(repo(), start: '/sell/new'));
+      await settle(t);
+      expect(find.text('What are you selling?'), findsOneWidget);
+      expect(find.text('Step 1 of 6'), findsOneWidget);
+      expect(find.text('Send for review'), findsNothing);
+      expect(find.text('Title deed number'), findsNothing, reason: 'later steps are not shown yet');
+    });
+
+    testWidgets('each step blocks Continue until it is complete and says why', (t) async {
       await big(t);
       final r = repo();
       await t.pumpWidget(app(r, start: '/sell/new'));
       await settle(t);
-      await t.tap(find.text('Send for review'));
-      await settle(t);
+      await next(t);
       expect(find.text('Choose a market.'), findsOneWidget);
-      expect(find.text('Add the owner photo ID.'), findsOneWidget);
-      expect(find.text('Accept the fee notice to continue.'), findsOneWidget);
+      expect(find.text('What are you selling?'), findsOneWidget, reason: 'still on step 1');
+      await pick(t, 'Market', 'Residential');
+      await pick(t, 'Property type', 'Villa');
+      await next(t);
+      expect(find.text('About the property'), findsOneWidget);
+      await next(t);
+      expect(find.text('Enter a title.'), findsOneWidget);
+      expect(find.text('Enter the size as a number above zero.'), findsOneWidget);
       expect(await r.mine(), isEmpty);
     });
 
-    testWidgets('a full submission lands in review and says it is not live', (
-      t,
-    ) async {
+    testWidgets('Back keeps what was entered', (t) async {
+      await big(t);
+      await t.pumpWidget(app(repo(), start: '/sell/new'));
+      await settle(t);
+      await pick(t, 'Market', 'Residential');
+      await pick(t, 'Property type', 'Villa');
+      await next(t);
+      await t.enterText(find.widgetWithText(TextField, 'Title'), 'Sea villa');
+      await t.tap(find.text('Back').last);
+      await settle(t);
+      expect(find.text('What are you selling?'), findsOneWidget);
+      expect(find.text('Villa'), findsWidgets, reason: 'the type is still chosen');
+      await next(t);
+      expect(find.text('Sea villa'), findsOneWidget, reason: 'the title is still typed');
+    });
+
+    testWidgets('a full submission lands in review and says nothing was sent to a real service', (t) async {
       await big(t);
       final r = repo();
-      await t.pumpWidget(
-        app(
-          r,
-          start: '/sell/new',
-          picker: _Picker([jpg('id.jpg'), jpg('deed.jpg'), jpg('p1.jpg')]),
-        ),
-      );
+      await t.pumpWidget(app(r, start: '/sell/new', picker: _Picker([jpg('p1.jpg'), jpg('id.jpg'), jpg('deed.jpg')])));
       await settle(t);
-      await t.tap(find.text('Choose a file').first);
-      await settle(t);
-      await t.tap(find.text('Choose a file').first);
-      await settle(t);
-      await t.tap(find.text('Add photo'));
-      await settle(t);
-      await t.tap(find.text('Market').first);
-      await settle(t);
-      await t.tap(find.text('Residential').last);
-      await settle(t);
-      await t.tap(find.text('Property type').first);
-      await settle(t);
-      await t.tap(find.text('Villa').last);
-      await settle(t);
-      await t.enterText(find.widgetWithText(TextField, 'Title'), 'Sea villa');
-      await t.tap(find.text('Governorate').first);
-      await settle(t);
-      await t.tap(find.text('Muscat').last);
-      await settle(t);
-      await t.tap(find.text('Wilayat').first);
-      await settle(t);
-      await t.tap(find.text('Bawshar').last);
-      await settle(t);
-      await t.enterText(find.widgetWithText(TextField, 'Size (m²)'), '420');
-      await t.enterText(
-        find.widgetWithText(TextField, 'Asking price (OMR)'),
-        '250000',
-      );
-      await t.enterText(
-        find.widgetWithText(TextField, 'Title deed number'),
-        'DEED778899',
-      );
-      await t.ensureVisible(find.byType(AQCheckRow));
-      await settle(t);
-      await t.tap(find.byType(AQCheckRow));
-      await settle(t);
-      await t.ensureVisible(find.text('Send for review'));
+      await fillToReview(t);
+      expect(find.text('Review and send'), findsOneWidget);
+      expect(find.text('Step 6 of 6'), findsOneWidget);
+      expect(find.textContaining('Sea villa'), findsOneWidget);
+      expect(find.textContaining('DEED778899'), findsOneWidget);
+      expect(find.textContaining('Aqary Real Estate fees will apply up to 2%'), findsOneWidget);
       await t.tap(find.text('Send for review'));
       await settle(t);
       final list = await r.mine();
       expect(list, hasLength(1));
       expect(list.single.status, EBrokerStatus.pendingVerification);
       expect(find.text('In review'), findsWidgets);
-      expect(find.textContaining('not visible to buyers'), findsOneWidget);
+      expect(find.textContaining('Prototype submission saved'), findsOneWidget);
+      expect(find.textContaining('No listing has been sent to a real service'), findsOneWidget);
       expect(find.text('Approved'), findsNothing);
+    });
+
+    testWidgets('review can jump back to a section to edit it', (t) async {
+      await big(t);
+      await t.pumpWidget(app(repo(), start: '/sell/new', picker: _Picker([jpg('p1.jpg'), jpg('id.jpg'), jpg('deed.jpg')])));
+      await settle(t);
+      await fillToReview(t);
+      await t.tap(find.text('Edit').at(1));
+      await settle(t);
+      expect(find.text('About the property'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Sea villa'), findsOneWidget);
+    });
+
+    testWidgets('a failed send keeps every answer and offers the same send again', (t) async {
+      await big(t);
+      final r = repo();
+      await t.pumpWidget(app(r, start: '/sell/new', picker: _Picker([jpg('p1.jpg'), jpg('id.jpg'), jpg('deed.jpg')])));
+      await settle(t);
+      await fillToReview(t);
+      r.debugNextError = const ApiException(ApiErrorCode.network);
+      await t.tap(find.text('Send for review'));
+      await settle(t);
+      expect(find.textContaining('Nothing was submitted'), findsOneWidget);
+      expect(find.text('Review and send'), findsOneWidget);
+      expect(find.textContaining('Sea villa'), findsOneWidget);
+      expect(await r.mine(), isEmpty);
+      await t.tap(find.text('Send for review'));
+      await settle(t);
+      expect((await r.mine()).single.input.title, 'Sea villa');
     });
 
     testWidgets('a failed load says so and Try again recovers', (t) async {
@@ -334,6 +392,9 @@ void main() {
         await settle(t);
         expect(find.text('Deed is blurry'), findsOneWidget);
         await t.tap(find.text('Update and resubmit'));
+        await settle(t);
+        expect(find.text('What are you selling?'), findsOneWidget);
+        await t.tap(find.text('Continue'));
         await settle(t);
         expect(find.widgetWithText(TextField, 'Title'), findsOneWidget);
         expect(find.text('Plot in Seeb'), findsWidgets);

@@ -1,0 +1,62 @@
+[
+ {
+  "name": "Explore: discovery sections (categories, development, e-Broker, maintenance, loan)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountEXPLORE OMANProperties, People and ServicesFind extraordinary places, trusted professionals and essential services, all in one place.Search properties or services…PROPERTIESFind your next placeVillas, apartments, commercial spaces, land and more across Oman.Explore "
+ },
+ {
+  "name": "Search \"villa\": results with count, Filters and Sort",
+  "pass": true,
+  "note": "BackSearch resultsShowing results for “villa”Clear searchAllBuyRentSave this search2 propertiesFiltersSortSave property4-Bedroom Villa in Al Mouj, Al Mouj, Muscat, Oman, For sale, 4 beds · 5 baths · 312 m², OMR 185,000Save propertyModern Family Villa in Salalah, Salalah, Oman, For sale, 5 beds · 6 b"
+ },
+ {
+  "name": "Sort sheet offers choices",
+  "pass": true,
+  "note": "Recommended | Price: low to high | Price: high to low | Largest area | Home | Explore | Activity | Account | Skip"
+ },
+ {
+  "name": "Sorting high to low reorders results",
+  "pass": true,
+  "note": "185000,115000,185000,115000,185000,115000,185000,115000,185000,115000,185000,115000,185000,115000"
+ },
+ {
+  "name": "Search with no match: clear empty state",
+  "pass": true,
+  "note": "BackSearch resultsShowing results for “zzzzqq”Clear searchAllBuyRentSave this search0 propertiesFiltersSortNo properties match these filters. Try another category or location.HomeExploreActivityAccountSkip BackSearch resultsShowing results "
+ },
+ {
+  "name": "Category browsing: Residential results",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunities in every corner of Oman.Search properties in Oman…AllResidentialCommercialAgricultureIndustrialAllBuyRent5 propertiesFilters, 1SortSave property4-Bedroom Vill"
+ },
+ {
+  "name": "Professional discovery: architecture directory",
+  "pass": true,
+  "note": "BackAccountDEVELOPMENT & BUILDINGArchitecture StudiosStudios designing inspiring buildings.AllDevelopersConstructionArchitectureDesignAll of OmanRelevance1 verifiedList viewMap viewWadi Architecture, Architecture Studio, Muscat, Oman, Verif"
+ },
+ {
+  "name": "Maintenance directory opens with its own title",
+  "pass": true,
+  "note": "BackMaintenancePlumbing, pool, AC and kitchen providers. Open one to request a visit.AllReal estate agentConstructionProperty developmentArchitectureInterior designExterior designMaintenance1 professi"
+ },
+ {
+  "name": "Explore @320: no overflow",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountEXPLORE OMANProperties, People and ServicesFind extraordinary plac"
+ },
+ {
+  "name": "Search results @320: no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Explore @1280: no overflow",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountEXPLORE OMANProperties, People and ServicesFind extraordinary plac"
+ },
+ {
+  "name": "Search results @1280: no overflow",
+  "pass": true,
+  "note": ""
+ }
+]

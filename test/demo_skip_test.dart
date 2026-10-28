@@ -29,6 +29,20 @@ void main() {
             return const Scaffold(body: Text('home'));
           },
         ),
+        GoRoute(
+          path: '/agent',
+          builder: (_, _) {
+            visited.add('/agent');
+            return const Scaffold(body: Text('agent'));
+          },
+        ),
+        GoRoute(
+          path: '/pro',
+          builder: (_, _) {
+            visited.add('/pro');
+            return const Scaffold(body: Text('business'));
+          },
+        ),
       ],
     );
     return ProviderScope(
@@ -73,7 +87,16 @@ void main() {
           await t.pump(const Duration(milliseconds: 1200));
           await t.tap(find.text('Skip').at(i));
           await t.pump(const Duration(milliseconds: 600));
-          expect(visited, contains('/app/home'));
+          // Each kind of account opens its own workspace: shopper Home, the agent workspace, or the
+          // business workspace for the four professional roles.
+          expect(
+            visited,
+            contains(switch (option.id) {
+              SignupPurpose.userToShop => '/app/home',
+              SignupPurpose.realEstateAgent => '/agent',
+              _ => '/pro',
+            }),
+          );
           expect(state.signedIn, isTrue);
           expect(state.purpose, option.id);
           expect(state.account, AccountState.active);

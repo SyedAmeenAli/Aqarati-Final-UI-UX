@@ -32,10 +32,13 @@ class AQViewingDateChip extends StatelessWidget {
 
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       enabled: enabled,
       selected: selected,
       label: v.t('vw.a11y.date', {'date': VFmt.fullDate(context, day.date), 'state': selected ? '$state, ${v.t('vw.a11y.selected')}' : state}),
       excludeSemantics: true,
+      onTap: enabled ? () => onTap?.call() : null,
       child: AQPressable(
         onTap: enabled
             ? () {
@@ -177,10 +180,13 @@ class AQViewingTimeSlot extends StatelessWidget {
     final time = VFmt.time(context, info.slot.start);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       enabled: enabled,
       selected: selected,
       label: v.t('vw.a11y.slot', {'time': time, 'state': selected ? '$stateText, ${v.t('vw.a11y.selected')}' : stateText}),
       excludeSemantics: true,
+      onTap: enabled ? () => onTap?.call() : null,
       child: AQPressable(
         onTap: enabled
             ? () {

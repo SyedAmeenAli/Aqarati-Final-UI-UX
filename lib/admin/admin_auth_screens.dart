@@ -6,7 +6,7 @@ import '../core/aq/aq_forms.dart';
 import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
-import '../core/config/backend_mode.dart';
+import '../core/config/demo_mode.dart';
 import '../data/api/account_api.dart' show ApiException;
 import '../features/entry/widgets/entry_common.dart' show MasterLogo;
 import 'admin_auth.dart';
@@ -115,6 +115,26 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
     super.dispose();
   }
 
+  /// Preview builds only: the same simulated sign-in and code, with the demo super admin.
+  Future<void> _demoEnter() async {
+    if (!kDemoMode || _busy) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final auth = ref.read(adminAuthProvider.notifier);
+      await auth.signIn('super@demo.test', DemoAdminStore.demoPassword);
+      await auth.verifyTotp(DemoAdminStore.demoCode);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'We could not open the demo console. Try again.');
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _submit() async {
     setState(() => _tried = true);
     if (_email.text.trim().isEmpty || _password.text.isEmpty || _busy) return;
@@ -199,19 +219,66 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
           loading: _busy,
           onPressed: _busy ? null : _submit,
         ),
-        if (kUseDemoBackend) ...[
-          const SizedBox(height: AQSpacing.x5),
+        const SizedBox(height: AQSpacing.x5),
+        // A frontend prototype: sign-in and the one-time code are simulated, not security.
+        Text(
+          'Prototype only. Sign-in and the one-time code on this page are simulated; they do not protect anything.',
+          style: AQTypography.of(
+            context,
+            AQText.bodySmall,
+            color: AQColors.of(context).inkFaint,
+          ),
+        ),
+        if (kDemoMode) ...[
+          const SizedBox(height: AQSpacing.x3),
+          AQSecondaryButton(
+            label: 'Open the demo console',
+            trailingChevron: false,
+            onPressed: _busy ? null : _demoEnter,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: AQSpacing.x1),
+            child: Text(
+              'Preview shortcut: signs in as the demo super admin through the same simulated sign-in and code. It protects nothing.',
+              style: AQTypography.of(
+                context,
+                AQText.bodySmall,
+                color: AQColors.of(context).inkFaint,
+              ),
+            ),
+          ),
+          const SizedBox(height: AQSpacing.x3),
           const AQDemoNotice(),
           const SizedBox(height: AQSpacing.x2),
           Text(
-            'Demo accounts: reviewer@demo.test, senior@demo.test, super@demo.test, auditor@demo.test. Password ${DemoAdminStore.demoPassword}. One-time code ${DemoAdminStore.demoCode}.',
+            'Demo accounts: reviewer@demo.test, senior@demo.test, super@demo.test, auditor@demo.test. Password ${DemoAdminStore.demoPassword}. The demo one-time code is ${DemoAdminStore.demoCode}.',
             style: AQTypography.of(
               context,
               AQText.bodySmall,
               color: AQColors.of(context).inkFaint,
             ),
           ),
-        ],
+        ] else
+          Padding(
+            padding: const EdgeInsets.only(top: AQSpacing.x2),
+            child: Text(
+              'Demo accounts are shown only in a build made for previews.',
+              style: AQTypography.of(
+                context,
+                AQText.bodySmall,
+                color: AQColors.of(context).inkFaint,
+              ),
+            ),
+          ),
+        if (ref.watch(adminExitProvider) != null)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: AQTextButton(
+              label: 'Back to AQARATI',
+              color: AQColors.of(context).accent,
+              onPressed: ref.read(adminExitProvider),
+            ),
+          ),
       ],
     );
   }
@@ -283,7 +350,7 @@ class _AdminTotpScreenState extends ConsumerState<AdminTotpScreen> {
               ? null
               : () => ref.read(adminAuthProvider.notifier).backToLogin(),
         ),
-        if (kUseDemoBackend) ...[
+        if (kDemoMode) ...[
           const SizedBox(height: AQSpacing.x5),
           const AQDemoNotice(),
         ],

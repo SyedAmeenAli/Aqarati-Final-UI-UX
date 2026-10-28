@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:aqarati_app/core/localization/flow_strings.dart';
+import 'package:aqarati_app/features/pro/pro_shell.dart';
 
 MeSession me(SignupPurpose? p, GrantState? g, {ReviewStage? stage, AccountState account = AccountState.active}) => MeSession(account: account, purpose: p, grant: g, stage: stage);
 
@@ -24,10 +25,13 @@ DemoBackendState state(SignupPurpose p, {InteriorExteriorServiceType? service, S
   ..businessName = name
   ..serviceType = service;
 
-Widget app(MeSession? session, {DemoDevBuildRepository? repo, DemoBackendState? s, bool dark = false, bool rtl = false, bool reduceMotion = false, double scale = 1, List<String>? visited}) {
+bool _isApprovedBusiness(MeSession? s) => s != null && s.grant == GrantState.approved && s.account == AccountState.active && const {SignupPurpose.propertyDevelopmentCompany, SignupPurpose.constructionCompany, SignupPurpose.buildingArchitecture, SignupPurpose.interiorExteriorDesign}.contains(s.purpose);
+
+Widget app(MeSession? session, {DemoDevBuildRepository? repo, DemoBackendState? s, bool dark = false, bool rtl = false, bool reduceMotion = false, double scale = 1, List<String>? visited, List<Override> extra = const []}) {
   final router = GoRouter(
     initialLocation: '/app/home',
-    routes: [GoRoute(path: '/app/home', builder: (c, st) => const Scaffold(body: RoleHomeScreen()))],
+    // An approved business account opens in the business workspace; that page is what these tests read.
+    routes: [GoRoute(path: '/app/home', builder: (c, st) => Scaffold(body: _isApprovedBusiness(session) ? const ProHomeScreen() : const RoleHomeScreen()))],
     errorBuilder: (c, st) {
       visited?.add(st.uri.toString());
       return Scaffold(body: Text('ROUTE ${st.uri}'));
@@ -36,6 +40,7 @@ Widget app(MeSession? session, {DemoDevBuildRepository? repo, DemoBackendState? 
   final st = s ?? (session?.purpose == null ? null : state(session!.purpose!));
   return ProviderScope(
     overrides: [
+      ...extra,
       devBuildRepositoryProvider.overrideWithValue(repo ?? DemoDevBuildRepository(() => st, lag: Duration.zero)),
       meProvider.overrideWith((ref) async {
         if (session == null) throw const ApiException(ApiErrorCode.network);
@@ -248,50 +253,41 @@ void main() {
       expect(find.textContaining('Marina Heights'), findsOneWidget);
     });
 
-    testWidgets('the five professional homes use different headlines and hierarchies', (t) async {
+    testWidgets('the four business homes use different headlines and hierarchies', (t) async {
       final titles = <String>{};
       for (final e in {
         SignupPurpose.constructionCompany: 'Build trust before the first call.',
         SignupPurpose.propertyDevelopmentCompany: 'Shape places for the long term.',
         SignupPurpose.buildingArchitecture: 'Architecture with intention.',
         SignupPurpose.interiorExteriorDesign: 'Spaces with a point of view.',
-        SignupPurpose.realEstateAgent: 'Work, in focus.',
       }.entries) {
         await pumpHome(t, app(me(e.key, GrantState.approved)));
         expect(find.text(e.value), findsOneWidget, reason: e.key.name);
         titles.add(e.value);
         await t.pumpWidget(const SizedBox());
       }
-      expect(titles.length, 5);
+      expect(titles.length, 4);
     });
   });
 
   group('agent workspace', () {
-    testWidgets('approved agent sees the agent workspace with a working Buyer / Agent switch', (t) async {
-      await pumpHome(t, app(me(SignupPurpose.realEstateAgent, GrantState.approved)));
-      expect(find.text('Work, in focus.'), findsOneWidget);
-      expect(find.text('Agent workspace'), findsWidgets);
-      expect(find.text('Buyer'), findsOneWidget);
-      expect(find.byType(AQHomeScreen), findsNothing);
-
-      await tapText(t, 'Buyer');
-      expect(find.byType(AQHomeScreen), findsOneWidget, reason: 'switching to Buyer opens the customer home');
-      expect(find.text('Work, in focus.'), findsNothing);
-      expect(find.text('Agent workspace'), findsOneWidget, reason: 'the switcher stays so the agent can return');
-
-      await tapText(t, 'Agent workspace');
-      expect(find.text('Work, in focus.'), findsOneWidget);
+    testWidgets('an approved agent is sent to the agent workspace, never the customer home', (t) async {
+      final visited = <String>[];
+      await pumpHome(t, app(me(SignupPurpose.realEstateAgent, GrantState.approved), visited: visited));
+      expect(visited, contains('/agent'));
       expect(find.byType(AQHomeScreen), findsNothing);
     });
 
-    testWidgets('agent tools open their own screens: listings, leads and viewings', (t) async {
-      for (final (label, route) in [('My listings', '/agent/listings'), ('Leads', '/agent/leads'), ('Viewings', '/app/activity')]) {
-        final visited = <String>[];
-        await pumpHome(t, app(me(SignupPurpose.realEstateAgent, GrantState.approved), visited: visited));
-        await tapText(t, label);
-        expect(visited, contains(route), reason: label);
-        await t.pumpWidget(const SizedBox());
-      }
+    testWidgets('an agent who chose the customer view sees the shopper home with a way back, and the way back goes to the agent workspace', (t) async {
+      final visited = <String>[];
+      await pumpHome(
+        t,
+        app(me(SignupPurpose.realEstateAgent, GrantState.approved), visited: visited, extra: [homeWorkspaceProvider.overrideWith((ref) => HomeWorkspace.buyer)]),
+      );
+      expect(find.byType(AQHomeScreen), findsOneWidget);
+      expect(find.text('Agent workspace'), findsOneWidget, reason: 'the switcher stays so the agent can return');
+      await tapText(t, 'Agent workspace');
+      expect(visited, contains('/agent'));
     });
 
     testWidgets('an agent who is not approved never sees agent tools or the switcher', (t) async {
@@ -344,7 +340,6 @@ void main() {
 
   group('rendering', () {
     final roles = <(String, SignupPurpose)>[
-      ('agent', SignupPurpose.realEstateAgent),
       ('construction', SignupPurpose.constructionCompany),
       ('developer', SignupPurpose.propertyDevelopmentCompany),
       ('architecture', SignupPurpose.buildingArchitecture),
@@ -393,12 +388,16 @@ void main() {
     });
 
     testWidgets('home switches smoothly without blocking taps (animations never gate the action)', (t) async {
-      await pumpHome(t, app(me(SignupPurpose.realEstateAgent, GrantState.approved)));
-      await t.tap(find.text('Buyer').first);
+      final visited = <String>[];
+      await pumpHome(
+        t,
+        app(me(SignupPurpose.realEstateAgent, GrantState.approved), visited: visited, extra: [homeWorkspaceProvider.overrideWith((ref) => HomeWorkspace.buyer)]),
+      );
+      await t.tap(find.text('Agent workspace').first);
       await t.pump(const Duration(milliseconds: 50));
       expect(t.takeException(), isNull);
       await settle(t);
-      expect(find.byType(AQHomeScreen), findsOneWidget);
+      expect(visited, contains('/agent'));
     });
   });
 

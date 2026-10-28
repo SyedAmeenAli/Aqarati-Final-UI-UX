@@ -1,0 +1,17 @@
+[
+ {
+  "name": "detail open with Confirm",
+  "pass": true,
+  "note": "BackRequestRequested The customer sees your answer in the app.RequestServiceACPreferred dayFriday, 30 October 2026Time of dayMorningReceivedWed 28 OctNotesSample request. The unit is not cooling.DEMO DATA Accounts, viewings and verification are simulated in th"
+ },
+ {
+  "name": "failed confirm: no confirmed state",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "retry while still failing: stays an error, nothing confirmed",
+  "pass": true,
+  "note": ""
+ }
+]

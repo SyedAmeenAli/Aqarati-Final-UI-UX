@@ -183,8 +183,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final fg = primary ? c.onAccent : c.ink;
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '$title. $body',
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -227,8 +233,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         Expanded(
           child: Semantics(
             button: true,
+            focusable: true,
+            onFocus: () {},
             label: '$term, ${f.t(tag)}',
             excludeSemantics: true,
+      onTap: () => _run(context, ref, term),
             child: AQPressable(
               onTap: () => _run(context, ref, term),
               pressedScale: 0.99,
@@ -259,8 +268,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: label,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -375,7 +390,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               header,
               Padding(
-                padding: const EdgeInsets.fromLTRB(AQSpacing.gutter, 0, AQSpacing.gutter, 48),
+                padding: EdgeInsets.fromLTRB(AQSpacing.gutter, 0, AQSpacing.gutter, 48 + AQShellInset.of(context)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   AQQueryField(controller: _ctl, hint: f.t('srch.hint'), autofocus: false, onChanged: (v) => setState(() => _q = v), onSubmitted: (v) => v.trim().isEmpty ? null : _run(context, ref, v)),
                   ...body,

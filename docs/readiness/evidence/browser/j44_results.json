@@ -1,0 +1,42 @@
+[
+ {
+  "name": "customer: truthful confirmation",
+  "pass": true,
+  "note": "Back⁨Linked sea villa⁩OMR 250000Prototype submission saved. No listing has been sent to a real service and nothing is live. It appears in Activity under Selling.In review Sent for review. It is not vi"
+ },
+ {
+  "name": "customer: Activity > Selling shows it In review",
+  "pass": true,
+  "note": "ViewingsMaintenanceSellingRequestsLinked sea villa, In reviewStart a submissionHomeExploreActivityAccount ViewingsMaintenanceSellingRequestsLinked sea villa, In reviewStart a submissionHomeExploreActi"
+ },
+ {
+  "name": "admin: the submission is in the moderation queue as an e-Broker record",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsListing moderationList"
+ },
+ {
+  "name": "admin: detail shows the submitted values",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsBack to moderationLinked sea villaAqary e-Broker · ID m1Waiting for reviewAqary e-BrokerPropertyReviewDecisionTitleCategor"
+ },
+ {
+  "name": "admin: decision recorded on the record",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "admin: the activity log notes the e-Broker decision",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsActivity logFictional "
+ },
+ {
+  "name": "customer: Activity > Selling now shows Approved (same record)",
+  "pass": true,
+  "note": "ViewingsMaintenanceSellingRequestsLinked sea villa, ApprovedStart a submissionHomeExploreActivityAccount ViewingsMaintenanceSellingRequestsLinked sea villa, ApprovedStart a submissionHomeExploreActivityAccount ViewingsMaintenanceSellingRequ"
+ },
+ {
+  "name": "admin: one queue row for the e-Broker record, no duplicate",
+  "pass": true,
+  "note": "rows 1"
+ }
+]

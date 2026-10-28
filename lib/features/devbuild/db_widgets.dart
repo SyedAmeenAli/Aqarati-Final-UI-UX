@@ -334,9 +334,12 @@ class DbProCard extends ConsumerWidget {
         : ', ${VFmt.dec(context, pro.rating!, digits: 1)}';
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label:
           '${pro.name}, ${dbProLabel(f, pro)}, ${pro.locationLabel}${pro.verified ? ', ${f.t('disc.verified')}' : ''}$rating',
       excludeSemantics: true,
+      onTap: onTap ?? () => context.push('/build/pro/${pro.id}'),
       child: AQPressable(
         onTap: onTap ?? () => context.push('/build/pro/${pro.id}'),
         child: ClipRRect(
@@ -607,9 +610,12 @@ Future<T?> showDbChoiceSheet<T>(
                   for (final o in options)
                     Semantics(
                       button: true,
+                      focusable: true,
+                      onFocus: () {},
                       selected: o.$1 == selected,
                       label: o.$2,
                       excludeSemantics: true,
+      onTap: () => Navigator.of(s).pop(o.$1),
                       child: AQPressable(
                         onTap: () => Navigator.of(s).pop(o.$1),
                         child: Container(
@@ -659,9 +665,15 @@ class DbPillRow extends StatelessWidget {
       for (final p in pills)
         Semantics(
           button: true,
+          focusable: true,
+          onFocus: () {},
           selected: p.$2,
           label: p.$1,
           excludeSemantics: true,
+      onTap: () {
+              AQHaptics.selection();
+              p.$3();
+            },
           child: AQPressable(
             onTap: () {
               AQHaptics.selection();
@@ -809,9 +821,12 @@ class DbSelectField<T> extends StatelessWidget {
       error: error,
       child: Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         enabled: onTap != null,
         label: '$label, ${valueLabel ?? hint}',
         excludeSemantics: true,
+      onTap: onTap,
         child: AQPressable(
           onTap: onTap,
           child: Container(

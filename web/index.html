@@ -35,6 +35,71 @@
   <!-- No Google Maps JS API script tag needed: web renders a real map via a
        keyless iframe embed (lib/core/widgets/aqarati_map_view_web.dart),
        not the JS Maps SDK. See AQARATI_GOOGLE_MAPS_IMPLEMENTATION.md. -->
+  <style>
+    /* Keyboard focus ring. Flutter's accessibility nodes sit under the canvas, so the ring is drawn on top. */
+    #aq-focus-ring {
+      position: fixed; z-index: 2147483647; pointer-events: none; display: none;
+      border: 3px solid #825c3f; border-radius: 14px; box-sizing: border-box;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+    }
+  </style>
+  <script>
+    // Flutter's accessibility nodes become focusable (Tab) but do not turn Enter or Space into a tap,
+    // and sit under the canvas. This activates the focused control like a native button and shows
+    // a visible focus ring while the keyboard is in use.
+    (function () {
+      var ring = null, raf = 0;
+      function el() {
+        if (!ring) { ring = document.createElement('div'); ring.id = 'aq-focus-ring'; document.body.appendChild(ring); }
+        return ring;
+      }
+      function place() {
+        var t = document.activeElement;
+        if (!t || t.tagName !== 'FLT-SEMANTICS' || !t.matches(':focus-visible')) { if (ring) ring.style.display = 'none'; return; }
+        var r = t.getBoundingClientRect(), g = el();
+        g.style.display = 'block';
+        g.style.left = r.left + 'px'; g.style.top = r.top + 'px';
+        g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+        raf = requestAnimationFrame(place);
+      }
+      document.addEventListener('focusin', function () { cancelAnimationFrame(raf); place(); }, true);
+      document.addEventListener('focusout', function () { cancelAnimationFrame(raf); if (ring) ring.style.display = 'none'; }, true);
+      // Flutter keeps Tab inside a focused text field among the text fields only, which traps the
+      // keyboard (buttons, links and the rest of the page are never reached), and DOM order is not the
+      // reading order. Move to the next control in reading order instead, the way a browser does.
+      window.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        var t = e.target;
+        if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA' && t.tagName !== 'FLT-SEMANTICS')) return;
+        var all = Array.prototype.slice.call(document.querySelectorAll('flt-semantics[tabindex="0"], input, textarea'))
+          .filter(function (n) { var r = n.getBoundingClientRect(); return r.width > 0 && r.height > 0; })
+          .sort(function (a, b) {
+            var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+            return (Math.round(ra.top / 6) - Math.round(rb.top / 6)) || (ra.left - rb.left);
+          });
+        var i = all.indexOf(t);
+        if (i < 0) return;
+        var next = all[i + (e.shiftKey ? -1 : 1)];
+        if (!next) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (t.tagName !== 'FLT-SEMANTICS' && window.aqReleaseTextFocus) window.aqReleaseTextFocus();
+        setTimeout(function () { next.focus(); }, 60);
+      }, true);
+      window.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var t = e.target;
+        if (!t || t.tagName !== 'FLT-SEMANTICS') return;
+        var role = t.getAttribute('role');
+        if (['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem', 'switch'].indexOf(role) < 0) return;
+        // One key press, one activation: stop Flutter's own key handling from also acting on it,
+        // and keep Space from scrolling the page.
+        e.preventDefault();
+        e.stopPropagation();
+        t.click();
+      }, true);
+    })();
+  </script>
 </head>
 <body>
   <!--

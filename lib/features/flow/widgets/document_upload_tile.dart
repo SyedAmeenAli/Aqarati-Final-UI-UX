@@ -170,9 +170,12 @@ class _TileButton extends StatelessWidget {
     final fg = primary ? c.onAccent : (off ? c.inkFaint : c.accent);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       enabled: !off,
       label: label,
       excludeSemantics: true,
+      onTap: onTap,
       child: AQPressable(
         onTap: onTap,
         child: Container(

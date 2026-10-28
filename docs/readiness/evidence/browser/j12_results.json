@@ -1,0 +1,217 @@
+[
+ {
+  "name": "help: the ? opens the explainer with buy, rent, sell and kinds of property",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "help: closing returns to the same Home, selections intact",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "help: also on the property types screen",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: opens from Account, empty and honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: empty save is refused with messages",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: digits in a name are refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: a failed save says nothing changed and keeps the typing",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: retry saves; the demo says it is kept on this device only",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: cancelling with changes asks first",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "profile: leaving discards the change",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker: intro shows the approved fee sentence and that nothing is charged in the app",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker: it says AQARATI Broker is a different programme (via the broker page)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker: an empty form lists what is missing",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "broker: introduction explains the badge and says it is not e-Broker",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "broker: directory lists the QA sample brokers with the badge",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "broker: profile shows the badge, a Call button and approved listings",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "broker: Call hands the number to the dialler and claims nothing more",
+  "pass": true,
+  "note": "[\"tel:+96890000101\"]"
+ },
+ {
+  "name": "broker: a listing leads into the existing viewing request",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "broker: no phone means no Call button, with the reason",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "broker: unknown broker shows not found",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: a non-provider sees \"Providers only\"",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: invitation \"(empty)\" shows its message",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: invitation \"WRONG\" shows its message",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: invitation \"DEMO-EXPIRED\" shows its message",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: invitation \"DEMO-USED\" shows its message",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: a valid invitation opens the business setup",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: empty setup is refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: after setup the business is under review and cannot take requests",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: once verified the empty inbox shows",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: request detail shows service, day, window, notes and Confirm / Decline",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: a failed confirm never shows confirmed (the page re-reads and offers Try again)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "provider: Try again recovers in the browser",
+  "pass": false,
+  "note": "did not recover; unit test passes (see report)"
+ },
+ {
+  "name": "engagement: the request explains the 14 and 60 day rules and that it is not a booking",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "engagement: sent, waiting for the professional",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "engagement: confirmed after the professional answers, review offered",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: no rating and no text are refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: under 10 characters is refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: a preview comes before sending",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: a failed send says nothing was submitted",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: sent for checking, not public",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: after moderation it shows Published, and editing is locked until allowed",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "review: an edit goes back to being checked",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "report: a Report review action is on each review (the demo roster had no reviews to show here)",
+  "pass": false,
+  "note": "BackReviewsNo published reviews yet."
+ }
+]

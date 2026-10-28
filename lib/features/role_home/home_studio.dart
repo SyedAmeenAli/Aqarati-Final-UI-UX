@@ -12,6 +12,8 @@ import '../devbuild/db_repository.dart';
 import '../devbuild/db_widgets.dart' show DbNotice, DbSkeleton, dbTypeImage;
 import 'role_home_model.dart';
 import 'role_home_widgets.dart';
+import '../ads/ad_models.dart' show AdAudience;
+import '../ads/sponsored_banner.dart';
 
 /// Building Architecture: a quiet editorial studio page. Whitespace, fine rules, a numbered
 /// index and the real bio set as a quotation. It is a profile home: the developer's project
@@ -33,8 +35,11 @@ class ArchitectureHome extends ConsumerWidget {
     Widget indexItem(String n, String label, VoidCallback onTap) => Expanded(
           child: Semantics(
             button: true,
+            focusable: true,
+            onFocus: () {},
             label: label,
             excludeSemantics: true,
+      onTap: onTap,
             child: AQPressable(
               onTap: onTap,
               child: Container(
@@ -96,6 +101,7 @@ class ArchitectureHome extends ConsumerWidget {
                 indexItem('04', f.t('rh.arc.idx.contact'), () => context.push('/app/account/workspace/leads')),
               ]),
       ),
+      const SponsoredBannerSlot(audience: AdAudience.architecture),
       Divider(color: c.hairline, height: AQSpacing.x6),
       RoleSection(f.t('rh.arc.practice'), action: f.t('rh.edit'), onAction: profile, accent: accent),
       org.when(
@@ -124,8 +130,11 @@ class ArchitectureHome extends ConsumerWidget {
         index: 4,
         child: Semantics(
           button: true,
+          focusable: true,
+          onFocus: () {},
           label: '${f.t('rh.arc.preview')}. ${f.t('rh.arc.preview.b')}',
           excludeSemantics: true,
+      onTap: directory,
           child: AQPressable(
             onTap: directory,
             child: Container(
@@ -242,6 +251,7 @@ class InteriorHome extends ConsumerWidget {
         padding: const EdgeInsets.only(top: AQSpacing.x2),
         child: Text(f.t('rh.int.service.hint'), style: AQTypography.of(context, AQText.bodySmall, color: c.inkFaint)),
       ),
+      const SponsoredBannerSlot(audience: AdAudience.interior),
       RoleSection(f.t('rh.int.language'), action: f.t('rh.edit'), onAction: profile, accent: accent),
       ExcludeSemantics(
         child: Row(children: [

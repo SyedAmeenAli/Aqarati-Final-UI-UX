@@ -41,8 +41,11 @@ class AgentHome extends ConsumerWidget {
         index: 2,
         child: Semantics(
           button: true,
+          focusable: true,
+          onFocus: () {},
           label: '${f.t('rh.agent.profile')}. ${f.t('rh.agent.profile.sub')}',
           excludeSemantics: true,
+      onTap: () => context.push('/verification/details'),
           child: AQPressable(
             onTap: () => context.push('/verification/details'),
             child: Container(

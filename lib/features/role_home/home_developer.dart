@@ -11,6 +11,8 @@ import '../devbuild/db_repository.dart';
 import '../devbuild/db_widgets.dart' show DbErrorCard, DbNotice, DbProjectCard, DbSkeleton, dbTypeImage;
 import 'role_home_model.dart';
 import 'role_home_widgets.dart';
+import '../ads/ad_models.dart' show AdAudience;
+import '../ads/sponsored_banner.dart';
 
 /// Property Development: project-first and cinematic. A panoramic hero carries the two project
 /// actions, then a pipeline of the developer's OWN projects filtered by the status the server
@@ -60,6 +62,7 @@ class _DeveloperHomeState extends ConsumerState<DeveloperHome> {
           ],
         ),
       ),
+      const SponsoredBannerSlot(audience: AdAudience.developer),
       RoleSection(f.t('rh.dev.pipeline'), action: f.t('pt.viewAll'), onAction: () => context.push('/app/account/workspace/projects'), accent: accent),
       projects.when(
         loading: () => const Column(children: [DbSkeleton(height: 44), SizedBox(height: AQSpacing.x3), DbSkeleton(height: 110)]),
@@ -134,9 +137,15 @@ class _FilterChip extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: selected,
       label: label,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();

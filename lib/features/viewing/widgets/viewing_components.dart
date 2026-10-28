@@ -598,8 +598,14 @@ class AQReviewEligibilityCard extends StatelessWidget {
           for (var i = 1; i <= 5; i++)
             Semantics(
               button: true,
+              focusable: true,
+              onFocus: () {},
               label: v.t('vw.rate.star', {'n': VFmt.n(context, i)}),
               excludeSemantics: true,
+      onTap: () {
+                  AQHaptics.selection();
+                  onRate(i);
+                },
               child: AQPressable(
                 onTap: () {
                   AQHaptics.selection();
@@ -689,8 +695,11 @@ class AQMyViewingRow extends StatelessWidget {
     final when = VFmt.dateTime(context, viewing.slot);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: v.t('vw.my.row', {'title': title, 'place': place, 'when': when, 'status': v.t(p.labelKey)}),
       excludeSemantics: true,
+      onTap: onTap,
       child: AQPressable(
         onTap: onTap,
         child: AQSurface(

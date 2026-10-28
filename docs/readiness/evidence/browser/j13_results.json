@@ -1,0 +1,22 @@
+[
+ {
+  "name": "lead: a failed Confirm shows an error and the request stays requested",
+  "pass": true,
+  "note": "Back⁨Sample villa⁩Viewing requestWe could not update this viewing. Its status did not change.Requested The customer asked for this time. Confirm or decline it.R"
+ },
+ {
+  "name": "lead: retry confirms it",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin verification: a failed decision says nothing was changed",
+  "pass": true,
+  "note": "Admin consoleVerificationListing moderationAds & SponsorsDemo ReviewerReviewerSign outBack to the queueDemo applicant: r"
+ },
+ {
+  "name": "admin verification: the same decision then goes through",
+  "pass": true,
+  "note": ""
+ }
+]

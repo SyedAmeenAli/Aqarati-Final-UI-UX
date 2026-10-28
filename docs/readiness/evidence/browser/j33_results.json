@@ -1,0 +1,67 @@
+[
+ {
+  "name": "wizard opens on step 1 of 6",
+  "pass": true,
+  "note": "BackWhat are you selling?Choose the market and the kind of property.Step 1 of 6Market *Market, MarketProperty type *Property type, Property typeBackContinueSkip"
+ },
+ {
+  "name": "Continue blocked with a reason on step 1",
+  "pass": true,
+  "note": "BackWhat are you selling?Choose the market and the kind of property.Step 1 of 6Market *Market, MarketChoose a market.Property type *Property type, Property type"
+ },
+ {
+  "name": "step 2 About the property",
+  "pass": true,
+  "note": "BackAbout the propertyA title, a short description and the size.Step 2 of 6BackContinue"
+ },
+ {
+  "name": "step 2 validation names missing fields",
+  "pass": true,
+  "note": "BackAbout the propertyA title, a short description and the size.Step 2 of 6Enter a title.Enter the size as a number above zero.BackContinue"
+ },
+ {
+  "name": "step 3 Location",
+  "pass": true,
+  "note": "BackWhere is it?The governorate and the wilayat.Step 3 of 6Governorate *Governorate, GovernorateWilayat *Wilayat, WilayatBackContinue"
+ },
+ {
+  "name": "Back keeps what was typed",
+  "pass": true,
+  "note": "Sea view villa||"
+ },
+ {
+  "name": "step 4 Price and photos",
+  "pass": true,
+  "note": "BackPrice and photosWhat you are asking, and at least one photo.Step 4 of 6PhotosNo photos added yet.Add photoBackContinue"
+ },
+ {
+  "name": "step 5 Owner and declarations",
+  "pass": true,
+  "note": "BackOwner and documentsYour photo ID, the title deed and the fee notice.Step 5 of 6Owner photo ID *PDF, JPG or PNG.Choose a fileTitle deed document *PDF, JPG or"
+ },
+ {
+  "name": "step 6 Review lists every answer with Edit",
+  "pass": true,
+  "note": "BackReview and sendCheck everything. Use Edit to change a section.Step 6 of 6What are you selling?EditMarket⁨Residential⁩Property type⁨Villa⁩About the propertyEditTitle⁨Sea view villa⁩Description-Size (m²)⁨420⁩Where is it?EditGovernorate⁨Muscat⁩Wilayat⁨Bawshar"
+ },
+ {
+  "name": "no horizontal overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Edit jumps back to that section",
+  "pass": true,
+  "note": "Sea view villa||"
+ },
+ {
+  "name": "truthful confirmation after submit",
+  "pass": true,
+  "note": "Back⁨Sea view villa⁩OMR 250000Prototype submission saved. No listing has been sent to a real service and nothing is live. It appears in Activity under Selling.In review Sent for review. It is not visible to buyers.PropertyProperty typeVillaGovernorate⁨Bawshar, Muscat⁩Size (m²)420 m²Title deed number"
+ },
+ {
+  "name": "submission appears in Activity (Selling)",
+  "pass": true,
+  "note": "ViewingsMaintenanceSellingRequestsSea view villa, In reviewStart a submissionHomeExploreActivityAccount"
+ }
+]

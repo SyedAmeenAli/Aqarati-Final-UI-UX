@@ -171,9 +171,12 @@ class LeadCard extends StatelessWidget {
     });
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label:
           '${f.t('ld.kind.${l.kind.name}')}, ${_title(f, l)}, $name, $received',
       excludeSemantics: true,
+      onTap: onOpen,
       child: AQPressable(
         onTap: onOpen,
         child: Container(

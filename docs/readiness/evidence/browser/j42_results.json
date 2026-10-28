@@ -1,0 +1,297 @@
+[
+ {
+  "name": "signed in as super admin",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: sample campaigns listed with audiences",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsDemo Super AdminSuper "
+ },
+ {
+  "name": "Ads: audience column shows the Home each banner is for",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Ads: search narrows to one campaign",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: audience filter keeps agent campaigns only",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: status filter shows the paused sample",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: opening a campaign shows details and the live-banner preview",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsBack to bannersEdit ba"
+ },
+ {
+  "name": "Ads: preview CTA tells where it opens",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: sample figures are labelled as not real",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Ads: an unknown app path is reported with its fallback, not a broken link",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logPr"
+ },
+ {
+  "name": "Ads: an invalid destination says it cannot be saved",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: preview updates as the headline is edited",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Ads: new campaign form shows the Home audiences to pick",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: the new campaign saves as a draft",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Ads: the new campaign is in the list",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Property listings: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Property listings: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Property listings: Hide asks for confirmation",
+  "pass": true,
+  "note": "Hide: 4-Bedroom Villa, Al Mouj?The listing would stop being shown to customers in this demo.CancelHide Hide: 4-Bedroom Villa, Al Mouj?The li"
+ },
+ {
+  "name": "Property listings: status becomes Hidden",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Agents and brokers: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Agents and brokers: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Agents and brokers: Mark trusted asks for confirmation",
+  "pass": true,
+  "note": "Mark trusted: Maha Agent Demo?The agent would carry the Trusted Broker mark in this demo.CancelMark trusted Mark trusted: Maha Agent Demo?Th"
+ },
+ {
+  "name": "Agents and brokers: status becomes Trusted",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Development projects: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Development projects: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Development projects: Publish asks for confirmation",
+  "pass": true,
+  "note": "Publish: Qurum Heights?The project would be shown to customers in this demo.CancelPublish Publish: Qurum Heights?The project would be shown "
+ },
+ {
+  "name": "Development projects: status becomes Published",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Construction: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Construction: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Construction: Suspend asks for confirmation",
+  "pass": true,
+  "note": "Suspend: Gulf Builders (demo)?Suspending is simulated: no real company is affected.CancelSuspend Suspend: Gulf Builders (demo)?Suspending is"
+ },
+ {
+  "name": "Construction: status becomes Suspended",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Architecture and design: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Architecture and design: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Architecture and design: Suspend asks for confirmation",
+  "pass": true,
+  "note": "Suspend: Studio Nakhal (demo)?Suspending is simulated: no real studio is affected.CancelSuspend Suspend: Studio Nakhal (demo)?Suspending is "
+ },
+ {
+  "name": "Architecture and design: status becomes Suspended",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Maintenance: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Maintenance: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Maintenance: Schedule asks for confirmation",
+  "pass": true,
+  "note": "Schedule: Plumbing, leaking sink?The visit would be marked as scheduled in this demo.CancelSchedule Schedule: Plumbing, leaking sink?The vis"
+ },
+ {
+  "name": "Maintenance: status becomes Scheduled",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Viewings and requests: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Viewings and requests: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Viewings and requests: Confirm asks for confirmation",
+  "pass": true,
+  "note": "Confirm: Viewing: 4-Bedroom Villa, Al Mouj?The appointment would be marked as confirmed in this demo.CancelConfirm Confirm: Viewing: 4-Bedro"
+ },
+ {
+  "name": "Viewings and requests: status becomes Confirmed",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Categories and content: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Categories and content: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Categories and content: Hide asks for confirmation",
+  "pass": true,
+  "note": "Hide: Residential?The item would be hidden from customers in this demo.CancelHide Hide: Residential?The item would be hidden from customers "
+ },
+ {
+  "name": "Categories and content: status becomes Hidden",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Announcements: list opens with records",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture a"
+ },
+ {
+  "name": "Announcements: record detail with actions",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "Announcements: Send \\(sample\\) asks for confirmation",
+  "pass": true,
+  "note": "Send (sample): Verify your business to appear in search?Sending is simulated. No message reaches any person.CancelSend (sample) Send (sample"
+ },
+ {
+  "name": "Announcements: status becomes Sent (sample)",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Announcements: a new draft is created",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Analytics: demo-record counts and labelled sample figures",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsR"
+ },
+ {
+  "name": "Settings: profile, role and session",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+ },
+ {
+  "name": "Activity log: module changes and banner edits appear",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsDemo Super AdminSuper "
+ },
+ {
+  "name": "no overflow @1280",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin @320: overview, ads and a module list fit (no horizontal page scroll)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin @390: overview, ads and a module list fit (no horizontal page scroll)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin @768: overview, ads and a module list fit (no horizontal page scroll)",
+  "pass": true,
+  "note": ""
+ }
+]

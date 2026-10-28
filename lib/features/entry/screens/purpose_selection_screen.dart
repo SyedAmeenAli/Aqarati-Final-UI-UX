@@ -7,6 +7,7 @@ import '../../../core/aq/aq_scene.dart';
 import '../../../core/aq/aq_tokens.dart';
 import '../../../core/aq/aq_typography.dart';
 import '../../../core/localization/entry_strings.dart';
+import '../../../core/localization/flow_strings.dart';
 import '../../../core/config/demo_mode.dart';
 import '../../../data/demo/demo_providers.dart';
 import '../demo_entry.dart';
@@ -17,7 +18,9 @@ import '../widgets/entry_common.dart' show MasterLogo;
 /// and choosing a role does not mean the person is verified. The journey length
 /// depends on the role, so no fixed "step x of 3" is shown.
 class PurposeSelectionScreen extends ConsumerStatefulWidget {
-  const PurposeSelectionScreen({super.key});
+  /// Shows only the four business and professional roles (Register as a Business or Professional).
+  final bool businessOnly;
+  const PurposeSelectionScreen({super.key, this.businessOnly = false});
 
   @override
   ConsumerState<PurposeSelectionScreen> createState() => _PurposeSelectionScreenState();
@@ -83,9 +86,13 @@ class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen>
     final selected = _selected == null ? null : signupPurposeOptions.firstWhere((o) => o.id == _selected);
     final logoWidth = (AQLayout.contentWidth(context) * (compact ? 0.24 : 0.26)).clamp(96.0, 150.0);
 
+    final options = widget.businessOnly
+        ? [for (final o in signupPurposeOptions) if (o.id != SignupPurpose.userToShop && o.id != SignupPurpose.realEstateAgent) o]
+        : signupPurposeOptions;
+    final f = FlowStrings.of(context);
     final rows = <Widget>[];
-    for (var i = 0; i < signupPurposeOptions.length; i += 2) {
-      final a = signupPurposeOptions[i], b = signupPurposeOptions[i + 1];
+    for (var i = 0; i < options.length; i += 2) {
+      final a = options[i], b = options[i + 1];
       final demo = kDemoMode && ref.watch(demoBackendStateProvider) != null;
       Widget tile(SignupPurposeOption o) => AQChoiceTile(
             icon: o.icon,
@@ -104,7 +111,7 @@ class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen>
         dy: 8,
         child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: tile(a)), const SizedBox(width: AQSpacing.x3), Expanded(child: tile(b))])),
       ));
-      if (i + 2 < signupPurposeOptions.length) rows.add(const SizedBox(height: AQSpacing.x3));
+      if (i + 2 < options.length) rows.add(const SizedBox(height: AQSpacing.x3));
     }
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -131,7 +138,7 @@ class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen>
                 child: Column(children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x4),
-                    child: AQTopBar(onBack: () => aqBack(context, '/entry'), backLabel: s.back),
+                    child: AQTopBar(onBack: () => aqBack(context, widget.businessOnly ? '/entry' : '/entry'), backLabel: s.back),
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -139,9 +146,9 @@ class _PurposeSelectionScreenState extends ConsumerState<PurposeSelectionScreen>
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Center(child: AQReveal(animation: _enter, begin: 0, end: 0.45, dy: 10, child: MasterLogo(width: logoWidth))),
                         SizedBox(height: compact ? AQSpacing.x4 : AQSpacing.x6),
-                        AQReveal(animation: _enter, begin: 0.08, end: 0.55, dy: 8, child: Semantics(header: true, child: Text(s.purposeTitle, style: AQTypography.of(context, AQText.displaySmall)))),
+                        AQReveal(animation: _enter, begin: 0.08, end: 0.55, dy: 8, child: Semantics(header: true, child: Text(widget.businessOnly ? f.t('biz.title') : s.purposeTitle, style: AQTypography.of(context, AQText.displaySmall)))),
                         const SizedBox(height: AQSpacing.x3),
-                        AQReveal(animation: _enter, begin: 0.16, end: 0.65, dy: 6, child: Text(s.purposeSub, style: AQTypography.of(context, AQText.bodyMedium, soft: true))),
+                        AQReveal(animation: _enter, begin: 0.16, end: 0.65, dy: 6, child: Text(widget.businessOnly ? f.t('biz.sub') : s.purposeSub, style: AQTypography.of(context, AQText.bodyMedium, soft: true))),
                         SizedBox(height: compact ? AQSpacing.x5 : AQSpacing.x6),
                         ...rows,
                       ]),

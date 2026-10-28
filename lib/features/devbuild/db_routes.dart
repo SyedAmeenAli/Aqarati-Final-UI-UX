@@ -46,42 +46,6 @@ List<RouteBase> dbShellRoutes() => [
       );
     },
   ),
-  // Business workspace pages keep the customer nav (Account stays selected).
-  GoRoute(
-    path: '/app/account/workspace',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbDashboardScreen()),
-  ),
-  GoRoute(
-    path: '/app/account/workspace/projects',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbMyProjectsScreen()),
-  ),
-  GoRoute(
-    path: '/app/account/workspace/profile',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbProfileEditScreen()),
-  ),
-  GoRoute(
-    path: '/app/account/workspace/leads',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbLeadsScreen()),
-  ),
-  GoRoute(
-    path: '/app/account/workspace/reviews',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbBizReviewsScreen()),
-  ),
-  GoRoute(
-    path: '/app/account/workspace/engagements',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbEngagementsScreen()),
-  ),
-  GoRoute(
-    path: '/app/account/workspace/portfolio',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const DbPortfolioScreen()),
-  ),
 ];
 
 /// Full-screen routes (no tab nav): profiles, project pages, gallery.
@@ -162,6 +126,45 @@ List<RouteBase> dbStandaloneRoutes() => [
         result: state.uri.queryParameters['r'] ?? 'submitted',
       ),
     ),
+  ),
+];
+
+/// The business workspace pages, hosted by the professional shell (`ProShell`), never the customer's.
+List<RouteBase> dbProShellRoutes() => [
+  GoRoute(
+    path: '/app/account/workspace',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbDashboardScreen()),
+  ),
+  GoRoute(
+    path: '/app/account/workspace/projects',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbMyProjectsScreen()),
+  ),
+  GoRoute(
+    path: '/app/account/workspace/profile',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbProfileEditScreen()),
+  ),
+  GoRoute(
+    path: '/app/account/workspace/leads',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbLeadsScreen()),
+  ),
+  GoRoute(
+    path: '/app/account/workspace/reviews',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbBizReviewsScreen()),
+  ),
+  GoRoute(
+    path: '/app/account/workspace/engagements',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbEngagementsScreen()),
+  ),
+  GoRoute(
+    path: '/app/account/workspace/portfolio',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const DbPortfolioScreen()),
   ),
   GoRoute(
     path: '/workspace/leads/:id',

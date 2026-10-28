@@ -139,7 +139,7 @@ void main() {
     expect(find.byType(SponsoredBannerView), findsNothing);
   });
 
-  test('only the Home screen mounts the banner; nothing mounts it app-wide', () {
+  test('only the six Home screens mount the banner; nothing mounts it app-wide', () {
     final users = <String>[];
     for (final e in Directory('lib').listSync(recursive: true)) {
       if (e is! File || !e.path.endsWith('.dart')) continue;
@@ -149,7 +149,14 @@ void main() {
         users.add(e.path.replaceAll('\\', '/'));
       }
     }
-    expect(users, ['lib/features/workspace/aq_home.dart']);
+    users.sort();
+    expect(users, [
+      'lib/features/agent/agent_screens.dart',
+      'lib/features/role_home/home_construction.dart',
+      'lib/features/role_home/home_developer.dart',
+      'lib/features/role_home/home_studio.dart', // architecture and interior
+      'lib/features/workspace/aq_home.dart',
+    ]);
     expect(
       File('lib/main.dart').readAsStringSync().contains('SponsoredBanner'),
       isFalse,

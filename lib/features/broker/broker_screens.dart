@@ -161,8 +161,11 @@ class _BrokerCard extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${b.name}, ${f.t('br.badge')}',
       excludeSemantics: true,
+      onTap: () => context.push('/broker/${b.id}'),
       child: AQPressable(
         onTap: () => context.push('/broker/${b.id}'),
         child: AQSurface(

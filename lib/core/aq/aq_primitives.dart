@@ -133,6 +133,8 @@ class _AQButton extends StatelessWidget {
             : c.surface);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       enabled: onPressed != null,
       label: semanticsLabel ?? label,
       excludeSemantics: true,
@@ -335,6 +337,8 @@ class AQTextButton extends StatelessWidget {
     final fg = color ?? c.inkSoft;
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       enabled: onPressed != null,
       label: label,
       excludeSemantics: true,
@@ -399,6 +403,8 @@ class AQIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: semanticsLabel,
       excludeSemantics: true,
       onTap: onPressed,

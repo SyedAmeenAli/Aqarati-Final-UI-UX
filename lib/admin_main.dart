@@ -1,3 +1,4 @@
+import 'core/config/web_keyboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,6 +12,7 @@ import 'admin/admin_repository.dart';
 void main() {
   // QA bundles expose the semantics tree from the start so a browser (or a screen reader) can reach every control.
   if (kShowReviewTools) WidgetsFlutterBinding.ensureInitialized().ensureSemantics();
+  installWebKeyboardSupport();
   runApp(
     ProviderScope(
       overrides: kUseDemoBackend ? adminOverrides(DemoAdminStore()) : const [],

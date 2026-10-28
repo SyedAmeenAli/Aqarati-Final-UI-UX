@@ -10,6 +10,7 @@ import '../core/config/backend_mode.dart';
 import '../features/viewing/domain/viewing_presentation.dart' show AQTone;
 import '../features/viewing/widgets/viewing_format.dart';
 import 'admin_auth.dart';
+import 'admin_directory.dart' show adminLog, decisionVerb;
 import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_review_parts.dart';
@@ -422,6 +423,7 @@ class _VerificationDetailScreenState
                         await ref
                             .read(verificationRepositoryProvider)
                             .decide(v.id, d, reason: reason, note: note);
+                        adminLog(ref, '${decisionVerb(d)} verification', v.applicantName);
                         ref.invalidate(verificationItemProvider(v.id));
                         ref.invalidate(verificationListProvider);
                       },

@@ -11,6 +11,8 @@ import '../devbuild/db_repository.dart';
 import '../devbuild/db_widgets.dart' show DbNotice, DbSkeleton, dbTypeImage;
 import 'role_home_model.dart';
 import 'role_home_widgets.dart';
+import '../ads/ad_models.dart' show AdAudience;
+import '../ads/sponsored_banner.dart';
 
 /// Construction: industrial and trust-first. A site photograph leads, then the company
 /// profile and four "essentials". It is a company-profile home, not a project dashboard:
@@ -54,8 +56,11 @@ class ConstructionHome extends ConsumerWidget {
         index: 3,
         child: Semantics(
           button: true,
+          focusable: true,
+          onFocus: () {},
           label: '${f.t('rh.con.profile')}. ${f.t('rh.con.profile.sub')}',
           excludeSemantics: true,
+      onTap: profile,
           child: AQPressable(
             onTap: profile,
             child: Container(
@@ -99,6 +104,7 @@ class ConstructionHome extends ConsumerWidget {
         const SizedBox(height: AQSpacing.x3),
         DbNotice(f.t('rh.profileGap'), icon: 'info', action: AQTextButton(label: f.t('rh.completeProfile'), color: c.accent, onPressed: profile)),
       ],
+      const SponsoredBannerSlot(audience: AdAudience.construction),
       RoleSection(f.t('rh.con.essentials'), action: f.t('rh.manageProfile'), onAction: profile, accent: accent),
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Expanded(child: RoleNumberCell(number: '01', label: f.t('rh.con.identity'), sub: f.t('rh.con.identity.s'), accent: accent, onTap: profile)),

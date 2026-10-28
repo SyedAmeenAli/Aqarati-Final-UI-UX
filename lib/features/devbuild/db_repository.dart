@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/config/backend_mode.dart';
+import '../../core/config/demo_mode.dart' show kDemoMode;
 import '../../core/domain/account_models.dart';
 import '../../data/api/account_api.dart';
 import '../../data/datasources/mock_business_data.dart';
@@ -99,6 +100,11 @@ abstract class DevBuildRepository {
   Future<List<ContactEvent>> myContactEvents();
   Future<List<Engagement>> myEngagements();
   Future<void> confirmEngagement(String id);
+
+  /// Portfolio work for construction, architecture and interior & exterior accounts.
+  Future<List<PortfolioItem>> myPortfolio();
+  Future<PortfolioItem> savePortfolioItem({String? id, required String title, String note = '', required String image});
+  Future<void> removePortfolioItem(String id);
 }
 
 /// Used when no real API is wired: every call fails like an offline request, so screens show
@@ -150,6 +156,12 @@ class UnavailableDevBuildRepository implements DevBuildRepository {
   Future<List<Engagement>> myEngagements() async => _no();
   @override
   Future<void> confirmEngagement(String id) async => _no();
+  @override
+  Future<List<PortfolioItem>> myPortfolio() async => _no();
+  @override
+  Future<PortfolioItem> savePortfolioItem({String? id, required String title, String note = '', required String image}) async => _no();
+  @override
+  Future<void> removePortfolioItem(String id) async => _no();
 }
 
 /// DEMO ONLY (see lib/core/config/backend_mode.dart): an in-memory stand-in for the documented
@@ -332,7 +344,79 @@ class DemoDevBuildRepository implements DevBuildRepository {
   };
 
   @override
-  DbCapabilities get caps => const DbCapabilities(profileEdit: true);
+  // Contact activity and engagement confirmation have no confirmed service. They are switched on
+  // only in a build made for previews (demo mode), where they run on the local sample data below.
+  DbCapabilities get caps => DbCapabilities(
+    profileEdit: true,
+    leadEvents: kDemoMode,
+    engagements: kDemoMode,
+    portfolio: kDemoMode,
+  );
+
+  /// Sample contact taps and engagements for the preview build. In memory, reset on reload.
+  late final List<ContactEvent> _events = [
+    ContactEvent(id: 'ce1', channel: ContactChannel.whatsapp, targetLabel: 'Profile', at: DateTime.now().subtract(const Duration(hours: 3))),
+    ContactEvent(id: 'ce2', channel: ContactChannel.call, targetLabel: 'Profile', at: DateTime.now().subtract(const Duration(days: 1, hours: 2))),
+    ContactEvent(id: 'ce3', channel: ContactChannel.call, targetLabel: 'Project: Al Khuwair Residences', at: DateTime.now().subtract(const Duration(days: 3))),
+    ContactEvent(id: 'ce4', channel: ContactChannel.whatsapp, targetLabel: 'Project: Qurum Heights', at: DateTime.now().subtract(const Duration(days: 6))),
+  ];
+  List<PortfolioItem>? _portfolio;
+  int _pfSeq = 0;
+
+  /// Bundled pictures a preview user can pick for a piece of work.
+  static const portfolioChoices = <String>[
+    'assets/businesses/b1/05_Contemporary_architectural_facad.jpg',
+    'assets/businesses/b1/06_Courtyard_architectural_design_c.jpg',
+    'assets/businesses/b3/06_Styled_bedroom_interior_photography.jpg',
+    'assets/businesses/b3/04_Reading_and_work_nook.jpg',
+    'assets/businesses/b2/07_13_Finished_residential_building_ex.jpg',
+    'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg',
+  ];
+
+  List<PortfolioItem> _seedPortfolio(ProType t) => [
+    for (final (i, img) in _demoPortfolio(t).indexed)
+      PortfolioItem(id: 'pf${++_pfSeq}', title: 'Sample work ${i + 1}', note: 'Sample entry', image: img),
+  ];
+
+  @override
+  Future<List<PortfolioItem>> myPortfolio() async {
+    await _lag();
+    final o = _requireOrg();
+    if (!kDemoMode) return const [];
+    return List.unmodifiable(_portfolio ??= _seedPortfolio(o.type));
+  }
+
+  @override
+  Future<PortfolioItem> savePortfolioItem({String? id, required String title, String note = '', required String image}) async {
+    if (!kDemoMode) throw const ApiException(ApiErrorCode.network);
+    await _lag();
+    final o = _requireOrg();
+    if (o.type == ProType.developer) throw const PermissionDeniedException();
+    if (title.trim().isEmpty) throw const ApiException(ApiErrorCode.validationFailed);
+    final list = _portfolio ??= _seedPortfolio(o.type);
+    final item = PortfolioItem(id: id ?? 'pf${++_pfSeq}', title: title.trim(), note: note.trim(), image: image);
+    final i = id == null ? -1 : list.indexWhere((x) => x.id == id);
+    if (i >= 0) {
+      list[i] = item;
+    } else {
+      list.insert(0, item);
+    }
+    return item;
+  }
+
+  @override
+  Future<void> removePortfolioItem(String id) async {
+    if (!kDemoMode) throw const ApiException(ApiErrorCode.network);
+    await _lag();
+    _requireOrg();
+    _portfolio?.removeWhere((x) => x.id == id);
+  }
+
+  late final List<Engagement> _engagements = [
+    Engagement(id: 'en1', clientLabel: 'Villa fit-out, Bawshar', state: EngagementState.awaitingMyConfirmation, confirmByDeadline: DateTime.now().add(const Duration(days: 9))),
+    const Engagement(id: 'en2', clientLabel: 'Office renovation, Ruwi', state: EngagementState.awaitingClient),
+    const Engagement(id: 'en3', clientLabel: 'Family home, Seeb', state: EngagementState.confirmedByBoth),
+  ];
 
   Future<void> _lag() =>
       lag == Duration.zero ? Future<void>.value() : Future<void>.delayed(lag);
@@ -439,8 +523,31 @@ class DemoDevBuildRepository implements DevBuildRepository {
       locationLabel: '',
       governorate: '',
       verified: true,
+      mediaUrls: kDemoMode ? _demoPortfolio(type) : const [],
     );
   }
+
+  static List<String> _demoPortfolio(ProType t) => switch (t) {
+    ProType.architecture => const [
+      'assets/businesses/b1/05_Contemporary_architectural_facad.jpg',
+      'assets/businesses/b1/06_Courtyard_architectural_design_c.jpg',
+      'assets/businesses/b1/08_Doubleheight_atrium_architectur.jpg',
+      'assets/businesses/b1/03_Architectural_model_of_contempor.jpg',
+    ],
+    ProType.interiorExterior => const [
+      'assets/businesses/b3/06_Styled_bedroom_interior_photography.jpg',
+      'assets/businesses/b3/04_Reading_and_work_nook.jpg',
+      'assets/businesses/b3/01_Modern_designer_bathroom_interio.jpg',
+      'assets/businesses/b3/03_Powder_room_interior_photography.jpg',
+    ],
+    ProType.construction => const [
+      'assets/businesses/b2/07_13_Finished_residential_building_ex.jpg',
+      'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg',
+      'assets/businesses/b2/01_Building_handover_residential_ar.jpg',
+      'assets/businesses/b2/09_41_Residential_development_architec.jpg',
+    ],
+    _ => const [],
+  };
 
   DbProfessional _requireOrg() {
     final o = _org();
@@ -585,19 +692,28 @@ class DemoDevBuildRepository implements DevBuildRepository {
   Future<List<ContactEvent>> myContactEvents() async {
     await _lag();
     _requireOrg();
-    return const [];
+    return kDemoMode ? List.unmodifiable(_events) : const [];
   }
 
   @override
   Future<List<Engagement>> myEngagements() async {
     await _lag();
     _requireOrg();
-    return const [];
+    return kDemoMode ? List.unmodifiable(_engagements) : const [];
   }
 
   @override
-  Future<void> confirmEngagement(String id) async =>
-      throw const ApiException(ApiErrorCode.network);
+  Future<void> confirmEngagement(String id) async {
+    if (!kDemoMode) throw const ApiException(ApiErrorCode.network);
+    await _lag();
+    _requireOrg();
+    final i = _engagements.indexWhere((x) => x.id == id);
+    if (i < 0 || _engagements[i].state != EngagementState.awaitingMyConfirmation) {
+      throw const PermissionDeniedException();
+    }
+    // The client had already confirmed, so confirming now completes it. Local only.
+    _engagements[i] = Engagement(id: id, clientLabel: _engagements[i].clientLabel, state: EngagementState.confirmedByBoth);
+  }
 }
 
 final devBuildRepositoryProvider = Provider<DevBuildRepository>((ref) {
@@ -632,6 +748,9 @@ final dbMyProjectProvider = FutureProvider.autoDispose
     .family<DbProject, String>(
       (ref, id) => ref.watch(devBuildRepositoryProvider).myProject(id),
     );
+final dbMyPortfolioProvider = FutureProvider.autoDispose<List<PortfolioItem>>(
+  (ref) => ref.watch(devBuildRepositoryProvider).myPortfolio(),
+);
 final dbMyContactEventsProvider =
     FutureProvider.autoDispose<List<ContactEvent>>(
       (ref) => ref.watch(devBuildRepositoryProvider).myContactEvents(),

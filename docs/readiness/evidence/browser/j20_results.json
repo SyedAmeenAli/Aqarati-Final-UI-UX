@@ -1,0 +1,77 @@
+[
+ {
+  "name": "moderation queue starts empty, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "three submissions: two agent, one Aqary e-Broker",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "filter by source: e-Broker only",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker detail: shown as its own source",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker detail: shows the agreed disclosure text as recorded",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker detail: adds no fee, payment or commission of its own",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "wrong step-up code changes nothing",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "MODERATION FAILURE: says nothing was changed, no recorded decision",
+  "pass": true,
+  "note": "Admin consoleVerificationListing moderationAds & SponsorsDemo ReviewerReviewerSign outBack to moderationDemo listing: apartment (e-Broker)Aqary e-Broker · ID m1"
+ },
+ {
+  "name": "queue unchanged after the failure: still 3 waiting, e-Broker item still pending",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "e-Broker approval recorded (reviewer decision, not automatic)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "incomplete: missing mandatory information is listed",
+  "pass": true,
+  "note": "Missing mandatory information: description, location, size, price, photos, title deed document"
+ },
+ {
+  "name": "incomplete: Approve is blocked with the reason",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "incomplete: request for corrections recorded",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "villa: rejection with a reason code recorded",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "auditor sees the moderation list",
+  "pass": true,
+  "note": ""
+ }
+]

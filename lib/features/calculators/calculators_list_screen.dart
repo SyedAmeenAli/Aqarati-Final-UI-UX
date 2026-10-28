@@ -37,8 +37,14 @@ class CalculatorsListScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: AQSpacing.x3),
             child: Semantics(
               button: true,
+              focusable: true,
+              onFocus: () {},
               label: '${f.t('calc.t.${t.name}')}. ${f.t('calc.d.${t.name}')}',
               excludeSemantics: true,
+      onTap: () {
+                  AQHaptics.selection();
+                  context.push('/calculators/${t.name}');
+                },
               child: AQPressable(
                 onTap: () {
                   AQHaptics.selection();

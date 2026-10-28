@@ -140,8 +140,11 @@ class _Profile extends ConsumerWidget {
                   height: w,
                   child: Semantics(
                     button: true,
+                    focusable: true,
+                    onFocus: () {},
                     label: f.t('bp.photo', {'i': VFmt.n(context, i + 1), 'n': VFmt.n(context, b.galleryUrls.length)}),
                     excludeSemantics: true,
+      onTap: () => _photo(context, b.galleryUrls[i]),
                     child: AQPressable(onTap: () => _photo(context, b.galleryUrls[i]), child: ClipRRect(borderRadius: BorderRadius.circular(AQRadius.medium), child: aqImg(b.galleryUrls[i], cacheWidth: 360))),
                   ),
                 ),

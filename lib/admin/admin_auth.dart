@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show VoidCallback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'admin_models.dart';
@@ -32,6 +33,10 @@ class AdminAuthController extends StateNotifier<AdminAuthState> {
 
   void backToLogin() => state = AdminAuthState.signedOut;
 }
+
+/// Set when the console is opened from inside the customer app (route `/admin`): leaves the console
+/// and returns there. Null in the stand-alone admin build.
+final adminExitProvider = Provider<VoidCallback?>((ref) => null);
 
 final adminAuthProvider =
     StateNotifierProvider<AdminAuthController, AdminAuthState>(

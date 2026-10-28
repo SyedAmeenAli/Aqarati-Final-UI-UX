@@ -1,0 +1,87 @@
+[
+ {
+  "name": "entry 320: both modes and the business button visible, no overflow",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all i"
+ },
+ {
+  "name": "entry 360: both modes and the business button visible, no overflow",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all i"
+ },
+ {
+  "name": "entry 390: both modes and the business button visible, no overflow",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all i"
+ },
+ {
+  "name": "entry 412: both modes and the business button visible, no overflow",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all i"
+ },
+ {
+  "name": "entry 430: both modes and the business button visible, no overflow",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all i"
+ },
+ {
+  "name": "entry 1280: both modes and the business button visible, no overflow",
+  "pass": true,
+  "note": "A Brighter Property Journey in OmanBuy, rent, invest or find trusted professionals — all i"
+ },
+ {
+  "name": "business selector lists the four roles only",
+  "pass": true,
+  "note": "BackRegister as a Business or ProfessionalChoose the kind of business you run. Each one has its own sign-up and workspace.Construction CompanyProperty Developme"
+ },
+ {
+  "name": "Interior and Exterior selection opens its own signup",
+  "pass": true,
+  "note": "BackInterior & Exterior Design · Your detailsLet's start with you.Show the work behind the spaces.NextYour answers are s"
+ },
+ {
+  "name": "user signup reaches \"Your account is active\"",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "then the interests screen",
+  "pass": true,
+  "note": "What are you looking for?Tell us what matters to you. We'll make your AQARATI experience more relevant. You can skip thi"
+ },
+ {
+  "name": "Home after interests: four primary actions still first",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "choice saved on the device",
+  "pass": true,
+  "note": "[\"[\\\"buy\\\",\\\"loan\\\"]\"]"
+ },
+ {
+  "name": "choice survives a reload",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Skip for now lands on Home with nothing stored",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD EVENINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Agent: Create an Account opens the agent signup",
+  "pass": true,
+  "note": "BackReal Estate Agent · Your detailsLet's start with you.Build trust around every property you repre"
+ },
+ {
+  "name": "approved agent session lands on the agent workspace, not customer Home",
+  "pass": false,
+  "note": "REAL ESTATE AGENTYour workspaceDemo data: these contacts and appointments are fictional and stay on "
+ },
+ {
+  "name": "shopper session lands on customer Home, not the agent workspace",
+  "pass": true,
+  "note": ""
+ }
+]

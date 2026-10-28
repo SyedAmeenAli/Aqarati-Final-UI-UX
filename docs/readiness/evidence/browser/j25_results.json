@@ -1,0 +1,112 @@
+[
+ {
+  "name": "Home: Tab reaches \"Buy a property\" in a sensible number of presses",
+  "pass": true,
+  "note": "presses 3"
+ },
+ {
+  "name": "Home: a visible focus ring is drawn on the focused card",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Home: Enter opens Buy categories",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountBuy: choose a categoryPick the kind of property you "
+ },
+ {
+  "name": "Categories: Tab reaches Commercial",
+  "pass": true,
+  "note": "presses 5"
+ },
+ {
+  "name": "Categories: Space opens its property types",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountBuy: choose a property typeCommercialOffices, shops,"
+ },
+ {
+  "name": "Types: Enter on Offices opens results",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunitie"
+ },
+ {
+  "name": "Shift+Tab moves focus backwards",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Entry: Tab reaches the business button",
+  "pass": true,
+  "note": "presses 5"
+ },
+ {
+  "name": "Entry: Enter opens the business selector",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Selector: Space selects the focused role (shown in the supportive line)",
+  "pass": true,
+  "note": "BackRegister as a Business or ProfessionalChoose the kind of"
+ },
+ {
+  "name": "Selector: Continue by keyboard opens the Architecture signup",
+  "pass": true,
+  "note": "BackBuilding Architecture · Your detailsLet's start with you.Let your practice be discovered.NextYou"
+ },
+ {
+  "name": "User signup reaches \"Your account is active\"",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Account active: keyboard reaches Go to home and opens interests",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interests: Tab reaches /^Maintenance Services/",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interests: Tab reaches /^Calculate a Property Loan/",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interests: Continue by keyboard lands on Home with the four primary actions",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD EVENINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Interests: both keyboard selections were stored",
+  "pass": true,
+  "note": "[\"maintenance\",\"loan\"]"
+ },
+ {
+  "name": "Home: chosen services (Loan, Maintenance) come before the others in order",
+  "pass": true,
+  "note": "Loan,Maintenance,Development,Architecture,Interior,Construction"
+ },
+ {
+  "name": "Interests: Skip for now by keyboard lands on Home, nothing stored",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Login: Tab reaches the Email field",
+  "pass": true,
+  "note": "Email"
+ },
+ {
+  "name": "Login: Tab reaches the Admin Console link",
+  "pass": true,
+  "note": "Admin Console →"
+ },
+ {
+  "name": "Agent session: agent workspace, not customer Home",
+  "pass": true,
+  "note": ""
+ }
+]

@@ -401,6 +401,12 @@ class ContactEvent {
   });
 }
 
+/// One piece of portfolio work. Preview builds keep these in memory only.
+class PortfolioItem {
+  final String id, title, note, image;
+  const PortfolioItem({required this.id, required this.title, this.note = '', required this.image});
+}
+
 /// A published review. Pending and removed reviews are never delivered to the client.
 class DbReview {
   final String id;

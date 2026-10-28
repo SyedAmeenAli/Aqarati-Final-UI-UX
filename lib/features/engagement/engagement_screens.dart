@@ -260,8 +260,11 @@ class _Card extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${e.professionalName}, ${f.t('ce.ph.${phase.name}')}',
       excludeSemantics: true,
+      onTap: () => context.push('/engagements/${e.id}'),
       child: AQPressable(
         onTap: () => context.push('/engagements/${e.id}'),
         child: AQSurface(

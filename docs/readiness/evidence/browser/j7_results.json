@@ -1,0 +1,82 @@
+[
+ {
+  "name": "reviewer: ads list is read-only (no New banner)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "senior reviewer: empty state with New banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "validation: sponsor, headline, button, image required",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "validation: insecure destination refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "preview shows the real customer banner text (Sponsored · sponsor, headline, button)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "saved as a draft, not live",
+  "pass": true,
+  "note": "the same component.SPONSORED · Gulf Furnishings\nSpring living sale\nUp to 30% off selected furniture.\nShop nowA secure https address, or a path inside the app.Placement *Home, topSearch resultsBanner image *Replace image11_Muscat_skyline_and_mountains.jpgSchedule (option"
+ },
+ {
+  "name": "banner detail/edit opens",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "after submit it waits for review (not live)",
+  "pass": true,
+  "note": "ee, drawn by the same component.SPONSORED · Gulf Furnishings\nSpring living sale\nUp to 30% off selected furniture.\nShop nowReviewDecisionApproveRequest resubmissionChoose a decisionRejectA secure https address, or a path inside the app.Placement *Home, topSearch resultsBanner image *Replace image11_Muscat_skyline_and_mountains.jpgSchedule (optional)"
+ },
+ {
+  "name": "approval recorded, banner becomes live inside its schedule",
+  "pass": true,
+  "note": "Decision recorded: approved."
+ },
+ {
+  "name": "list shows it as live with Pause",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "editing a live banner warns it returns to draft",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "pause: banner is paused and no longer served (Resume offered)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "resume: live again (Pause offered, Resume gone)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "two live banners listed",
+  "pass": true,
+  "note": "Gulf first"
+ },
+ {
+  "name": "Move up on the second banner puts it first",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Move down puts the first banner back second",
+  "pass": true,
+  "note": ""
+ }
+]

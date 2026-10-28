@@ -27,6 +27,8 @@ class AQActionCard extends StatelessWidget {
       button: true,
       label: '$title. $sub',
       excludeSemantics: true,
+      focusable: true,
+      onFocus: () {},
       onTap: onTap,
       child: AQPressable(
         onTap: () {

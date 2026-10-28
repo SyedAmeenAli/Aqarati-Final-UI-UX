@@ -1,3 +1,4 @@
+import 'package:aqarati_app/admin/admin_directory_screens.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -78,6 +79,11 @@ Future<void> login(WidgetTester t, String who) async {
   await settle(t);
   await t.enterText(find.byType(TextField).first, DemoAdminStore.demoCode);
   await settle(t);
+  // Signing in lands on the overview; the older tests below work from the verification queue.
+  if (find.byType(AdminOverviewScreen).evaluate().isNotEmpty) {
+    GoRouter.of(t.element(find.byType(AdminOverviewScreen))).go('/verification');
+    await settle(t);
+  }
 }
 
 void main() {
@@ -91,7 +97,7 @@ void main() {
       expect(adminRedirect(AdminAuthStage.signedOut, '/login'), isNull);
       expect(adminRedirect(AdminAuthStage.needsTotp, '/moderation'), '/code');
       expect(adminRedirect(AdminAuthStage.needsTotp, '/code'), isNull);
-      expect(adminRedirect(AdminAuthStage.active, '/login'), '/verification');
+      expect(adminRedirect(AdminAuthStage.active, '/login'), '/overview');
       expect(adminRedirect(AdminAuthStage.active, '/ads'), isNull);
     });
 
@@ -824,7 +830,7 @@ void main() {
   });
 
   group('separation', () {
-    test('the customer app never imports the admin console', () {
+    test('the customer app imports the admin console only to host it at /admin', () {
       final offenders = <String>[];
       for (final f
           in Directory('lib')
@@ -835,6 +841,9 @@ void main() {
         if (p.startsWith('lib/admin/') || p.endsWith('lib/admin_main.dart')) {
           continue;
         }
+        // The one deliberate bridge: the router hosts the console at `/admin` so a single web build
+        // carries both. Nothing else in the customer app may reach into it.
+        if (p == 'lib/core/router/app_router.dart') continue;
         final src = f.readAsStringSync();
         if (RegExp(r"import\s+'[^']*\badmin/|import\s+'[^']*admin_main\.dart")
             .hasMatch(src)) {

@@ -1,0 +1,77 @@
+[
+ {
+  "name": "Construction: portfolio lists sample work",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩EditRemove⁨Sample work 3⁩⁨Sample entry⁩EditRemove⁨Sample work 4⁩⁨Sa"
+ },
+ {
+  "name": "Construction: a new piece is added (local, labelled prototype)",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Saved on this device.⁨Construction new piece⁩⁨Prototype entry⁩EditRemove⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩EditRemove⁨Sample work 3⁩⁨Sample en"
+ },
+ {
+  "name": "Construction: editing renames the piece",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Saved on this device.⁨Construction nConstruction renamedew piece⁩⁨Prototype entry⁩EditRemove⁨Sa"
+ },
+ {
+  "name": "Construction: removing asks first, then removes it",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Removed from this device.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩Ed"
+ },
+ {
+  "name": "Construction: still in the professional shell",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Architecture: portfolio lists sample work",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩EditRemove⁨Sample work 3⁩⁨Sample entry⁩EditRemove⁨Sample work 4⁩⁨Sa"
+ },
+ {
+  "name": "Architecture: a new piece is added (local, labelled prototype)",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Saved on this device.⁨Architecture new piece⁩⁨Prototype entry⁩EditRemove⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩EditRemove⁨Sample work 3⁩⁨Sample en"
+ },
+ {
+  "name": "Architecture: editing renames the piece",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Saved on this device.⁨Architecture nArchitecture renamedew piece⁩⁨Prototype entry⁩EditRemove⁨Sa"
+ },
+ {
+  "name": "Architecture: removing asks first, then removes it",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Removed from this device.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩Ed"
+ },
+ {
+  "name": "Architecture: still in the professional shell",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior: portfolio lists sample work",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩EditRemove⁨Sample work 3⁩⁨Sample entry⁩EditRemove⁨Sample work 4⁩⁨Sa"
+ },
+ {
+  "name": "Interior & Exterior: a new piece is added (local, labelled prototype)",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Saved on this device.⁨Interior & Exterior new piece⁩⁨Prototype entry⁩EditRemove⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩EditRemove⁨Sample work 3⁩⁨Sa"
+ },
+ {
+  "name": "Interior & Exterior: editing renames the piece",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Saved on this device.⁨Interior & ExterInterior & Exterior renamedior new piece⁩⁨Prototype entry"
+ },
+ {
+  "name": "Interior & Exterior: removing asks first, then removes it",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.Removed from this device.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨Sample entry⁩Ed"
+ },
+ {
+  "name": "Interior & Exterior: still in the professional shell",
+  "pass": true,
+  "note": ""
+ }
+]

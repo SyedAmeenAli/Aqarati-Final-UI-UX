@@ -52,9 +52,12 @@ class StarsInput extends StatelessWidget {
         for (var i = 1; i <= 5; i++)
           Semantics(
             button: true,
+            focusable: true,
+            onFocus: () {},
             selected: value == i,
             label: f.t('rv.star', {'n': '$i'}),
             excludeSemantics: true,
+      onTap: () => onChanged(i),
             child: AQPressable(
               onTap: () => onChanged(i),
               child: SizedBox(
@@ -516,9 +519,14 @@ class MyReviewsScreen extends ConsumerWidget {
                             ),
                             child: Semantics(
                               button: true,
+                              focusable: true,
+                              onFocus: () {},
                               label:
                                   '${r.target.name}, ${f.t('rv.st.${r.status.name}')}',
                               excludeSemantics: true,
+      onTap: () => context.push(
+                                  '/review/${r.target.kind.name}/${r.target.id}?name=${Uri.encodeComponent(r.target.name)}',
+                                ),
                               child: AQPressable(
                                 onTap: () => context.push(
                                   '/review/${r.target.kind.name}/${r.target.id}?name=${Uri.encodeComponent(r.target.name)}',
@@ -688,9 +696,12 @@ class _ReportState extends State<_ReportSheet> {
                   for (final r in ReportReason.values)
                     Semantics(
                       button: true,
+                      focusable: true,
+                      onFocus: () {},
                       selected: _reason == r,
                       label: f.t('rp.r.${r.name}'),
                       excludeSemantics: true,
+      onTap: () => setState(() => _reason = r),
                       child: AQPressable(
                         onTap: () => setState(() => _reason = r),
                         child: Container(

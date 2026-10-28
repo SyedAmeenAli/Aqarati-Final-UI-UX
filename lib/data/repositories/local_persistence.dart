@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/notifications/notifications.dart' show readNotificationsProvider;
+import '../../features/onboarding/interests.dart';
 import 'app_state_providers.dart';
 
 /// Keeps the two pieces of purely local, on-device state across restarts: the properties a person
@@ -34,7 +35,15 @@ class _AQLocalPersistenceState extends ConsumerState<AQLocalPersistence> {
       final ids = prefs.getStringList(kSavedIdsKey);
       final recent = prefs.getStringList(kRecentSearchesKey);
       final read = prefs.getStringList(kReadNotificationsKey);
+      final interests = prefs.getStringList(kInterestsKey);
       if (!mounted) return;
+      if (interests != null) {
+        ref.read(interestsProvider.notifier).update((s) => {
+          ...s,
+          for (final n in interests)
+            ...Interest.values.where((i) => i.name == n),
+        });
+      }
       if (read != null) ref.read(readNotificationsProvider.notifier).update((s) => {...read, ...s});
       // Merge with anything chosen before the read finished, so no early tap is lost.
       if (ids != null) ref.read(savedPropertyIdsProvider.notifier).update((s) => {...ids, ...s});
@@ -59,6 +68,9 @@ class _AQLocalPersistenceState extends ConsumerState<AQLocalPersistence> {
     });
     ref.listen<List<String>>(recentSearchesProvider, (_, next) {
       if (_loaded) _save(kRecentSearchesKey, next);
+    });
+    ref.listen<Set<Interest>>(interestsProvider, (_, next) {
+      if (_loaded) _save(kInterestsKey, [for (final i in next) i.name]);
     });
     ref.listen<Set<String>>(readNotificationsProvider, (_, next) {
       if (_loaded) _save(kReadNotificationsKey, next.toList());

@@ -6,6 +6,8 @@ import '../data/api/account_api.dart' show ApiErrorCode, ApiException;
 import '../data/models/enums.dart';
 import '../features/ads/ad_models.dart';
 import '../features/ads/ad_repository.dart';
+import '../features/ebroker/ebroker_models.dart';
+import '../features/ebroker/ebroker_repository.dart';
 import 'admin_models.dart';
 
 // ------------------------------------------------------------------ contracts
@@ -176,6 +178,61 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
   final List<VerificationItem> _verifications = [];
   final List<ListingSubmission> _listings = [];
   int _seq = 0;
+  bool _seeded = false;
+
+  /// DEMO: the customer's e-Broker store. Its submissions appear in the moderation queue as
+  /// e-Broker records, and decisions are written back to the same record the customer reads.
+  DemoEBrokerRepository? ebroker;
+  final Map<String, String> _ebLink = {}; // e-Broker id -> moderation id
+  final Map<String, int> _ebRev = {};
+
+  void _syncEBroker() {
+    final eb = ebroker;
+    if (eb == null) return;
+    for (final (sub, rev) in eb.adminView()) {
+      final linked = _ebLink[sub.id];
+      final i = linked == null ? -1 : _listings.indexWhere((l) => l.id == linked);
+      if (i >= 0 && _ebRev[sub.id] == rev) continue;
+      final inp = sub.input;
+      final old = i >= 0 ? _listings[i] : null;
+      final next = ListingSubmission(
+        id: old?.id ?? 'm${++_seq}',
+        title: inp.title,
+        description: inp.description,
+        ownerName: 'Prototype owner (e-Broker)',
+        location: '${inp.wilayat}, ${inp.governorate}',
+        type: inp.type,
+        source: ListingSource.eBroker,
+        submittedAt: sub.submittedAt,
+        status: ModerationStatus.pending,
+        priceOmr: inp.priceOmr,
+        sizeSqm: inp.sizeSqm,
+        transaction: TransactionType.buy,
+        photos: inp.photoNames,
+        documents: [
+          AdminDocument(id: 'd${++_seq}', label: 'Owner photo ID', fileName: inp.ownerIdName),
+          AdminDocument(id: 'd${++_seq}', label: 'Title deed', fileName: inp.deedDocName),
+        ],
+        feeDisclosureAccepted: sub.feeAcceptedAt != null,
+        history: old?.history ?? const [],
+      );
+      if (i >= 0) {
+        _listings[i] = next;
+      } else {
+        _listings.add(next);
+        _ebLink[sub.id] = next.id;
+      }
+      _ebRev[sub.id] = rev;
+    }
+  }
+
+  String _reasonText(ReasonCode? r, String note) {
+    final words = r == null
+        ? ''
+        : r.name.replaceAllMapped(RegExp('[A-Z]'), (m) => ' ${m[0]!.toLowerCase()}');
+    final base = words.isEmpty ? '' : '${words[0].toUpperCase()}${words.substring(1)}.';
+    return [base, note.trim()].where((x) => x.isNotEmpty).join(' ');
+  }
 
   /// Test and QA hook: the next write fails with this error.
   Object? debugNextError;
@@ -245,7 +302,8 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
 
   // ---- demo records (explicit, labelled, no real files)
   void seedDemoRecords() {
-    if (_verifications.isNotEmpty || _listings.isNotEmpty) return;
+    if (_seeded || _verifications.isNotEmpty) return;
+    _seeded = true;
     final now = _clock();
     AdminDocument doc(String label) => AdminDocument(
       id: 'd${++_seq}',
@@ -354,7 +412,7 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
       );
   }
 
-  bool get hasRecords => _verifications.isNotEmpty || _listings.isNotEmpty;
+  bool get hasRecords => _seeded || _verifications.isNotEmpty || _listings.isNotEmpty;
 
   // ---- verification
   @override
@@ -464,6 +522,7 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
   // ---- moderation (same lock and decision rules; a separate list)
   Future<List<ListingSubmission>> listListings() async {
     await _call();
+    _syncEBroker();
     final l = <ListingSubmission>[..._listings]
       ..sort((a, b) => a.submittedAt.compareTo(b.submittedAt));
     return List.unmodifiable(l);
@@ -471,11 +530,13 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
 
   Future<ListingSubmission?> getListing(String id) async {
     await _call();
+    _syncEBroker();
     return _listings.where((v) => v.id == id).firstOrNull;
   }
 
   Future<ListingSubmission> claimListing(String id) async {
     final s = await _call(write: true);
+    _syncEBroker();
     final i = _listings.indexWhere((v) => v.id == id);
     if (i < 0) throw const ApiException(ApiErrorCode.server);
     final v = _listings[i];
@@ -499,6 +560,7 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
   }) async {
     final s = await _call(write: true);
     if (!s.role.canDecide) throw const AdminForbiddenException();
+    _syncEBroker();
     final i = _listings.indexWhere((v) => v.id == id);
     if (i < 0) throw const ApiException(ApiErrorCode.server);
     final v = _listings[i];
@@ -528,11 +590,25 @@ class DemoAdminStore implements AdminAuthRepository, VerificationRepository {
       Decision.requestResubmission => ModerationStatus.resubmissionRequired,
       Decision.reject => ModerationStatus.rejected,
     };
-    return _listings[i] = v.copyWith(
+    final decided = _listings[i] = v.copyWith(
       status: next,
       history: [...v.history, rec],
       clearClaim: true,
     );
+    // An e-Broker record: the customer sees the same outcome in Activity.
+    final ebId = _ebLink.entries.where((e) => e.value == id).firstOrNull?.key;
+    if (ebId != null) {
+      ebroker?.applyAdminDecision(
+        ebId,
+        switch (decision) {
+          Decision.approve => EBrokerStatus.approved,
+          Decision.requestResubmission => EBrokerStatus.resubmissionRequired,
+          Decision.reject => EBrokerStatus.rejected,
+        },
+        feedback: _reasonText(reason, note),
+      );
+    }
+    return decided;
   }
 
   /// QA / tests: add a record directly.
@@ -657,9 +733,16 @@ class _AdAdminAdapter implements AdAdminRepository {
 
 // ------------------------------------------------------------------ providers
 
-final adminStoreProvider = Provider<DemoAdminStore?>(
-  (ref) => kUseDemoBackend ? DemoAdminStore() : null,
-);
+/// In the demo the console shares the customer app's campaign store, so a banner changed here is
+/// the banner the Homes serve.
+final adminStoreProvider = Provider<DemoAdminStore?>((ref) {
+  if (!kUseDemoBackend) return null;
+  final ads = ref.watch(adRepositoryProvider);
+  final store = DemoAdminStore(ads: ads is DemoAdRepository ? ads : null);
+  final eb = ref.watch(eBrokerRepositoryProvider);
+  if (eb is DemoEBrokerRepository) store.ebroker = eb;
+  return store;
+});
 final adminAuthRepositoryProvider = Provider<AdminAuthRepository>(
   (ref) =>
       ref.watch(adminStoreProvider) ?? const UnavailableAdminAuthRepository(),

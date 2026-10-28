@@ -100,8 +100,11 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: label,
       excludeSemantics: true,
+      onTap: onTap,
       child: AQPressable(
         onTap: onTap,
         pressedScale: 0.92,
@@ -116,9 +119,16 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
     final saved = ref.watch(savedPropertyIdsProvider).contains(p.id);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: saved,
       label: saved ? f.t('home.unsave') : f.t('home.save'),
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.confirm();
+          final cur = ref.read(savedPropertyIdsProvider);
+          ref.read(savedPropertyIdsProvider.notifier).state = saved ? ({...cur}..remove(p.id)) : {...cur, p.id};
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.confirm();
@@ -234,9 +244,12 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
               separatorBuilder: (_, _) => const SizedBox(width: AQSpacing.x2),
               itemBuilder: (context, i) => Semantics(
                 button: true,
+                focusable: true,
+                onFocus: () {},
                 selected: i == _i,
                 label: f.t('pd.photo', {'i': VFmt.n(context, i + 1), 'n': VFmt.n(context, images.length)}),
                 excludeSemantics: true,
+      onTap: () => _go(i, images.length),
                 child: AQPressable(
                   onTap: () => _go(i, images.length),
                   child: AnimatedContainer(

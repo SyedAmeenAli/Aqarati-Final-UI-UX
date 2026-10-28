@@ -83,6 +83,8 @@ class AQCategoryStepScreen extends StatelessWidget {
       width: w,
       child: Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         label: '${f.t(k.key)}. ${f.t('pt.c.${k.name}')}',
         excludeSemantics: true,
         onTap: open,
@@ -236,6 +238,8 @@ class AQTypeStepScreen extends StatelessWidget {
       width: w,
       child: Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         label: label,
         excludeSemantics: true,
         onTap: open,

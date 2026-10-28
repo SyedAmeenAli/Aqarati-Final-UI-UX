@@ -12,6 +12,7 @@ import '../data/models/enums.dart';
 import '../data/models/money.dart';
 import '../features/viewing/widgets/viewing_format.dart';
 import 'admin_auth.dart';
+import 'admin_directory.dart' show adminLog, decisionVerb;
 import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_review_parts.dart';
@@ -487,6 +488,7 @@ class _ModerationDetailScreenState
                         await ref
                             .read(moderationRepositoryProvider)
                             .decide(l.id, d, reason: reason, note: note);
+                        adminLog(ref, '${decisionVerb(d)} listing${l.source == ListingSource.eBroker ? ' (e-Broker)' : ''}', l.title);
                         ref.invalidate(moderationItemProvider(l.id));
                         ref.invalidate(moderationListProvider);
                       },

@@ -64,7 +64,7 @@ Widget _app(String location, DevBuildRepository repo, {double scale = 1}) {
     routes: [
       ShellRoute(
         builder: (c, s, child) => Scaffold(body: child),
-        routes: dbShellRoutes(),
+        routes: [...dbShellRoutes(), ...dbProShellRoutes()],
       ),
       ...dbStandaloneRoutes(),
       GoRoute(

@@ -9,6 +9,10 @@ import 'dart:typed_data';
 /// Wire names are `home_top` and `results_in_feed`.
 enum AdPlacement { homeTop, resultsInFeed }
 
+/// Who a banner is for: the Home screen it may appear on. One banner can target several audiences.
+/// (The six public roles: User to Shop, Real Estate Agent, and the four professional kinds.)
+enum AdAudience { customer, agent, developer, construction, architecture, interior }
+
 /// Items share the verification state machine (draft, pending_verification, approved,
 /// resubmission_required, rejected). [paused] and [expired] come from the ad events the module emits
 /// (`ad.paused`, `ad.expired`).
@@ -40,6 +44,9 @@ class SponsoredAd {
   final Uint8List? imageBytes;
   final String? imageName;
   final AdPlacement placement;
+
+  /// The Home screens this banner may be served to. Never empty.
+  final Set<AdAudience> audiences;
   final AdStatus status;
   final DateTime? startsAt, endsAt;
 
@@ -60,6 +67,7 @@ class SponsoredAd {
     this.imageBytes,
     this.imageName,
     this.placement = AdPlacement.homeTop,
+    this.audiences = const {AdAudience.customer},
     this.status = AdStatus.draft,
     this.startsAt,
     this.endsAt,
@@ -96,6 +104,7 @@ class SponsoredAd {
     imageBytes: imageBytes,
     imageName: imageName,
     placement: placement,
+    audiences: audiences,
     status: status ?? this.status,
     startsAt: startsAt,
     endsAt: endsAt,
@@ -112,6 +121,7 @@ class AdDraft {
   final Uint8List? imageBytes;
   final String? imageName;
   final AdPlacement placement;
+  final Set<AdAudience> audiences;
   final DateTime? startsAt, endsAt;
   const AdDraft({
     required this.sponsor,
@@ -123,6 +133,7 @@ class AdDraft {
     this.imageBytes,
     this.imageName,
     this.placement = AdPlacement.homeTop,
+    this.audiences = const {AdAudience.customer},
     this.startsAt,
     this.endsAt,
   });
@@ -149,6 +160,7 @@ Map<String, String> validateAd(AdDraft d) {
   if (d.sponsor.trim().isEmpty) e['sponsor'] = 'adm.err.sponsor';
   if (d.headline.trim().isEmpty) e['headline'] = 'adm.err.headline';
   if (d.cta.trim().isEmpty) e['cta'] = 'adm.err.cta';
+  if (d.audiences.isEmpty) e['audience'] = 'adm.err.audience';
   if (!destinationValid(d.destination)) {
     e['destination'] = 'adm.err.destination';
   }
@@ -168,4 +180,29 @@ Map<String, String> validateAd(AdDraft d) {
     e['schedule'] = 'adm.err.schedule';
   }
   return e;
+}
+
+/// App routes a banner may point at. A destination that is a path but not one of these is replaced
+/// by [kAdFallbackRoute] when tapped, so a mistyped campaign never lands on an error page.
+const kAdKnownRoutePrefixes = <String>[
+  '/app/',
+  '/properties',
+  '/property/',
+  '/professionals',
+  '/business/',
+  '/calculators',
+  '/sell',
+  '/saved',
+  '/search',
+  '/map',
+  '/agent',
+  '/pro',
+];
+const kAdFallbackRoute = '/app/explore';
+
+/// The route a tap on [destination] should open, or null for an external https address.
+String? adInAppRoute(String destination) {
+  final d = destination.trim();
+  if (!d.startsWith('/')) return null;
+  return kAdKnownRoutePrefixes.any(d.startsWith) ? d : kAdFallbackRoute;
 }

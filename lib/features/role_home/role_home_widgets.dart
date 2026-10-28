@@ -269,9 +269,19 @@ class _RoleTileState extends State<RoleTile> {
     final dim = widget.unavailable;
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${widget.label}. ${widget.sub}',
       expanded: dim ? _open : null,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          if (dim) {
+            setState(() => _open = !_open);
+          } else {
+            widget.onTap?.call();
+          }
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -331,8 +341,14 @@ class RoleNumberCell extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '$label. $sub',
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -477,8 +493,14 @@ class RolePhotoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: label,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();

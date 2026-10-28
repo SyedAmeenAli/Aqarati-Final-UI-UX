@@ -1,0 +1,222 @@
+[
+ {
+  "name": "Admin sign-in: Tab reaches Email",
+  "pass": true,
+  "note": "presses 1"
+ },
+ {
+  "name": "Admin sign-in: Tab moves on to Password",
+  "pass": true,
+  "note": "presses 1"
+ },
+ {
+  "name": "Admin sign-in: Tab reaches Continue and a focus ring is drawn",
+  "pass": true,
+  "note": "presses 2"
+ },
+ {
+  "name": "Admin sign-in: Enter moves to the one-time code step",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin: code entered by keyboard reaches Overview",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelo"
+ },
+ {
+  "name": "Admin: Tab reaches the Accounts item in the sidebar",
+  "pass": true,
+  "note": "presses 5"
+ },
+ {
+  "name": "Admin: Enter on Accounts opens the account list",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin: Tab reaches an account row",
+  "pass": true,
+  "note": "presses 28"
+ },
+ {
+  "name": "Admin: Enter opens the account detail",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin: Tab reaches a status action",
+  "pass": true,
+  "note": "presses 7"
+ },
+ {
+  "name": "Admin: Enter opens the confirmation dialog",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin: Escape closes the dialog without changing anything",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin: Tab reaches Property listings in the sidebar",
+  "pass": true,
+  "note": "presses 5"
+ },
+ {
+  "name": "Admin: Space opens the module list",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin: a record opens from the keyboard",
+  "pass": true,
+  "note": "presses 18"
+ },
+ {
+  "name": "Admin: the module action opens a confirmation",
+  "pass": true,
+  "note": "presses 6"
+ },
+ {
+  "name": "architecture: Tab reaches the Portfolio tab",
+  "pass": true,
+  "note": "presses 7"
+ },
+ {
+  "name": "architecture: focus ring drawn on the tab",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture: Enter opens Portfolio",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample en"
+ },
+ {
+  "name": "architecture: Space opens Engagements",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEEngagementsConfirm work you have completed with a client.Villa fit-o"
+ },
+ {
+  "name": "architecture: Tab reaches Add portfolio work",
+  "pass": true,
+  "note": "presses 15"
+ },
+ {
+  "name": "architecture: Enter opens the add dialog",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture: Escape closes it",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: Tab reaches the Projects tab",
+  "pass": true,
+  "note": "presses 6"
+ },
+ {
+  "name": "developer: focus ring drawn on the tab",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: Enter opens Projects",
+  "pass": true,
+  "note": "BackDEVELOPER WORKSPACEMy projectsManage the developments you have submitted.Add new proje"
+ },
+ {
+  "name": "developer: Space opens Enquiries",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEContact activityWhen customers tap Call or WhatsApp on your profile."
+ },
+ {
+  "name": "construction: Tab reaches the Portfolio tab",
+  "pass": true,
+  "note": "presses 4"
+ },
+ {
+  "name": "construction: focus ring drawn on the tab",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "construction: Enter opens Portfolio",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample en"
+ },
+ {
+  "name": "construction: Space opens Requests",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEContact activityWhen customers tap Call or WhatsApp on your profile."
+ },
+ {
+  "name": "interior: Tab reaches the Portfolio tab",
+  "pass": true,
+  "note": "presses 3"
+ },
+ {
+  "name": "interior: focus ring drawn on the tab",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "interior: Enter opens Portfolio",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample en"
+ },
+ {
+  "name": "interior: Space opens Engagements",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEEngagementsConfirm work you have completed with a client.Villa fit-o"
+ },
+ {
+  "name": "buyer: Tab reaches the banner button",
+  "pass": true,
+  "note": "presses 54"
+ },
+ {
+  "name": "buyer: focus ring drawn on the banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer: Enter opens the banner destination",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunitie"
+ },
+ {
+  "name": "agent: Tab reaches the banner button",
+  "pass": true,
+  "note": "presses 5"
+ },
+ {
+  "name": "agent: focus ring drawn on the banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: Enter opens the banner destination",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunitie"
+ },
+ {
+  "name": "developer: Tab reaches the banner button",
+  "pass": true,
+  "note": "presses 3"
+ },
+ {
+  "name": "developer: focus ring drawn on the banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: Enter opens the banner destination",
+  "pass": true,
+  "note": "BackAccountDEVELOPMENT & BUILDINGConstruction CompaniesVerified builders with pr"
+ }
+]

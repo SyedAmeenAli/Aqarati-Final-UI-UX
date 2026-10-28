@@ -466,7 +466,7 @@ void main() {
         purpose: SignupPurpose.realEstateAgent,
         grant: GrantState.pendingVerification,
       );
-      expect(routeForSession(agent), '/app/home');
+      expect(routeForSession(agent), '/agent', reason: 'an approved agent goes to the agent workspace');
       expect(routeForSession(buyer), '/app/home');
       expect(routeForSession(agentPending), '/verification');
     });

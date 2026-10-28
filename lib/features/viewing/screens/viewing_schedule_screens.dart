@@ -311,9 +311,12 @@ class _PeriodTabs extends StatelessWidget {
       final sel = p == current;
       return Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         selected: sel,
         label: '${v.t(periodKey(p))}, ${periodRange(context, day.inPeriod(p))}',
         excludeSemantics: true,
+      onTap: () => onChanged(p),
         child: AQPressable(
           onTap: () => onChanged(p),
           child: AnimatedContainer(

@@ -1,0 +1,112 @@
+[
+ {
+  "name": "default build: #/admin opens the admin sign-in directly",
+  "pass": true,
+  "note": "Admin consoleSign inUse your admin account. You will be asked for a one-time code next.Show passwordContinuePr"
+ },
+ {
+  "name": "default build: no demo accounts or password shown",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "refresh on #/admin keeps the admin sign-in",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "customer routes still work in the same build (#/entry)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Admin Console link opens the in-app console sign-in",
+  "pass": true,
+  "note": "Admin consoleSign inUse your admin account. You will be asked for a one-time code next.Show passwordContinuePr"
+ },
+ {
+  "name": "demo build shows the demo accounts (explicit preview only)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "step 2: the illustrative one-time code",
+  "pass": true,
+  "note": "Admin consoleOne-time codeEnter the 6-digit code from your authenticator app.Back to sign inDEMO DATA Accounts"
+ },
+ {
+  "name": "signed in: Overview with metrics and recent activity",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+ },
+ {
+  "name": "Accounts: 14 demo accounts with role and status filters",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+ },
+ {
+  "name": "Accounts: search narrows to one",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Account detail with review status actions and activity",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+ },
+ {
+  "name": "status change asks for confirmation first",
+  "pass": true,
+  "note": "Set active Rana Agent Example?The account would be treated as active in this demo.CancelSet active"
+ },
+ {
+  "name": "after confirming, the status is Active and the log has an entry",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+ },
+ {
+  "name": "Reports: list with status and kind filters",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Report resolved with a note",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+ },
+ {
+  "name": "Activity log shows this session's changes at the top",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+ },
+ {
+  "name": "Listing moderation (existing queue) is in the same console",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Ads & Sponsors (existing management) is in the same console",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin sign-in @320: no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin sign-in @390: no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin sign-in @768: no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "admin sign-in @1280: no overflow",
+  "pass": true,
+  "note": ""
+ }
+]

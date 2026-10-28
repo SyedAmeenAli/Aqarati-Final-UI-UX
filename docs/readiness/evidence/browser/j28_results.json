@@ -1,0 +1,242 @@
+[
+ {
+  "name": "agent session lands on the agent dashboard, not customer Home",
+  "pass": true,
+  "note": "REAL ESTATE AGENTYour workspaceDemo data: these contacts and appointments are fictional and stay on this devic"
+ },
+ {
+  "name": "agent navigation: Dashboard, Contacts, Listings, Calendar, More; no customer tabs",
+  "pass": true,
+  "note": "Dashboard,Contacts,Listings,Calendar,More"
+ },
+ {
+  "name": "Contacts: list with 8 demo contacts",
+  "pass": true,
+  "note": "ContactsAdd contactAllNewContactedViewingNegotiatingWonLostLatest activityNameFollow-up date8 contactsOmar Sam"
+ },
+ {
+  "name": "Contacts: search narrows the list",
+  "pass": true,
+  "note": "ContactsAdd contactClear searchAllNewContactedViewingNegotiatingWonLostLatest activityNameFollow-up date1 cont"
+ },
+ {
+  "name": "Contact detail opens the right record with notes and actions",
+  "pass": true,
+  "note": "BackCONTACTMariam FictionalContactedCallEditEmail: mariam@example.testSourceWalk-inInterestsFarm, BuyPreferred"
+ },
+ {
+  "name": "Add a note: it appears at the top of the timeline",
+  "pass": true,
+  "note": "BackCONTACTMariam FictionalContactedCallEditEmail: mariam@ex"
+ },
+ {
+  "name": "Change status: a status entry is added to the timeline",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "New contact: empty form shows both errors",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "New contact: saved and opened as a contact record",
+  "pass": true,
+  "note": "BackCONTACTZainab FictionalNewCallEditSourceAdded by youInterests-Preferred location-Budget-Next follow-upNo f"
+ },
+ {
+  "name": "Calendar: upcoming viewing and follow-ups grouped by day",
+  "pass": true,
+  "note": "CalendarDemo data: these contacts and appointments are fictional and stay on this device.Upcoming (4)Overdue ("
+ },
+ {
+  "name": "Calendar: Overdue tab shows the overdue follow-up",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Appointment sheet: reschedule, mark done and cancel offered, simulation stated",
+  "pass": true,
+  "note": "Call Huda ExampleFollow-up · Tue 27 Oct, 11:00 AMSimulated: the other person is not notified.Huda ExampleResch"
+ },
+ {
+  "name": "Mark done: it leaves Overdue",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "and appears under Done and cancelled",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "More: profile, requests, enquiries, service requests, customer view, sign out",
+  "pass": true,
+  "note": "MoreYour workProfessional profile and verificationViewing requests from customersEnquiriesService requestsAcco"
+ },
+ {
+  "name": "Listings opens the existing listing management inside the agent workspace",
+  "pass": true,
+  "note": "BackMy listingsProperties you have listed on AQARATI.No listings yetAdd your first property. It is reviewed be"
+ },
+ {
+  "name": "View as a customer: customer Home with customer tabs, plus the way back",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman | Home,Explore,Activity,Account"
+ },
+ {
+  "name": "/agent @320: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts @320: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts/C1 @320: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/calendar @320: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/more @320: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent @360: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts @360: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts/C1 @360: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/calendar @360: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/more @360: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent @390: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts @390: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts/C1 @390: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/calendar @390: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/more @390: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent @412: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts @412: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts/C1 @412: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/calendar @412: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/more @412: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent @430: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts @430: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts/C1 @430: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/calendar @430: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/more @430: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent @1280: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts @1280: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/contacts/C1 @1280: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/calendar @1280: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "/agent/more @1280: no horizontal overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "a shopper cannot open agent screens",
+  "pass": true,
+  "note": "BackDashboardAgent workspace only Listings are managed from an approved real estate agent account.Back"
+ }
+]

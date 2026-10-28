@@ -1,0 +1,132 @@
+[
+ {
+  "name": "agent: empty inbox, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: sample leads listed (QA tools, labelled DEMO)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: viewing filter shows viewing requests",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: contact lead detail shows customer, message, phone",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: Call hands the number to the dialler (tel: link)",
+  "pass": true,
+  "note": "[\"tel:+96890000001\"]"
+ },
+ {
+  "name": "agent: no invented call outcome",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: viewing request detail has requested time and Confirm/Decline",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: confirm follows the response, status Confirmed",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: two viewing requests present",
+  "pass": true,
+  "note": "cards=2"
+ },
+ {
+  "name": "agent: decline asks first",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: Keep request leaves it requested",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent: declined after the response",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer cannot open agent leads",
+  "pass": true,
+  "note": "BackLeadsAgent workspace only\nLeads are shown to an approved real estate agent.Back | Back"
+ },
+ {
+  "name": "agent cannot open developer enquiries",
+  "pass": true,
+  "note": "BackProject enquiriesDevelopment company only\nProject enquiries are shown to an approved d"
+ },
+ {
+  "name": "developer cannot open service requests",
+  "pass": true,
+  "note": "BackService requestsService companies only\nService requests are shown to an approved const"
+ },
+ {
+  "name": "construction cannot open developer enquiries",
+  "pass": true,
+  "note": "BackProject enquiriesDevelopment company only\nProject enquiries are shown to an approved d"
+ },
+ {
+  "name": "buyer cannot open agent leads",
+  "pass": true,
+  "note": "BackLeadsAgent workspace only\nLeads are shown to an approved real estate agent.Back | Back"
+ },
+ {
+  "name": "developer: empty enquiries, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: project enquiry listed",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: detail shows the project and message, no viewing actions",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "construction: empty requests, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "construction: service request detail (service, location, timing)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture: empty requests, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture: service request detail (service, location, timing)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "interior: empty requests, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "interior: service request detail (service, location, timing)",
+  "pass": true,
+  "note": ""
+ }
+]

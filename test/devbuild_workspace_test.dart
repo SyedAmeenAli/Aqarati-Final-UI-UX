@@ -73,7 +73,7 @@ Widget _app(
     routes: [
       ShellRoute(
         builder: (c, s, child) => Scaffold(body: child),
-        routes: dbShellRoutes(),
+        routes: [...dbShellRoutes(), ...dbProShellRoutes()],
       ),
       ...dbStandaloneRoutes(),
       GoRoute(

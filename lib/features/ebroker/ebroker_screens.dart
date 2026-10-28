@@ -195,8 +195,11 @@ class _Card extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${s.input.title}, ${f.t('eb.st.${s.status.name}')}',
       excludeSemantics: true,
+      onTap: () => context.push('/sell/${s.id}'),
       child: AQPressable(
         onTap: () => context.push('/sell/${s.id}'),
         child: AQSurface(
@@ -236,6 +239,8 @@ class _Card extends StatelessWidget {
 
 // ------------------------------------------------------------------ form
 
+const _kSteps = 6;
+
 class EBrokerFormScreen extends ConsumerStatefulWidget {
   final String? editId;
   const EBrokerFormScreen({super.key, this.editId});
@@ -254,6 +259,7 @@ class _EBrokerFormState extends ConsumerState<EBrokerFormScreen> {
   String? _gov, _wilayat, _idName, _deedName;
   final List<String> _photos = [];
   bool _accepted = false, _tried = false, _saving = false, _loaded = false;
+  int _step = 0;
   String? _failKey, _photoErr, _fileErr;
 
   bool get _editing => widget.editId != null;
@@ -295,6 +301,39 @@ class _EBrokerFormState extends ConsumerState<EBrokerFormScreen> {
     _ePhotos,
     _eAccept,
   ].every((e) => e == null);
+
+  /// The errors that block each step. Review (the last) has none of its own: it re-checks everything.
+  List<String?> _stepErrors(int step) => switch (step) {
+    0 => [_eMarket, _eType],
+    1 => [_eTitle, _eSize],
+    2 => [_eGov, _eWil],
+    3 => [_ePrice, _ePhotos],
+    4 => [_eId, _eDeedDoc, _eDeed, _eAccept],
+    _ => const [],
+  };
+
+  void _next() {
+    setState(() => _tried = true);
+    if (_stepErrors(_step).any((e) => e != null)) return;
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _step++;
+      _tried = false;
+      _failKey = null;
+    });
+  }
+
+  void _previous() {
+    if (_step == 0) {
+      aqBack(context, _editing ? '/sell/${widget.editId}' : '/sell');
+      return;
+    }
+    setState(() {
+      _step--;
+      _tried = false;
+      _failKey = null;
+    });
+  }
 
   void _load(EBrokerSubmission s) {
     if (_loaded) return;
@@ -353,7 +392,17 @@ class _EBrokerFormState extends ConsumerState<EBrokerFormScreen> {
 
   Future<void> _submit() async {
     setState(() => _tried = true);
-    if (!_valid || _saving) return;
+    if (!_valid) {
+      // Take the person to the first step that still needs something.
+      for (var i = 0; i < _kSteps - 1; i++) {
+        if (_stepErrors(i).any((e) => e != null)) {
+          setState(() => _step = i);
+          break;
+        }
+      }
+      return;
+    }
+    if (_saving) return;
     FocusScope.of(context).unfocus();
     final input = EBrokerInput(
       title: _title.text.trim(),
@@ -473,229 +522,359 @@ class _EBrokerFormState extends ConsumerState<EBrokerFormScreen> {
             ],
           ),
         );
-    return AQViewingScaffold(
-      title: _editing ? f.t('eb.form.edit') : f.t('eb.form.title'),
-      subtitle: f.t('eb.sub'),
-      backLabel: f.t('common.back'),
-      onBack: back,
-      bottom: AQBottomActionBar(
-        primary: AQPrimaryButton(
-          label: f.t('eb.submit'),
-          trailingChevron: false,
-          loading: _saving,
-          onPressed: _saving ? null : _submit,
-        ),
-      ),
-      children: [
-        if (_failKey != null) AQErrorBanner(text: f.t(_failKey!)),
-        AQViewingSectionTitle(f.t('eb.sec.owner')),
-        fileTile(f.t('eb.f.id'), _idName, true, _eId),
-        gap(),
-        fileTile(f.t('eb.f.deedDoc'), _deedName, false, _eDeedDoc),
-        if (_fileErr != null)
-          Padding(
-            padding: const EdgeInsets.only(top: AQSpacing.x1),
-            child: Text(
-              _fileErr!,
-              style: AQTypography.of(
-                context,
-                AQText.bodySmall,
-                color: AQColors.of(context).danger,
-              ),
+    final last = _step == _kSteps - 1;
+    List<Widget> stepBody() {
+      switch (_step) {
+        case 0:
+          return [
+            DbSelectField<PropertyMarket>(
+              label: f.t('eb.f.market'),
+              valueLabel: _market == null
+                  ? null
+                  : f.t('ls.market.${_market!.name}'),
+              hint: f.t('eb.f.market'),
+              required: true,
+              error: err(_eMarket),
+              onTap: () async {
+                final r = await showDbChoiceSheet<PropertyMarket>(
+                  context,
+                  title: f.t('eb.f.market'),
+                  options: [
+                    for (final m in PropertyMarket.values)
+                      (m, f.t('ls.market.${m.name}')),
+                  ],
+                  selected: _market,
+                );
+                if (r != null) {
+                  setState(() {
+                    if (_market != r) _type = null;
+                    _market = r;
+                  });
+                }
+              },
             ),
-          ),
-        AQViewingSectionTitle(f.t('eb.sec.property')),
-        DbSelectField<PropertyMarket>(
-          label: f.t('eb.f.market'),
-          valueLabel: _market == null
-              ? null
-              : f.t('ls.market.${_market!.name}'),
-          hint: f.t('eb.f.market'),
-          required: true,
-          error: err(_eMarket),
-          onTap: () async {
-            final r = await showDbChoiceSheet<PropertyMarket>(
-              context,
-              title: f.t('eb.f.market'),
-              options: [
-                for (final m in PropertyMarket.values)
-                  (m, f.t('ls.market.${m.name}')),
+            gap(),
+            DbSelectField<PropertyType>(
+              label: f.t('eb.f.type'),
+              valueLabel: _type == null ? null : _typeLabel(f, _type!),
+              hint: f.t('eb.f.type'),
+              required: true,
+              error: err(_eType),
+              onTap: _market == null
+                  ? null
+                  : () async {
+                      final r = await showDbChoiceSheet<PropertyType>(
+                        context,
+                        title: f.t('eb.f.type'),
+                        options: [
+                          for (final t in kMarketTypes[_market]!)
+                            (t, _typeLabel(f, t)),
+                        ],
+                        selected: _type,
+                      );
+                      if (r != null) setState(() => _type = r);
+                    },
+            ),
+          ];
+        case 1:
+          return [
+            AQTextField(
+              label: f.t('eb.f.title'),
+              controller: _title,
+              error: txt(_eTitle),
+              onChanged: (_) => setState(() {}),
+            ),
+            gap(),
+            AQTextField(
+              label: f.t('eb.f.desc'),
+              controller: _desc,
+              minLines: 3,
+              maxLines: 6,
+              keyboardType: TextInputType.multiline,
+              action: TextInputAction.newline,
+            ),
+            gap(),
+            AQTextField(
+              label: f.t('eb.f.size'),
+              controller: _size,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              formatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                LengthLimitingTextInputFormatter(10),
               ],
-              selected: _market,
-            );
-            if (r != null) {
-              setState(() {
-                if (_market != r) _type = null;
-                _market = r;
-              });
-            }
-          },
-        ),
-        gap(),
-        DbSelectField<PropertyType>(
-          label: f.t('eb.f.type'),
-          valueLabel: _type == null ? null : _typeLabel(f, _type!),
-          hint: f.t('eb.f.type'),
-          required: true,
-          error: err(_eType),
-          onTap: _market == null
-              ? null
-              : () async {
-                  final r = await showDbChoiceSheet<PropertyType>(
-                    context,
-                    title: f.t('eb.f.type'),
-                    options: [
-                      for (final t in kMarketTypes[_market]!)
-                        (t, _typeLabel(f, t)),
+              error: txt(_eSize),
+              onChanged: (_) => setState(() {}),
+            ),
+          ];
+        case 2:
+          return [
+            DbSelectField<String>(
+              label: f.t('eb.f.gov'),
+              valueLabel: _gov,
+              hint: f.t('eb.f.gov'),
+              required: true,
+              error: err(_eGov),
+              onTap: () async {
+                final r = await showDbChoiceSheet<String>(
+                  context,
+                  title: f.t('eb.f.gov'),
+                  options: [for (final g in omanGovernorates.keys) (g, g)],
+                  selected: _gov,
+                );
+                if (r != null) {
+                  setState(() {
+                    if (_gov != r) _wilayat = null;
+                    _gov = r;
+                  });
+                }
+              },
+            ),
+            gap(),
+            DbSelectField<String>(
+              label: f.t('eb.f.wilayat'),
+              valueLabel: _wilayat,
+              hint: f.t('eb.f.wilayat'),
+              required: true,
+              error: err(_eWil),
+              onTap: _gov == null
+                  ? null
+                  : () async {
+                      final r = await showDbChoiceSheet<String>(
+                        context,
+                        title: f.t('eb.f.wilayat'),
+                        options: [
+                          for (final w in omanGovernorates[_gov]!) (w, w),
+                        ],
+                        selected: _wilayat,
+                      );
+                      if (r != null) setState(() => _wilayat = r);
+                    },
+            ),
+          ];
+        case 3:
+          return [
+            AQTextField(
+              label: f.t('eb.f.price'),
+              controller: _price,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              formatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                LengthLimitingTextInputFormatter(14),
+              ],
+              error: txt(_ePrice),
+              onChanged: (_) => setState(() {}),
+            ),
+            AQViewingSectionTitle(f.t('eb.sec.photos')),
+            if (_photos.isEmpty)
+              DbNotice(txt(_ePhotos) ?? f.t('eb.photo.none'), icon: 'info')
+            else
+              for (var i = 0; i < _photos.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AQSpacing.x1),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          VFmt.iso(_photos[i]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AQTypography.of(context, AQText.bodyMedium),
+                        ),
+                      ),
+                      AQIconButton(
+                        icon: 'close',
+                        semanticsLabel: f.t(
+                          'eb.photo.remove',
+                          {'n': '${i + 1}'},
+                        ),
+                        onPressed: () => setState(() => _photos.removeAt(i)),
+                      ),
                     ],
-                    selected: _type,
-                  );
-                  if (r != null) setState(() => _type = r);
-                },
-        ),
-        gap(),
-        AQTextField(
-          label: f.t('eb.f.title'),
-          controller: _title,
-          error: txt(_eTitle),
-          onChanged: (_) => setState(() {}),
-        ),
-        gap(),
-        AQTextField(
-          label: f.t('eb.f.desc'),
-          controller: _desc,
-          minLines: 3,
-          maxLines: 6,
-          keyboardType: TextInputType.multiline,
-          action: TextInputAction.newline,
-        ),
-        AQViewingSectionTitle(f.t('eb.sec.location')),
-        DbSelectField<String>(
-          label: f.t('eb.f.gov'),
-          valueLabel: _gov,
-          hint: f.t('eb.f.gov'),
-          required: true,
-          error: err(_eGov),
-          onTap: () async {
-            final r = await showDbChoiceSheet<String>(
-              context,
-              title: f.t('eb.f.gov'),
-              options: [for (final g in omanGovernorates.keys) (g, g)],
-              selected: _gov,
-            );
-            if (r != null) {
-              setState(() {
-                if (_gov != r) _wilayat = null;
-                _gov = r;
-              });
-            }
-          },
-        ),
-        gap(),
-        DbSelectField<String>(
-          label: f.t('eb.f.wilayat'),
-          valueLabel: _wilayat,
-          hint: f.t('eb.f.wilayat'),
-          required: true,
-          error: err(_eWil),
-          onTap: _gov == null
-              ? null
-              : () async {
-                  final r = await showDbChoiceSheet<String>(
+                  ),
+                ),
+            if (_photoErr != null)
+              Text(
+                _photoErr!,
+                style: AQTypography.of(
+                  context,
+                  AQText.bodySmall,
+                  color: AQColors.of(context).danger,
+                ),
+              ),
+            AQTextButton(
+              label: f.t('eb.photo.add'),
+              color: AQColors.of(context).accent,
+              onPressed: _addPhoto,
+            ),
+          ];
+        case 4:
+          return [
+            fileTile(f.t('eb.f.id'), _idName, true, _eId),
+            gap(),
+            fileTile(f.t('eb.f.deedDoc'), _deedName, false, _eDeedDoc),
+            if (_fileErr != null)
+              Padding(
+                padding: const EdgeInsets.only(top: AQSpacing.x1),
+                child: Text(
+                  _fileErr!,
+                  style: AQTypography.of(
                     context,
-                    title: f.t('eb.f.wilayat'),
-                    options: [for (final w in omanGovernorates[_gov]!) (w, w)],
-                    selected: _wilayat,
-                  );
-                  if (r != null) setState(() => _wilayat = r);
-                },
-        ),
-        AQViewingSectionTitle(f.t('eb.sec.facts')),
-        AQTextField(
-          label: f.t('eb.f.size'),
-          controller: _size,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          formatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            LengthLimitingTextInputFormatter(10),
-          ],
-          error: txt(_eSize),
-          onChanged: (_) => setState(() {}),
-        ),
-        gap(),
-        AQTextField(
-          label: f.t('eb.f.price'),
-          controller: _price,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          formatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            LengthLimitingTextInputFormatter(14),
-          ],
-          error: txt(_ePrice),
-          onChanged: (_) => setState(() {}),
-        ),
-        gap(),
-        AQTextField(
-          label: f.t('eb.f.deed'),
-          controller: _deed,
-          error: txt(_eDeed),
-          formatters: [LengthLimitingTextInputFormatter(24)],
-          onChanged: (_) => setState(() {}),
-        ),
-        AQViewingSectionTitle(f.t('eb.sec.photos')),
-        if (_photos.isEmpty)
-          DbNotice(txt(_ePhotos) ?? f.t('eb.photo.none'), icon: 'info')
-        else
-          for (var i = 0; i < _photos.length; i++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AQSpacing.x1),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      VFmt.iso(_photos[i]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AQTypography.of(context, AQText.bodyMedium),
+                    AQText.bodySmall,
+                    color: AQColors.of(context).danger,
+                  ),
+                ),
+              ),
+            gap(),
+            AQTextField(
+              label: f.t('eb.f.deed'),
+              controller: _deed,
+              error: txt(_eDeed),
+              formatters: [LengthLimitingTextInputFormatter(24)],
+              onChanged: (_) => setState(() {}),
+            ),
+            AQViewingSectionTitle(f.t('eb.sec.fee')),
+            AQNoticeCard(
+              icon: 'info',
+              title: f.t('eb.fee.text'),
+              body: f.t('eb.fee.note'),
+            ),
+            const SizedBox(height: AQSpacing.x2),
+            AQCheckRow(
+              value: _accepted,
+              label: f.t('eb.accept'),
+              error: txt(_eAccept),
+              onChanged: (v) => setState(() => _accepted = v),
+            ),
+          ];
+        default:
+          Widget row(String label, String value, int step) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: AQSpacing.x1),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 110,
+                  child: Text(
+                    label,
+                    style: AQTypography.of(
+                      context,
+                      AQText.bodySmall,
+                      soft: true,
                     ),
                   ),
-                  AQIconButton(
-                    icon: 'close',
-                    semanticsLabel: f.t('eb.photo.remove', {'n': '${i + 1}'}),
-                    onPressed: () => setState(() => _photos.removeAt(i)),
+                ),
+                Expanded(
+                  child: Text(
+                    value.isEmpty ? '-' : VFmt.iso(value),
+                    style: AQTypography.of(context, AQText.bodyMedium),
                   ),
+                ),
+              ],
+            ),
+          );
+          Widget block(int step, List<Widget> rows) => Padding(
+            padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+            child: AQSurface(
+              padding: const EdgeInsets.all(AQSpacing.x4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Semantics(
+                          header: true,
+                          child: Text(
+                            f.t('eb.step.$step.t'),
+                            style: AQTypography.of(context, AQText.titleSmall),
+                          ),
+                        ),
+                      ),
+                      AQTextButton(
+                        label: f.t('eb.rev.edit'),
+                        color: AQColors.of(context).accent,
+                        onPressed: () => setState(() {
+                          _tried = false;
+                          _step = step;
+                        }),
+                      ),
+                    ],
+                  ),
+                  ...rows,
                 ],
               ),
             ),
-        if (_photoErr != null)
-          Text(
-            _photoErr!,
-            style: AQTypography.of(
-              context,
-              AQText.bodySmall,
-              color: AQColors.of(context).danger,
-            ),
-          ),
-        AQTextButton(
-          label: f.t('eb.photo.add'),
-          color: AQColors.of(context).accent,
-          onPressed: _addPhoto,
+          );
+          return [
+            block(0, [
+              row(f.t('eb.f.market'), _market == null ? '' : f.t('ls.market.${_market!.name}'), 0),
+              row(f.t('eb.f.type'), _type == null ? '' : _typeLabel(f, _type!), 0),
+            ]),
+            block(1, [
+              row(f.t('eb.f.title'), _title.text.trim(), 1),
+              row(f.t('eb.f.desc'), _desc.text.trim(), 1),
+              row(f.t('eb.f.size'), _size.text.trim(), 1),
+            ]),
+            block(2, [
+              row(f.t('eb.f.gov'), _gov ?? '', 2),
+              row(f.t('eb.f.wilayat'), _wilayat ?? '', 2),
+            ]),
+            block(3, [
+              row(f.t('eb.f.price'), _price.text.trim(), 3),
+              row(f.t('eb.sec.photos'), _photos.join(', '), 3),
+            ]),
+            block(4, [
+              row(f.t('eb.f.id'), _idName ?? '', 4),
+              row(f.t('eb.f.deedDoc'), _deedName ?? '', 4),
+              row(f.t('eb.f.deed'), _deed.text.trim(), 4),
+              row(f.t('eb.d.fee'), _accepted ? f.t('eb.fee.text') : '', 4),
+            ]),
+            if (kUseDemoBackend) DbNotice(f.t('eb.demo'), icon: 'info'),
+          ];
+      }
+    }
+
+    return AQViewingScaffold(
+      title: f.t('eb.step.$_step.t'),
+      subtitle: f.t('eb.step.$_step.s'),
+      backLabel: f.t('common.back'),
+      onBack: _previous,
+      bottom: AQBottomActionBar(
+        stack: false,
+        secondary: AQSecondaryButton(
+          label: f.t('eb.back'),
+          trailingChevron: false,
+          onPressed: _saving ? null : _previous,
         ),
-        AQViewingSectionTitle(f.t('eb.sec.fee')),
-        AQNoticeCard(
-          icon: 'info',
-          title: f.t('eb.fee.text'),
-          body: f.t('eb.fee.note'),
+        primary: AQPrimaryButton(
+          label: last ? f.t('eb.submit') : f.t('eb.continue'),
+          trailingChevron: false,
+          loading: _saving,
+          onPressed: _saving ? null : (last ? _submit : _next),
         ),
-        const SizedBox(height: AQSpacing.x2),
-        AQCheckRow(
-          value: _accepted,
-          label: f.t('eb.accept'),
-          error: txt(_eAccept),
-          onChanged: (v) => setState(() => _accepted = v),
+      ),
+      children: [
+        AQProgressStepper(
+          step: _step + 1,
+          total: _kSteps,
+          label: f.t('eb.step.of', {'n': '${_step + 1}', 'total': '$_kSteps'}),
         ),
         const SizedBox(height: AQSpacing.x4),
-        if (kUseDemoBackend) DbNotice(f.t('eb.demo'), icon: 'info'),
+        if (_failKey != null) AQErrorBanner(text: f.t(_failKey!)),
+        AnimatedSwitcher(
+          duration: AQMotion.scaled(context, AQMotion.fast),
+          child: KeyedSubtree(
+            key: ValueKey(_step),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: stepBody(),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -788,7 +967,7 @@ class EBrokerDetailScreen extends ConsumerWidget {
                 )
               : null,
           children: [
-            if (flash == 'sent')
+            if (flash == 'sent' && s.status == EBrokerStatus.pendingVerification)
               AQErrorBanner(
                 tone: AQBannerTone.success,
                 text: '${f.t('eb.sent')} ${f.t('eb.sent.b')}',

@@ -44,6 +44,9 @@ class DemoEBrokerRepository implements EBrokerRepository {
   final Set<String> _foreign = {};
   int _seq = 0;
 
+  /// Bumped on every submit or resubmit, so the admin console can tell a changed record.
+  final Map<String, int> _rev = {};
+
   Object? debugNextError;
 
   Future<void> _lag() async {
@@ -90,6 +93,7 @@ class DemoEBrokerRepository implements EBrokerRepository {
       feeAcceptedAt: _clock(),
     );
     _items.add(s);
+    _rev[s.id] = 1;
     return s;
   }
 
@@ -101,10 +105,35 @@ class DemoEBrokerRepository implements EBrokerRepository {
     if (!_items[i].canResubmit) throw const ApiException(ApiErrorCode.conflict);
     if (_dup(input.titleDeed, except: id))
       throw const EBrokerDuplicateException();
+    _rev[id] = (_rev[id] ?? 1) + 1;
     return _items[i] = _items[i].copyWith(
       input: input,
       status: EBrokerStatus.pendingVerification,
       feeAcceptedAt: _clock(),
+    );
+  }
+
+  /// DEMO: what the admin console sees, with a revision per record. Same objects the customer
+  /// reads, so the two screens cannot disagree.
+  List<(EBrokerSubmission, int)> adminView() => [
+    for (final s in _items) (s, _rev[s.id] ?? 1),
+  ];
+
+  /// DEMO: the console's decision, applied to the same record the customer reads.
+  void applyAdminDecision(
+    String id,
+    EBrokerStatus status, {
+    String? feedback,
+  }) {
+    final i = _items.indexWhere((s) => s.id == id);
+    if (i < 0) return;
+    _items[i] = EBrokerSubmission(
+      id: _items[i].id,
+      input: _items[i].input,
+      status: status,
+      feedback: status == EBrokerStatus.approved ? null : feedback,
+      submittedAt: _items[i].submittedAt,
+      feeAcceptedAt: _items[i].feeAcceptedAt,
     );
   }
 

@@ -138,9 +138,12 @@ class AgentListingCard extends StatelessWidget {
             children: [
               Semantics(
                 button: true,
+                focusable: true,
+                onFocus: () {},
                 label:
                     '${l.title}, ${l.locationLabel}, ${f.t('ls.st.${l.status.name}')}, ${_priceLabel(l)}',
                 excludeSemantics: true,
+      onTap: onOpen,
                 child: AQPressable(
                   onTap: onOpen,
                   child: Stack(
@@ -1560,8 +1563,11 @@ class _PhotoTile extends StatelessWidget {
             end: 2,
             child: Semantics(
               button: true,
+              focusable: true,
+              onFocus: () {},
               label: label,
               excludeSemantics: true,
+      onTap: onRemove,
               child: AQPressable(
                 onTap: onRemove,
                 child: SizedBox(

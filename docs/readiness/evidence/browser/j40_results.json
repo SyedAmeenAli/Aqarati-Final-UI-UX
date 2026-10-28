@@ -1,0 +1,367 @@
+[
+ {
+  "name": "User to Shop: exactly one sponsorship banner with Al Mouj Waterfront",
+  "pass": true,
+  "note": "banner buttons 1"
+ },
+ {
+  "name": "User to Shop: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop: no overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop: banner CTA \"View homes\" is reachable",
+  "pass": true,
+  "note": "{\"y\":673,\"h\":92}"
+ },
+ {
+  "name": "User to Shop: primary actions (Buy) sit above the banner",
+  "pass": true,
+  "note": "{\"y\":237}"
+ },
+ {
+  "name": "User to Shop: tapping the banner opens its destination",
+  "pass": true,
+  "note": "/app/home :: BackList viewMap viewFind your place in Oman.Homes, investments and opportunities in every corner of"
+ },
+ {
+  "name": "User to Shop: Back returns to the same Home",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman"
+ },
+ {
+  "name": "Real Estate Agent: exactly one sponsorship banner with Qurum Heights",
+  "pass": true,
+  "note": "banner buttons 1"
+ },
+ {
+  "name": "Real Estate Agent: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent: no overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent: banner CTA \"See homes\" is reachable",
+  "pass": true,
+  "note": "{\"y\":357,\"h\":92}"
+ },
+ {
+  "name": "Real Estate Agent: tapping the banner opens its destination",
+  "pass": true,
+  "note": "/agent :: BackList viewMap viewFind your place in Oman.Homes, investments and opportunities in every corner of"
+ },
+ {
+  "name": "Real Estate Agent: Back returns to the same Home",
+  "pass": true,
+  "note": "REAL ESTATE AGENTYour workspaceDemo data: these contacts and appointments are fi"
+ },
+ {
+  "name": "Development Company: exactly one sponsorship banner with Gulf Materials",
+  "pass": true,
+  "note": "banner buttons 1"
+ },
+ {
+  "name": "Development Company: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company: no overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company: banner CTA \"Find builders\" is reachable",
+  "pass": true,
+  "note": "{\"y\":560,\"h\":92}"
+ },
+ {
+  "name": "Development Company: tapping the banner opens its destination",
+  "pass": true,
+  "note": "/pro :: BackAccountDEVELOPMENT & BUILDINGConstruction CompaniesVerified builders with proven expertise.AllDe"
+ },
+ {
+  "name": "Development Company: Back returns to the same Home",
+  "pass": true,
+  "note": "DEVELOPER WORKSPACEReview BusinessYOUR DEVELOPMENTSShape places for the long ter"
+ },
+ {
+  "name": "Construction Company: exactly one sponsorship banner with Plant Hire Oman",
+  "pass": true,
+  "note": "banner buttons 1"
+ },
+ {
+  "name": "Construction Company: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company: no overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company: banner CTA \"Browse\" is reachable",
+  "pass": true,
+  "note": "{\"y\":806,\"h\":46}"
+ },
+ {
+  "name": "Construction Company: tapping the banner opens its destination",
+  "pass": true,
+  "note": "/pro :: BackMaintenancePlumbing, pool, AC and kitchen providers. Open one to request a visit.AllReal estate "
+ },
+ {
+  "name": "Construction Company: Back returns to the same Home",
+  "pass": true,
+  "note": "COMPANY WORKSPACEBuild trust before the first call.CONSTRUCTION COMPANYA strong "
+ },
+ {
+  "name": "Building Architecture: exactly one sponsorship banner with Studio Light",
+  "pass": true,
+  "note": "banner buttons 1"
+ },
+ {
+  "name": "Building Architecture: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture: no overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture: banner CTA \"Learn more\" is reachable",
+  "pass": true,
+  "note": "{\"y\":686,\"h\":92}"
+ },
+ {
+  "name": "Building Architecture: tapping the banner opens its destination",
+  "pass": true,
+  "note": "/pro :: BackAccountDEVELOPMENT & BUILDINGArchitecture StudiosStudios designing inspiring buildings.AllDevelo"
+ },
+ {
+  "name": "Building Architecture: Back returns to the same Home",
+  "pass": true,
+  "note": "THE PRACTICEArchitecture with intention.A studio profile built around trust, pla"
+ },
+ {
+  "name": "Interior & Exterior Design: exactly one sponsorship banner with Dar Fabrics",
+  "pass": true,
+  "note": "banner buttons 1"
+ },
+ {
+  "name": "Interior & Exterior Design: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design: no overflow @390",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design: banner CTA \"Explore\" is reachable",
+  "pass": true,
+  "note": "{\"y\":698,\"h\":92}"
+ },
+ {
+  "name": "Interior & Exterior Design: tapping the banner opens its destination",
+  "pass": true,
+  "note": "/pro :: BackAccountDEVELOPMENT & BUILDINGInterior & Exterior DesignDesigners for homes and outdoor spaces.Al"
+ },
+ {
+  "name": "Interior & Exterior Design: Back returns to the same Home",
+  "pass": true,
+  "note": "DESIGN STUDIOSpaces with a point of view.LIGHT / MATERIAL / FORMA considered way"
+ },
+ {
+  "name": "User to Shop @320: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop @360: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop @412: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop @430: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop @768: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "User to Shop @1280: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent @320: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent @360: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent @412: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent @430: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent @768: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Real Estate Agent @1280: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company @320: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company @360: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company @412: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company @430: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company @768: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Development Company @1280: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company @320: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company @360: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company @412: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company @430: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company @768: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Construction Company @1280: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture @320: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture @360: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture @412: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture @430: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture @768: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Building Architecture @1280: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design @320: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design @360: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design @412: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design @430: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design @768: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Interior & Exterior Design @1280: banner shown, no overflow",
+  "pass": true,
+  "note": ""
+ }
+]

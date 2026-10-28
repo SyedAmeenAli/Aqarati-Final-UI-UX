@@ -9,22 +9,25 @@ const Map<PropCategory, List<(PropertyType, String)>> kBrowseTypes = {
   PropCategory.residential: [
     (
       PropertyType.villa,
-      'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
+      'assets/properties/p4/02_Contemporary_villa_at_sunset.jpg',
     ),
     (
       PropertyType.apartment,
-      'assets/properties/p5/03_Contemporary_apartment_property_.jpg',
+      'assets/properties/p2/02_Apartment_buildings_in_Muscat.jpg',
     ),
     (
       PropertyType.residentialLand,
-      'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
+      'assets/properties/p3/01_Aerial_view_of_residential_plot.jpg',
     ),
   ],
   PropCategory.commercial: [
-    (PropertyType.shop, 'assets/properties/p6/05_Rear_utility_area_of_shop.jpg'),
+    (
+      PropertyType.shop,
+      'assets/properties/p6/01_Commercial_strip_architectural_p.jpg',
+    ),
     (
       PropertyType.office,
-      'assets/properties/p6/04_Modern_commercial_building_exterior.jpg',
+      'assets/properties/p6/03_Empty_retail_interior_floor_plan.jpg',
     ),
     (
       PropertyType.commercialBuilding,
@@ -36,17 +39,17 @@ const Map<PropCategory, List<(PropertyType, String)>> kBrowseTypes = {
     ),
     (
       PropertyType.commercialLand,
-      'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
+      'assets/properties/p3/02_Elevated_view_of_vacant_plot.jpg',
     ),
   ],
   PropCategory.industrial: [
     (
       PropertyType.investmentLand,
-      'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
+      'assets/properties/p3/03_Street_frontage_of_residential_plot.jpg',
     ),
     (
       PropertyType.industrial,
-      'assets/properties/p6/05_Rear_utility_area_of_shop.jpg',
+      'assets/location/15_Sohar_coastal_landscape_development.jpg',
     ),
   ],
   PropCategory.agriculture: [
@@ -54,7 +57,10 @@ const Map<PropCategory, List<(PropertyType, String)>> kBrowseTypes = {
       PropertyType.agriculturalLand,
       'assets/properties/p3/05_Vacant_plot_facing_distant_hills.jpg',
     ),
-    (PropertyType.farm, 'assets/location/05_Desert_landscape_with_rugged_mou.jpg'),
+    (
+      PropertyType.farm,
+      'assets/properties/p4/07_Family_garden_view_at_villa.jpg',
+    ),
   ],
 };
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/config/backend_mode.dart';
+import 'core/config/web_keyboard.dart';
 import 'core/localization/entry_strings.dart';
 import 'data/demo/demo_providers.dart';
 import 'core/startup/intro_host.dart';
@@ -15,6 +16,7 @@ void main() {
   // QA bundles expose the semantics tree from the start so a browser (or a screen reader) can reach every control.
   if (kShowReviewTools)
     WidgetsFlutterBinding.ensureInitialized().ensureSemantics();
+  installWebKeyboardSupport();
   runApp(
     ProviderScope(
       overrides: kUseDemoBackend ? demoOverrides() : const [],

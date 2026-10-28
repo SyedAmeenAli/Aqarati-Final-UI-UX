@@ -108,7 +108,7 @@ void main() {
     expect(routeForSession(const MeSession(account: AccountState.active, purpose: SignupPurpose.userToShop)), '/app/home');
     expect(routeForSession(const MeSession(account: AccountState.active, purpose: SignupPurpose.constructionCompany, grant: GrantState.draft)), '/onboarding/verification-intro');
     expect(routeForSession(const MeSession(account: AccountState.active, purpose: SignupPurpose.constructionCompany, grant: GrantState.pendingVerification)), '/verification');
-    expect(routeForSession(const MeSession(account: AccountState.active, purpose: SignupPurpose.constructionCompany, grant: GrantState.approved)), '/app/home');
+    expect(routeForSession(const MeSession(account: AccountState.active, purpose: SignupPurpose.constructionCompany, grant: GrantState.approved)), '/pro', reason: 'an approved business opens its own workspace');
   });
 
   test('expiry status: valid, expiring soon, expired, none', () {

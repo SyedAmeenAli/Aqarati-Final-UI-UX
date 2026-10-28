@@ -25,7 +25,7 @@ String routeForSession(MeSession me) {
   if (cfg == null || !cfg.needsDocuments) return '/app/home';
   return switch (me.grant) {
     null || GrantState.draft => '/onboarding/verification-intro',
-    GrantState.approved => '/app/home',
+    GrantState.approved => me.purpose == SignupPurpose.realEstateAgent ? '/agent' : (me.purpose == SignupPurpose.userToShop ? '/app/home' : '/pro'),
     _ => '/verification',
   };
 }

@@ -432,9 +432,12 @@ class _EventRow extends StatelessWidget {
     );
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label:
           '$label, ${event.targetLabel}, ${VFmt.fullDate(context, event.at)}',
       excludeSemantics: true,
+      onTap: () => context.push('/workspace/leads/${event.id}'),
       child: AQPressable(
         onTap: () => context.push('/workspace/leads/${event.id}'),
         child: Container(
@@ -757,8 +760,11 @@ class _EngagementRow extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${e.clientLabel}, ${f.t('db.eng.s.${e.state.name}')}',
       excludeSemantics: true,
+      onTap: () => context.push('/workspace/engagements/${e.id}'),
       child: AQPressable(
         onTap: () => context.push('/workspace/engagements/${e.id}'),
         child: Container(
@@ -975,11 +981,114 @@ class _DbEngagementDetailScreenState
 
 // ----------------------------------------------------- #86 portfolio
 
-class DbPortfolioScreen extends ConsumerWidget {
+class DbPortfolioScreen extends ConsumerStatefulWidget {
   const DbPortfolioScreen({super.key});
+  @override
+  ConsumerState<DbPortfolioScreen> createState() => _PortfolioState();
+}
+
+class _PortfolioState extends ConsumerState<DbPortfolioScreen> {
+  String? _done, _failed;
+
+  Future<void> _edit(PortfolioItem? item) async {
+    final f = FlowStrings.of(context);
+    final title = TextEditingController(text: item?.title ?? '');
+    final note = TextEditingController(text: item?.note ?? '');
+    var image = item?.image ?? DemoDevBuildRepository.portfolioChoices.first;
+    var tried = false;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (d) => StatefulBuilder(
+        builder: (d, set) => AlertDialog(
+          title: Text(item == null ? f.t('db.pf.add') : f.t('db.pf.edit')),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                AQTextField(label: f.t('db.pf.titleLbl'), controller: title, error: tried && title.text.trim().isEmpty ? f.t('db.pf.titleErr') : null, onChanged: (_) => set(() {})),
+                const SizedBox(height: AQSpacing.x3),
+                AQTextField(label: f.t('db.pf.noteLbl'), controller: note),
+                const SizedBox(height: AQSpacing.x3),
+                Text(f.t('db.pf.pick'), style: AQTypography.of(d, AQText.labelMedium, soft: true)),
+                const SizedBox(height: AQSpacing.x2),
+                Wrap(spacing: AQSpacing.x2, runSpacing: AQSpacing.x2, children: [
+                  for (final (n, img) in DemoDevBuildRepository.portfolioChoices.indexed)
+                    Semantics(
+                      button: true,
+                      selected: image == img,
+                      label: '${f.t('db.pf.pick')} ${n + 1}',
+                      excludeSemantics: true,
+                      onTap: () => set(() => image = img),
+                      child: AQPressable(
+                        onTap: () => set(() => image = img),
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(AQRadius.small), border: Border.all(color: image == img ? AQColors.of(d).accent : AQColors.of(d).hairline, width: image == img ? 3 : 1)),
+                          clipBehavior: Clip.antiAlias,
+                          child: aqImg(img, cacheWidth: 200),
+                        ),
+                      ),
+                    ),
+                ]),
+              ]),
+            ),
+          ),
+          actions: [
+            AQTextButton(label: f.t('db.pf.cancel'), color: AQColors.of(d).inkSoft, onPressed: () => Navigator.of(d).pop(false)),
+            AQTextButton(
+              label: f.t('db.pf.save'),
+              color: AQColors.of(d).accent,
+              onPressed: () {
+                if (title.text.trim().isEmpty) {
+                  set(() => tried = true);
+                  return;
+                }
+                Navigator.of(d).pop(true);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    final t = title.text, n = note.text;
+    title.dispose();
+    note.dispose();
+    if (ok != true || !mounted) return;
+    try {
+      await ref.read(devBuildRepositoryProvider).savePortfolioItem(id: item?.id, title: t, note: n, image: image);
+      ref.invalidate(dbMyPortfolioProvider);
+      if (mounted) setState(() { _done = f.t('db.pf.saved'); _failed = null; });
+    } catch (e) {
+      if (mounted) setState(() { _failed = f.t('common.networkError'); _done = null; });
+    }
+  }
+
+  Future<void> _remove(PortfolioItem item) async {
+    final f = FlowStrings.of(context);
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (d) => AlertDialog(
+        title: Text(f.t('db.pf.removeAsk')),
+        content: Text(item.title),
+        actions: [
+          AQTextButton(label: f.t('db.pf.cancel'), color: AQColors.of(d).inkSoft, onPressed: () => Navigator.of(d).pop(false)),
+          AQTextButton(label: f.t('db.pf.remove'), color: AQColors.of(d).danger, onPressed: () => Navigator.of(d).pop(true)),
+        ],
+      ),
+    );
+    if (yes != true || !mounted) return;
+    try {
+      await ref.read(devBuildRepositoryProvider).removePortfolioItem(item.id);
+      ref.invalidate(dbMyPortfolioProvider);
+      if (mounted) setState(() { _done = f.t('db.pf.removed'); _failed = null; });
+    } catch (e) {
+      if (mounted) setState(() { _failed = f.t('common.networkError'); _done = null; });
+    }
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final f = FlowStrings.of(context);
     final c = AQColors.of(context);
     final repo = ref.watch(devBuildRepositoryProvider);
@@ -994,84 +1103,72 @@ class DbPortfolioScreen extends ConsumerWidget {
             children: [DbNotice(f.t('db.pf.devNote'), icon: 'development')],
           );
         }
-        final org = ref.watch(dbMyOrgProvider);
+        final on = repo.caps.portfolio;
+        final list = on ? ref.watch(dbMyPortfolioProvider) : null;
+        final org = on ? null : ref.watch(dbMyOrgProvider);
+        Widget tile(PortfolioItem it) => Padding(
+          padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+          child: AQSurface(
+            padding: EdgeInsets.zero,
+            child: Row(children: [
+              SizedBox(width: 104, height: 96, child: ClipRRect(borderRadius: const BorderRadiusDirectional.horizontal(start: Radius.circular(AQRadius.medium)), child: aqImg(it.image, cacheWidth: 300))),
+              const SizedBox(width: AQSpacing.x3),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AQSpacing.x2),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(VFmt.iso(it.title), maxLines: 2, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.titleSmall)),
+                    if (it.note.isNotEmpty) Text(VFmt.iso(it.note), maxLines: 2, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+                    Wrap(children: [
+                      AQTextButton(label: f.t('db.pf.edit'), color: c.accent, onPressed: () => _edit(it)),
+                      AQTextButton(label: f.t('db.pf.remove'), color: c.inkSoft, onPressed: () => _remove(it)),
+                    ]),
+                  ]),
+                ),
+              ),
+            ]),
+          ),
+        );
         return DbShellPage(
           eyebrow: f.t('db.ws.eyebrow'),
           title: f.t('db.pf.title'),
           subtitle: f.t('db.pf.sub'),
           onBack: () => aqBack(context, _wsBack),
           children: [
-            org.when(
-              loading: () => const DbSkeletonList(count: 1, height: 160),
-              error: (e, _) => DbErrorCard(
-                error: e,
-                onRetry: () => ref.invalidate(dbMyOrgProvider),
+            if (_done != null) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: AQErrorBanner(tone: AQBannerTone.success, text: _done!)),
+            if (_failed != null) Padding(padding: const EdgeInsets.only(bottom: AQSpacing.x3), child: AQErrorBanner(text: _failed!)),
+            if (on) ...[
+              list!.when(
+                loading: () => const DbSkeletonList(count: 2, height: 96),
+                error: (e, _) => DbErrorCard(error: e, onRetry: () => ref.invalidate(dbMyPortfolioProvider)),
+                data: (items) => items.isEmpty ? DbNotice(f.t('db.pf.empty'), icon: 'work') : Column(children: [for (final it in items) tile(it)]),
               ),
-              data: (o) {
-                final media = o?.mediaUrls ?? const <String>[];
-                if (media.isEmpty)
-                  return DbNotice(f.t('db.pf.empty'), icon: 'work');
-                return GridView.count(
-                  crossAxisCount: aqLargeText(context) ? 1 : 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: AQSpacing.x2,
-                  crossAxisSpacing: AQSpacing.x2,
-                  children: [
-                    for (final m in media)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(AQRadius.medium),
-                        child: aqImg(m, cacheWidth: 500),
-                      ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: AQSpacing.x4),
-            Semantics(
-              button: true,
-              enabled: false,
-              label: '${f.t('db.pf.add')}. ${f.t('db.pf.off')}',
-              excludeSemantics: true,
-              child: Opacity(
-                opacity: 0.55,
-                child: Container(
-                  padding: const EdgeInsets.all(AQSpacing.x4),
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    borderRadius: BorderRadius.circular(AQRadius.medium),
-                    border: Border.all(color: c.hairline),
-                  ),
-                  child: Row(
-                    children: [
-                      DbIcon('plus', size: 22, color: c.inkSoft),
-                      const SizedBox(width: AQSpacing.x3),
-                      Expanded(
-                        child: Text(
-                          f.t('db.pf.add'),
-                          style: AQTypography.of(context, AQText.titleSmall),
-                        ),
-                      ),
-                      AQIcon('lock', size: 18, color: c.inkSoft),
-                    ],
-                  ),
-                ),
+              const SizedBox(height: AQSpacing.x2),
+              AQPrimaryButton(label: f.t('db.pf.add'), leadingIcon: 'plus', trailingChevron: false, onPressed: () => _edit(null)),
+              const SizedBox(height: AQSpacing.x3),
+              DbNotice(f.t('db.pf.demo'), icon: 'info'),
+            ] else ...[
+              org!.when(
+                loading: () => const DbSkeletonList(count: 1, height: 160),
+                error: (e, _) => DbErrorCard(error: e, onRetry: () => ref.invalidate(dbMyOrgProvider)),
+                data: (o) {
+                  final media = o?.mediaUrls ?? const <String>[];
+                  if (media.isEmpty) return DbNotice(f.t('db.pf.empty'), icon: 'work');
+                  return GridView.count(
+                    crossAxisCount: aqLargeText(context) ? 1 : 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: AQSpacing.x2,
+                    crossAxisSpacing: AQSpacing.x2,
+                    children: [for (final m in media) ClipRRect(borderRadius: BorderRadius.circular(AQRadius.medium), child: aqImg(m, cacheWidth: 500))],
+                  );
+                },
               ),
-            ),
-            const SizedBox(height: AQSpacing.x2),
-            Text(
-              f.t(repo.caps.portfolio ? 'db.pf.on' : 'db.pf.off'),
-              style: AQTypography.of(context, AQText.bodySmall, soft: true),
-            ),
-            const SizedBox(height: AQSpacing.x1),
-            Text(
-              f.t('db.pf.proposed'),
-              style: AQTypography.of(
-                context,
-                AQText.labelSmall,
-                color: c.inkFaint,
-              ),
-            ),
+              const SizedBox(height: AQSpacing.x4),
+              DbNotice('${f.t('db.pf.add')}. ${f.t('db.pf.off')}', icon: 'lock'),
+              const SizedBox(height: AQSpacing.x1),
+              Text(f.t('db.pf.proposed'), style: AQTypography.of(context, AQText.labelSmall, color: c.inkFaint)),
+            ],
           ],
         );
       },

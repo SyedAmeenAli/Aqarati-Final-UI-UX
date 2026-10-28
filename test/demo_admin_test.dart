@@ -38,6 +38,11 @@ Widget _app(String start) => ProviderScope(
                 },
               ),
             ),
+            GoRoute(path: '/admin', builder: (_, _) => const Scaffold(body: Text('AT /admin'))),
+            GoRoute(
+              path: '/agent',
+              builder: (_, _) => const Scaffold(body: Text('AGENT WORKSPACE')),
+            ),
             GoRoute(
               path: '/app/home',
               builder: (_, _) => const Scaffold(body: Text('HOME')),
@@ -107,7 +112,8 @@ void main() {
         expect(find.text('Skip for Demo'), findsOneWidget);
         await t.tap(find.text('Skip for Demo'));
         await _settle(t);
-        expect(find.text('HOME'), findsOneWidget);
+        expect(find.text('AGENT WORKSPACE'), findsOneWidget);
+        expect(find.text('HOME'), findsNothing);
         expect(find.textContaining('no account was created'), findsOneWidget);
         final me = await t.runAsync(() => _box.read(meProvider.future)) as MeSession;
         expect(me.purpose, SignupPurpose.realEstateAgent);
@@ -162,7 +168,7 @@ void main() {
     });
 
     testWidgets(
-      'with no address configured it explains instead of a dead link',
+      'with no external address it opens the console hosted inside the app at /admin',
       (t) async {
         _phone(t);
         await t.pumpWidget(_app('/login'));
@@ -170,11 +176,7 @@ void main() {
         expect(adminConsoleUrl(), isNull);
         await t.tap(find.text('Admin Console →'));
         await _settle(t);
-        expect(find.text('Admin Console is separate'), findsOneWidget);
-        expect(find.textContaining('lib/admin_main.dart'), findsOneWidget);
-        await t.tap(find.text('Got it'));
-        await _settle(t);
-        expect(find.text('Admin Console is separate'), findsNothing);
+        expect(find.text('AT /admin'), findsOneWidget);
       },
     );
 

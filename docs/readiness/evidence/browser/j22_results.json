@@ -1,0 +1,132 @@
+[
+ {
+  "name": "DEFAULT build: User signup has no Skip for Demo",
+  "pass": true,
+  "note": "BackUser to Shop · AccountLet's start with you.Find your place in Oman.NextYour answers are saved on this device (never your password or doc"
+ },
+ {
+  "name": "DEFAULT build: Agent signup has no Skip for Demo",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "DEFAULT build: purpose screen lists six roles and no Skip chips",
+  "pass": true,
+  "note": "BackWhat brings you to AQARATI?Choose your main purpose to personalize your experience.User to ShopR"
+ },
+ {
+  "name": "DEFAULT build: login shows Admin Console link",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "DEMO build: User signup shows Skip for Demo",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "DEMO build: Skip opens User to Shop Home with six modules and a demo notice",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountSPONSORED Sample banner one Review-build sample. Not a real advertiser. Learn moreGOOD MORNINGLet's find your next place in Oman.Search properties or services…Propert"
+ },
+ {
+  "name": "DEMO build: Agent signup shows Skip for Demo",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "DEMO build: Skip opens the agent workspace with a demo notice",
+  "pass": true,
+  "note": "AGENT WORKSPACEVerified roleWork, in focus.Your agent profile. Licensed role · ApprovedBuyerAgent workspaceYour toolsMy listings. Add, edit and pause your propertiesViewings. Open your viewing activit"
+ },
+ {
+  "name": "Admin link with no address on a hosted build explains, no dead link",
+  "pass": true,
+  "note": "BackCreate accountWelcome backLog in to continue your property journey.Show passwordForgot password?Your data is secure."
+ },
+ {
+  "name": "Admin link on localhost opens the local admin address (port 8081)",
+  "pass": false,
+  "note": "http://localhost:3343/#/login chrome-error://chromewebdata/"
+ },
+ {
+  "name": "mobile: entry shows both experiences",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "mobile: entry no overflow, not blank",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "mobile: Home shows the six modules",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman.Search properties o"
+ },
+ {
+  "name": "mobile: Home no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "mobile: Properties hub",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "mobile: Rent > Commercial shows rentable types only",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountRent: choose a property typeCommercialOffices, shops, buildings and storage across Oman.Only property types that can be re"
+ },
+ {
+  "name": "mobile: type opens results",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunities in every corner of"
+ },
+ {
+  "name": "mobile: results no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: entry shows both experiences",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: entry no overflow, not blank",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: Home shows the six modules",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountGOOD MORNINGLet's find your next place in Oman.Search properties o"
+ },
+ {
+  "name": "desktop: Home no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: Properties hub",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: Rent > Commercial shows rentable types only",
+  "pass": true,
+  "note": "BackChoose a location: All OmanAccountRent: choose a property typeCommercialOffices, shops, buildings and storage across Oman.Only property types that can be re"
+ },
+ {
+  "name": "desktop: type opens results",
+  "pass": true,
+  "note": "BackList viewMap viewFind your place in Oman.Homes, investments and opportunities in every corner of"
+ },
+ {
+  "name": "desktop: results no overflow",
+  "pass": true,
+  "note": ""
+ }
+]

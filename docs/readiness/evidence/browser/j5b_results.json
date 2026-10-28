@@ -1,0 +1,47 @@
+[
+ {
+  "name": "reject with reason code and note is recorded",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "the decision shows in earlier decisions with the reason",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "\"Other\" without a note is refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "request resubmission is recorded",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: first approval leaves it awaiting a second approver",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: the same person cannot give the second approval",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "senior reviewer signs in",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: second, different approver completes it",
+  "pass": true,
+  "note": "Decision recorded: approved."
+ },
+ {
+  "name": "auditor can read but not decide",
+  "pass": true,
+  "note": ""
+ }
+]

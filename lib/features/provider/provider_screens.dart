@@ -471,9 +471,12 @@ class _RequestCard extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label:
           '${f.t('mnt.svc.${b.service.name}')}, ${VFmt.fullDate(context, b.date)}, ${f.t('mnt.st.${b.status.name}')}',
       excludeSemantics: true,
+      onTap: () => context.push('/provider/requests/${b.id}'),
       child: AQPressable(
         onTap: () => context.push('/provider/requests/${b.id}'),
         child: AQSurface(

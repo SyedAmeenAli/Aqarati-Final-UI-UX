@@ -95,8 +95,38 @@ Future<void> showDbContactSheet(
               ),
               Semantics(
                 button: true,
+                focusable: true,
+                onFocus: () {},
                 label: '${f.t('db.contact.copy')} $number',
                 excludeSemantics: true,
+      onTap: () async {
+                    var copied = true;
+                    try {
+                      await Clipboard.setData(ClipboardData(text: number));
+                    } catch (_) {
+                      copied = false;
+                    }
+                    if (copied && repo.caps.leadEvents) {
+                      try {
+                        await repo.logContactEvent(pro.id, ch);
+                      } catch (_) {}
+                    }
+                    if (!s.mounted) return;
+                    Navigator.of(s).pop();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            f.t(
+                              copied
+                                  ? 'db.contact.copied'
+                                  : 'db.contact.copyFailed',
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 child: AQPressable(
                   onTap: () async {
                     var copied = true;
@@ -1161,8 +1191,11 @@ class DbProjectDetailScreen extends ConsumerWidget {
             if (dev != null)
               Semantics(
                 button: true,
+                focusable: true,
+                onFocus: () {},
                 label: '${f.t('db.developedBy')} ${dev.name}',
                 excludeSemantics: true,
+      onTap: () => context.push('/build/pro/${dev.id}'),
                 child: AQPressable(
                   onTap: () => context.push('/build/pro/${dev.id}'),
                   child: Container(
@@ -1233,11 +1266,15 @@ class DbProjectDetailScreen extends ConsumerWidget {
                       const SizedBox(width: AQSpacing.x2),
                   itemBuilder: (_, i) => Semantics(
                     button: true,
+                    focusable: true,
+                    onFocus: () {},
                     label: f.t('db.photoOf', {
                       'a': VFmt.n(context, i + 1),
                       'b': VFmt.n(context, p.mediaUrls.length),
                     }),
                     excludeSemantics: true,
+      onTap: () =>
+                          context.push('/build/project/${p.id}/gallery?i=$i'),
                     child: AQPressable(
                       onTap: () =>
                           context.push('/build/project/${p.id}/gallery?i=$i'),

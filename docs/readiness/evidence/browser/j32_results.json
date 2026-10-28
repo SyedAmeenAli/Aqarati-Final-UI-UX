@@ -1,0 +1,192 @@
+[
+ {
+  "name": "developer @390: role tabs Home/Projects/Enquiries/Company/More",
+  "pass": true,
+  "note": "DEVELOPER WORKSPACEReview BusinessYOUR DEVELOPMENTSShape places for the long term.Manage your projects from draft to approved publication.Add projectManage projectsSponsored: Gulf Materials (sample). "
+ },
+ {
+  "name": "developer @390: no Explore/Activity/Account customer tabs",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer: Projects opens a page",
+  "pass": true,
+  "note": "BackDEVELOPER WORKSPACEMy projectsManage the developments you have submitted.Add new projectAllApprovedUnder reviewChang"
+ },
+ {
+  "name": "developer: Enquiries opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEContact activityWhen customers tap Call or WhatsApp on your profile.WhatsApp, Profile, Wednesday, "
+ },
+ {
+  "name": "developer: Enquiries lists sample contact activity",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEContact activityWhen customers tap Call or WhatsApp on your profile.WhatsApp, Profile, Wednesday, 28 October 2026Call, Profile, Wednesday,"
+ },
+ {
+  "name": "developer: Company opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACECompany profileKeep the details customers see accurate.Basic informationBusiness name⁨Review Busin"
+ },
+ {
+  "name": "developer: More opens a page",
+  "pass": true,
+  "note": "MoreYour businessReviews of your businessVerification statusWorkspace summaryAccountBrowse as a customer. Opens the shop"
+ },
+ {
+  "name": "developer @1280: desktop renders, no overflow",
+  "pass": true,
+  "note": "DEVELOPER WORKSPACEReview BusinessYOUR DEVELOPMENTSShape places for the long term.Manage your projec"
+ },
+ {
+  "name": "construction @390: role tabs Home/Portfolio/Requests/Company/More",
+  "pass": true,
+  "note": "COMPANY WORKSPACEBuild trust before the first call.CONSTRUCTION COMPANYA strong profile speaks first.Keep company information accurate so customers understand your business.Your company profile. Compa"
+ },
+ {
+  "name": "construction @390: no Explore/Activity/Account customer tabs",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "construction: Portfolio opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨"
+ },
+ {
+  "name": "construction: Portfolio has work and no 'not available'",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "construction: Requests opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEContact activityWhen customers tap Call or WhatsApp on your profile.WhatsApp, Profile, Wednesday, "
+ },
+ {
+  "name": "construction: Requests lists sample contact activity",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEContact activityWhen customers tap Call or WhatsApp on your profile.WhatsApp, Profile, Wednesday, 28 October 2026Call, Profile, Wednesday,"
+ },
+ {
+  "name": "construction: Company opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACECompany profileKeep the details customers see accurate.Basic informationBusiness name⁨Review Busin"
+ },
+ {
+  "name": "construction: More opens a page",
+  "pass": true,
+  "note": "MoreYour businessReviews of your businessVerification statusWorkspace summaryAccountBrowse as a customer. Opens the shop"
+ },
+ {
+  "name": "construction @1280: desktop renders, no overflow",
+  "pass": true,
+  "note": "COMPANY WORKSPACEBuild trust before the first call.CONSTRUCTION COMPANYA strong profile speaks first"
+ },
+ {
+  "name": "architecture @390: role tabs Studio/Portfolio/Engagements/Profile/More",
+  "pass": true,
+  "note": "THE PRACTICEArchitecture with intention.A studio profile built around trust, place and clarity.Every line has a reason.PROFILELOCATIONREVIEWSCONTACTSponsored: Studio Light (sample). Visualisation tool"
+ },
+ {
+  "name": "architecture @390: no Explore/Activity/Account customer tabs",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture: Portfolio opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨"
+ },
+ {
+  "name": "architecture: Portfolio has work and no 'not available'",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture: Engagements opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEEngagementsConfirm work you have completed with a client.Villa fit-out, Bawshar, Waiting for your "
+ },
+ {
+  "name": "architecture: Engagements lists three states",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEEngagementsConfirm work you have completed with a client.Villa fit-out, Bawshar, Waiting for your confirmationOffice renovation, Ruwi, Waiting for the clientFamily home, Seeb, Co"
+ },
+ {
+  "name": "architecture: engagement confirmed locally",
+  "pass": true,
+  "note": "BackConfirm engagement⁨Villa fit-out, Bawshar⁩Your confirmation: DoneReview opens after both confirm: DoneBoth sides confirmed. The client can now leave a review.A review opens only after both you and"
+ },
+ {
+  "name": "architecture: Profile opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACECompany profileKeep the details customers see accurate.Basic informationBusiness name⁨Review Busin"
+ },
+ {
+  "name": "architecture: More opens a page",
+  "pass": true,
+  "note": "MoreYour businessReviews of your businessVerification statusWorkspace summaryAccountBrowse as a customer. Opens the shop"
+ },
+ {
+  "name": "architecture @1280: desktop renders, no overflow",
+  "pass": true,
+  "note": "THE PRACTICEArchitecture with intention.A studio profile built around trust, place and clarity.Every"
+ },
+ {
+  "name": "interior @390: role tabs Gallery/Portfolio/Engagements/Profile/More",
+  "pass": true,
+  "note": "DESIGN STUDIOSpaces with a point of view.LIGHT / MATERIAL / FORMA considered way of living.Use your public profile to make your specialisation clear.InteriorExteriorBothService type changes go to revi"
+ },
+ {
+  "name": "interior @390: no Explore/Activity/Account customer tabs",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "interior: Portfolio opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEPortfolioWork shown on your public profile.⁨Sample work 1⁩⁨Sample entry⁩EditRemove⁨Sample work 2⁩⁨"
+ },
+ {
+  "name": "interior: Portfolio has work and no 'not available'",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "interior: Engagements opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEEngagementsConfirm work you have completed with a client.Villa fit-out, Bawshar, Waiting for your "
+ },
+ {
+  "name": "interior: Engagements lists three states",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACEEngagementsConfirm work you have completed with a client.Villa fit-out, Bawshar, Waiting for your confirmationOffice renovation, Ruwi, Waiting for the clientFamily home, Seeb, Co"
+ },
+ {
+  "name": "interior: engagement confirmed locally",
+  "pass": true,
+  "note": "BackConfirm engagement⁨Villa fit-out, Bawshar⁩Your confirmation: DoneReview opens after both confirm: DoneBoth sides confirmed. The client can now leave a review.A review opens only after both you and"
+ },
+ {
+  "name": "interior: Profile opens a page",
+  "pass": true,
+  "note": "BackBUSINESS WORKSPACECompany profileKeep the details customers see accurate.Basic informationBusiness name⁨Review Busin"
+ },
+ {
+  "name": "interior: More opens a page",
+  "pass": true,
+  "note": "MoreYour businessReviews of your businessVerification statusWorkspace summaryAccountBrowse as a customer. Opens the shop"
+ },
+ {
+  "name": "interior @1280: desktop renders, no overflow",
+  "pass": true,
+  "note": "DESIGN STUDIOSpaces with a point of view.LIGHT / MATERIAL / FORMA considered way of living.Use your "
+ },
+ {
+  "name": "four roles show four different home pages",
+  "pass": true,
+  "note": ""
+ }
+]

@@ -1,0 +1,182 @@
+[
+ {
+  "name": "Home 320px: exactly one banner, 80-100 px tall",
+  "pass": true,
+  "note": "{\"top\":66,\"bottom\":158,\"h\":92,\"count\":1}"
+ },
+ {
+  "name": "Home 320px: banner sits between header and hero",
+  "pass": true,
+  "note": "header 9 banner 66-158 hero null"
+ },
+ {
+  "name": "Home 360px: exactly one banner, 80-100 px tall",
+  "pass": true,
+  "note": "{\"top\":66,\"bottom\":158,\"h\":92,\"count\":1}"
+ },
+ {
+  "name": "Home 360px: banner sits between header and hero",
+  "pass": true,
+  "note": "header 9 banner 66-158 hero null"
+ },
+ {
+  "name": "Home 390px: exactly one banner, 80-100 px tall",
+  "pass": true,
+  "note": "{\"top\":66,\"bottom\":158,\"h\":92,\"count\":1}"
+ },
+ {
+  "name": "Home 390px: banner sits between header and hero",
+  "pass": true,
+  "note": "header 9 banner 66-158 hero null"
+ },
+ {
+  "name": "Home 412px: exactly one banner, 80-100 px tall",
+  "pass": true,
+  "note": "{\"top\":66,\"bottom\":158,\"h\":92,\"count\":1}"
+ },
+ {
+  "name": "Home 412px: banner sits between header and hero",
+  "pass": true,
+  "note": "header 9 banner 66-158 hero null"
+ },
+ {
+  "name": "Home 430px: exactly one banner, 80-100 px tall",
+  "pass": true,
+  "note": "{\"top\":66,\"bottom\":158,\"h\":92,\"count\":1}"
+ },
+ {
+  "name": "Home 430px: banner sits between header and hero",
+  "pass": true,
+  "note": "header 9 banner 66-158 hero null"
+ },
+ {
+  "name": "rotation does not move the banner or the hero",
+  "pass": true,
+  "note": "[\"66-92\"] hero [null]"
+ },
+ {
+  "name": "buyer /app/explore: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /app/activity: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /app/account: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /properties: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /properties/all?cat=residential: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /map: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /property/p1: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /property/p1/viewing: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /search/start: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /saved: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /app/explore/build: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /build/pro/b1: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /business/b1/book: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /notifications: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /login: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /entry: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "buyer /account/delete: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent /agent/listings: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent /agent/leads: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer /app/home: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "developer /app/account/workspace: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "construction /app/home: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "architecture /app/home: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "interior /app/home: no banner",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "agent workspace home: no banner",
+  "pass": true,
+  "note": ""
+ }
+]

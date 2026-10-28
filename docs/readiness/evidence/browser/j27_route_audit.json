@@ -1,0 +1,177 @@
+[
+ {
+  "name": "Home",
+  "path": "/app/home",
+  "nav": true,
+  "sel": "Home",
+  "text": "Choose a location: All OmanAccountGOOD EVENINGLet's find your next pla"
+ },
+ {
+  "name": "Explore",
+  "path": "/app/explore",
+  "nav": true,
+  "sel": "",
+  "text": "Choose a location: All OmanAccountEXPLORE OMANProperties, People and S"
+ },
+ {
+  "name": "Activity",
+  "path": "/app/activity",
+  "nav": true,
+  "sel": "Activity",
+  "text": "ViewingsMaintenanceSellingRequestsMy ViewingsManage your viewing reque"
+ },
+ {
+  "name": "Account",
+  "path": "/app/account",
+  "nav": true,
+  "sel": "Account",
+  "text": "AccountDEMO DATA Accounts, viewings and verification are simulated in "
+ },
+ {
+  "name": "Buy > categories",
+  "path": "/properties/categories?tx=buy",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackChoose a location: All OmanAccountBuy: choose a categoryPick the k"
+ },
+ {
+  "name": "Rent > categories",
+  "path": "/properties/categories?tx=rent",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackChoose a location: All OmanAccountRent: choose a categoryPick the "
+ },
+ {
+  "name": "Buy > Residential types",
+  "path": "/properties/types?tx=buy&cat=residential",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackChoose a location: All OmanAccountBuy: choose a property typeResid"
+ },
+ {
+  "name": "Rent > Residential types",
+  "path": "/properties/types?tx=rent&cat=residential",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackChoose a location: All OmanAccountRent: choose a property typeResi"
+ },
+ {
+  "name": "Buy results (villa)",
+  "path": "/properties/all?tx=buy&cat=residential&types=villa",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackList viewMap viewFind your place in Oman.Homes, investments and op"
+ },
+ {
+  "name": "Rent results (apartment)",
+  "path": "/properties/all?tx=rent&cat=residential&types=apartment",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackList viewMap viewFind your place in Oman.Homes, investments and op"
+ },
+ {
+  "name": "Property detail p1",
+  "path": "/property/p1",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackPhoto 1 of 9For salePrevious photo1/9Next photoPhoto 1 of 9Photo 2"
+ },
+ {
+  "name": "Property detail p3",
+  "path": "/property/p3",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackPhoto 1 of 5For salePrevious photo1/5Next photoPhoto 1 of 5Photo 2"
+ },
+ {
+  "name": "My Favorites",
+  "path": "/saved",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackSavedProperties and searches you want to come back to.PropertiesSe"
+ },
+ {
+  "name": "Sell (e-Broker)",
+  "path": "/sell",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackSell with Aqary e-BrokerFor owners selling a property.How it works"
+ },
+ {
+  "name": "Development",
+  "path": "/app/explore/build/results?cat=developer",
+  "nav": true,
+  "sel": "Explore",
+  "text": "BackAccountDEVELOPMENT & BUILDINGProperty DevelopersTrusted developers"
+ },
+ {
+  "name": "Architecture",
+  "path": "/app/explore/build/results?cat=architecture",
+  "nav": true,
+  "sel": "Explore",
+  "text": "BackAccountDEVELOPMENT & BUILDINGArchitecture StudiosStudios designing"
+ },
+ {
+  "name": "Interior & Exterior",
+  "path": "/app/explore/build/results?cat=interiorExterior",
+  "nav": true,
+  "sel": "Explore",
+  "text": "BackAccountDEVELOPMENT & BUILDINGInterior & Exterior DesignDesigners f"
+ },
+ {
+  "name": "Construction",
+  "path": "/app/explore/build/results?cat=construction",
+  "nav": true,
+  "sel": "Explore",
+  "text": "BackAccountDEVELOPMENT & BUILDINGConstruction CompaniesVerified builde"
+ },
+ {
+  "name": "Maintenance",
+  "path": "/professionals?cat=maintenance",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackMaintenancePlumbing, pool, AC and kitchen providers. Open one to r"
+ },
+ {
+  "name": "Loan Calculator",
+  "path": "/calculators",
+  "nav": true,
+  "sel": "Home",
+  "text": "BackProperty toolsMake better property decisions. Results are estimate"
+ },
+ {
+  "name": "Search",
+  "path": "/search/start",
+  "nav": true,
+  "sel": "Explore",
+  "text": "BackChoose a location: All OmanAccountSEARCHFind what you need in Oman"
+ },
+ {
+  "name": "Map",
+  "path": "/map",
+  "nav": true,
+  "sel": "Explore",
+  "text": "BackList viewProperties6 PropertiesVillas, apartments and land in All "
+ },
+ {
+  "name": "Notifications",
+  "path": "/notifications",
+  "nav": true,
+  "sel": "Account",
+  "text": "BackNotificationsUpdates on your viewings, maintenance requests and ve"
+ },
+ {
+  "name": "Buyer profile",
+  "path": "/app/account/profile",
+  "nav": true,
+  "sel": "Account",
+  "text": "BackYour profileThe details we keep for your account.NameNo name added"
+ },
+ {
+  "name": "Engagements",
+  "path": "/engagements",
+  "nav": true,
+  "sel": "Account",
+  "text": "BackYour engagementsRequests you made with professionals.No engagement"
+ }
+]

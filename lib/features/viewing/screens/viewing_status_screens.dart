@@ -341,9 +341,15 @@ class _SuggestionTile extends StatelessWidget {
     final text = '${VFmt.fullDate(context, slot.start)}, ${VFmt.range(context, slot)}';
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       selected: selected,
       label: selected ? '$text, ${v.t('vw.a11y.selected')}' : text,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();

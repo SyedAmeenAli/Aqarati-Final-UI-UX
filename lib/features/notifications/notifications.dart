@@ -173,8 +173,11 @@ class _Row extends StatelessWidget {
     final title = f.t(n.titleKey);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${unread ? '${f.t('ntf.unread', {'n': '1'})}. ' : ''}$title${sub.isEmpty ? '' : '. $sub'}',
       excludeSemantics: true,
+      onTap: onTap,
       child: AQPressable(
         onTap: onTap,
         child: AnimatedContainer(

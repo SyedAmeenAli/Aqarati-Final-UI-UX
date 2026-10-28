@@ -1,0 +1,27 @@
+[
+ {
+  "name": "admin: the one-tap demo console entry opens the dashboard",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelo"
+ },
+ {
+  "name": "ads failure: a failed load says so and offers Try again, no broken list",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsR"
+ },
+ {
+  "name": "ads failure: Try again recovers the list",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ },
+ {
+  "name": "ads failure: a failed save shows an error and keeps what was typed",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsR"
+ },
+ {
+  "name": "ads failure: the same save then succeeds, once",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenance"
+ }
+]

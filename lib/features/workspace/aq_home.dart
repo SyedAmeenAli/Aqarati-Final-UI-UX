@@ -13,6 +13,7 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/models/enums.dart';
 import '../../core/aq/aq_help.dart';
 import '../ads/sponsored_banner.dart';
+import '../onboarding/interests.dart';
 import 'aq_action_card.dart';
 import '../../data/models/property.dart';
 import '../../data/repositories/app_state_providers.dart'
@@ -165,8 +166,11 @@ class AQHero extends StatelessWidget {
                     ],
                     Semantics(
                       button: true,
+                      focusable: true,
+                      onFocus: () {},
                       label: f.t('nav.account'),
                       excludeSemantics: true,
+      onTap: () => context.go('/app/account'),
                       child: AQPressable(
                         onTap: () => context.go('/app/account'),
                         child: Container(
@@ -243,8 +247,11 @@ class _LocationPill extends ConsumerWidget {
     final label = area ?? f.t('home.loc.all');
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${f.t('home.loc.title')}: $label',
       excludeSemantics: true,
+      onTap: () => _pickArea(context, ref),
       child: AQPressable(
         onTap: () => _pickArea(context, ref),
         child: Container(
@@ -334,8 +341,11 @@ class AQSearchEntry extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: hint,
       excludeSemantics: true,
+      onTap: () => context.push('/search/start'),
       child: AQPressable(
         onTap: () => context.push('/search/start'),
         child: Container(
@@ -470,8 +480,14 @@ class _TileRow extends StatelessWidget {
                 width: w,
                 child: Semantics(
                   button: true,
+                  focusable: true,
+                  onFocus: () {},
                   label: t.$2,
                   excludeSemantics: true,
+      onTap: () {
+                      AQHaptics.selection();
+                      t.$3();
+                    },
                   child: AQPressable(
                     onTap: () {
                       AQHaptics.selection();
@@ -628,8 +644,11 @@ class AQBanner extends StatelessWidget {
                 const SizedBox(height: AQSpacing.x4),
                 Semantics(
                   button: true,
+                  focusable: true,
+                  onFocus: () {},
                   label: cta,
                   excludeSemantics: true,
+      onTap: onTap,
                   child: AQPressable(
                     onTap: onTap,
                     child: Container(
@@ -755,6 +774,8 @@ class AQSlideSwitch extends StatelessWidget {
                 Expanded(
                   child: Semantics(
                     button: true,
+                    focusable: true,
+                    onFocus: () {},
                     selected: i == index,
                     label: labels[i],
                     excludeSemantics: true,
@@ -842,9 +863,12 @@ class _FeaturedState extends ConsumerState<_Featured> {
                     Positioned.fill(
                       child: Semantics(
                         button: true,
+                        focusable: true,
+                        onFocus: () {},
                         label:
                             '${p.title}, ${p.locationLabel}, ${p.priceLabel}',
                         excludeSemantics: true,
+      onTap: () => context.push('/property/${p.id}'),
                         child: AQPressable(
                           onTap: () => context.push('/property/${p.id}'),
                           child: ClipRRect(
@@ -980,9 +1004,18 @@ class _FeaturedState extends ConsumerState<_Featured> {
                       top: AQSpacing.x3,
                       child: Semantics(
                         button: true,
+                        focusable: true,
+                        onFocus: () {},
                         selected: isSaved,
                         label: isSaved ? f.t('home.unsave') : f.t('home.save'),
                         excludeSemantics: true,
+      onTap: () {
+                            AQHaptics.confirm();
+                            final next = {...saved};
+                            isSaved ? next.remove(p.id) : next.add(p.id);
+                            ref.read(savedPropertiesProvider.notifier).state =
+                                next;
+                          },
                         child: AQPressable(
                           onTap: () {
                             AQHaptics.confirm();
@@ -1133,8 +1166,11 @@ Widget _brokerLoan(BuildContext context) {
   Widget card(String image, String title, String body, VoidCallback onTap) =>
       Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         label: '$title. $body',
         excludeSemantics: true,
+      onTap: onTap,
         child: AQPressable(
           onTap: onTap,
           child: ClipRRect(
@@ -1358,11 +1394,12 @@ class AQHomePrimary extends StatelessWidget {
   }
 }
 
-class AQModuleGrid extends StatelessWidget {
+class AQModuleGrid extends ConsumerWidget {
   const AQModuleGrid({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final interests = ref.watch(interestsProvider);
     final f = FlowStrings.of(context);
     final c = AQColors.of(context);
     final large = aqLargeText(context);
@@ -1386,6 +1423,14 @@ class AQModuleGrid extends StatelessWidget {
       ('area', 'loan', '/calculators'),
       ('shield', 'maintenance', '/professionals?cat=maintenance'),
     ];
+    // What the person said they are looking for comes first; the rest keep their order.
+    final wanted = [
+      for (final m in modules)
+        if (interests.any((i) => i.name == m.$2)) m,
+    ];
+    modules
+      ..removeWhere(wanted.contains)
+      ..insertAll(0, wanted);
     Widget tile((String, String, String) m) {
       final label = f.t('hm6.${m.$2}');
       void open() {
@@ -1395,6 +1440,8 @@ class AQModuleGrid extends StatelessWidget {
 
       return Semantics(
         button: true,
+        focusable: true,
+        onFocus: () {},
         label: label,
         excludeSemantics: true,
         onTap: open,
@@ -1603,8 +1650,14 @@ class _Action extends StatelessWidget {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: label,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();
@@ -1846,8 +1899,11 @@ class AQResultCard extends ConsumerWidget {
     ].join(' · ');
     final card = Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${p.title}, ${p.locationLabel}, $tx, $facts, ${p.priceLabel}',
       excludeSemantics: true,
+      onTap: () => context.push('/property/${p.id}'),
       child: AQPressable(
         onTap: () => context.push('/property/${p.id}'),
         child: ClipRRect(
@@ -1966,9 +2022,17 @@ class AQResultCard extends ConsumerWidget {
           top: 0,
           child: Semantics(
             button: true,
+            focusable: true,
+            onFocus: () {},
             selected: saved,
             label: saved ? f.t('home.unsave') : f.t('home.save'),
             excludeSemantics: true,
+            onTap: () {
+              final cur = ref.read(savedPropertiesProvider);
+              ref.read(savedPropertiesProvider.notifier).state = saved
+                  ? ({...cur}..remove(p.id))
+                  : {...cur, p.id};
+            },
             child: AQPressable(
               onTap: () {
                 AQHaptics.confirm();

@@ -79,8 +79,14 @@ class _DbHomeScreenState extends ConsumerState<DbHomeScreen> {
                 width: w,
                 child: Semantics(
                   button: true,
+                  focusable: true,
+                  onFocus: () {},
                   label: f.t('${t.key}.long'),
                   excludeSemantics: true,
+      onTap: () {
+                      AQHaptics.selection();
+                      context.push(dbResultsPath(type: t));
+                    },
                   child: AQPressable(
                     onTap: () {
                       AQHaptics.selection();
@@ -239,8 +245,11 @@ class _MiniProCard extends StatelessWidget {
     final f = FlowStrings.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: '${pro.name}, ${dbProLabel(f, pro)}, ${pro.locationLabel}',
       excludeSemantics: true,
+      onTap: () => context.push('/build/pro/${pro.id}'),
       child: AQPressable(
         onTap: () => context.push('/build/pro/${pro.id}'),
         child: Container(
@@ -342,8 +351,11 @@ class DbCategoriesScreen extends StatelessWidget {
         for (final t in ProType.values) ...[
           Semantics(
             button: true,
+            focusable: true,
+            onFocus: () {},
             label: '${f.t('${t.key}.long')}. ${f.t('${t.key}.desc')}',
             excludeSemantics: true,
+      onTap: () => context.push(dbResultsPath(type: t)),
             child: AQPressable(
               onTap: () => context.push(dbResultsPath(type: t)),
               child: ClipRRect(
@@ -564,8 +576,14 @@ class _DbResultsScreenState extends ConsumerState<DbResultsScreen> {
     final c = AQColors.of(context);
     return Semantics(
       button: true,
+      focusable: true,
+      onFocus: () {},
       label: badge > 0 ? '$label, $badge' : label,
       excludeSemantics: true,
+      onTap: () {
+          AQHaptics.selection();
+          onTap();
+        },
       child: AQPressable(
         onTap: () {
           AQHaptics.selection();

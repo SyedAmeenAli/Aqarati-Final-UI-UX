@@ -24,18 +24,6 @@ List<RouteBase> extraRoutes() => [
     ),
   ),
   GoRoute(
-    path: '/engagements',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const MyEngagementsScreen()),
-  ),
-  GoRoute(
-    path: '/engagements/:id',
-    pageBuilder: (context, state) => AQRoute.forward(
-      key: state.pageKey,
-      child: EngagementDetailScreen(id: state.pathParameters['id']!),
-    ),
-  ),
-  GoRoute(
     path: '/review/:kind/:id',
     pageBuilder: (context, state) => AQRoute.forward(
       key: state.pageKey,
@@ -46,6 +34,58 @@ List<RouteBase> extraRoutes() => [
         id: state.pathParameters['id']!,
         name: state.uri.queryParameters['name'] ?? '',
       ),
+    ),
+  ),
+  GoRoute(
+    path: '/provider',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const ProviderHomeScreen()),
+  ),
+  GoRoute(
+    path: '/provider/invite',
+    pageBuilder: (context, state) => AQRoute.forward(
+      key: state.pageKey,
+      child: ProviderInviteScreen(code: state.uri.queryParameters['code']),
+    ),
+  ),
+  GoRoute(
+    path: '/provider/requests/:id',
+    pageBuilder: (context, state) => AQRoute.forward(
+      key: state.pageKey,
+      child: ProviderRequestScreen(id: state.pathParameters['id']!),
+    ),
+  ),
+  GoRoute(
+    path: '/sell/new',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const EBrokerFormScreen()),
+  ),
+  GoRoute(
+    path: '/sell-new',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const EBrokerFormScreen()),
+  ),
+  GoRoute(
+    path: '/sell/:id/edit',
+    pageBuilder: (context, state) => AQRoute.forward(
+      key: state.pageKey,
+      child: EBrokerFormScreen(editId: state.pathParameters['id']),
+    ),
+  ),
+];
+
+/// Customer screens hosted by the shared shell (they keep the bottom navigation).
+List<RouteBase> extraShellRoutes() => [
+  GoRoute(
+    path: '/engagements',
+    pageBuilder: (context, state) =>
+        AQRoute.forward(key: state.pageKey, child: const MyEngagementsScreen()),
+  ),
+  GoRoute(
+    path: '/engagements/:id',
+    pageBuilder: (context, state) => AQRoute.forward(
+      key: state.pageKey,
+      child: EngagementDetailScreen(id: state.pathParameters['id']!),
     ),
   ),
   GoRoute(
@@ -83,49 +123,22 @@ List<RouteBase> extraRoutes() => [
     ),
   ),
   GoRoute(
-    path: '/provider',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const ProviderHomeScreen()),
-  ),
-  GoRoute(
-    path: '/provider/invite',
-    pageBuilder: (context, state) => AQRoute.forward(
-      key: state.pageKey,
-      child: ProviderInviteScreen(code: state.uri.queryParameters['code']),
-    ),
-  ),
-  GoRoute(
-    path: '/provider/requests/:id',
-    pageBuilder: (context, state) => AQRoute.forward(
-      key: state.pageKey,
-      child: ProviderRequestScreen(id: state.pathParameters['id']!),
-    ),
-  ),
-  GoRoute(
     path: '/sell',
     pageBuilder: (context, state) =>
         AQRoute.forward(key: state.pageKey, child: const EBrokerIntroScreen()),
   ),
   GoRoute(
-    path: '/sell/new',
-    pageBuilder: (context, state) =>
-        AQRoute.forward(key: state.pageKey, child: const EBrokerFormScreen()),
-  ),
-  GoRoute(
     path: '/sell/:id',
+    // `new` is the form, which lives outside the shell (it has its own action bar); the shell
+    // route would otherwise read it as the id of a submission.
+    redirect: (context, state) =>
+        state.pathParameters['id'] == 'new' ? '/sell-new' : null,
     pageBuilder: (context, state) => AQRoute.forward(
       key: state.pageKey,
       child: EBrokerDetailScreen(
         id: state.pathParameters['id']!,
         flash: state.uri.queryParameters['flash'],
       ),
-    ),
-  ),
-  GoRoute(
-    path: '/sell/:id/edit',
-    pageBuilder: (context, state) => AQRoute.forward(
-      key: state.pageKey,
-      child: EBrokerFormScreen(editId: state.pathParameters['id']),
     ),
   ),
 ];

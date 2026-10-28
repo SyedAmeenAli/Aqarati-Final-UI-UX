@@ -1,0 +1,442 @@
+[
+ {
+  "session": "buyer",
+  "path": "/app/home",
+  "chars": 891,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASponsored · QA sample sponsor BSample banner oneSample bann",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/app/explore",
+  "chars": 1045,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/app/activity",
+  "chars": 567,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/app/account",
+  "chars": 426,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/properties",
+  "chars": 772,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/properties/all?cat=residential",
+  "chars": 872,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/property/p1",
+  "chars": 769,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/property/p1/viewing",
+  "chars": 1284,
+  "bad": false,
+  "head": "BackSchedule a Viewing⁨4-Bedroom Villa in Al Mouj⁩ · ⁨Al Mouj⁩⁨4-Bedroom Villa in Al Mouj⁩",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/search/start",
+  "chars": 654,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/search?q=villa",
+  "chars": 427,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/saved",
+  "chars": 284,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/compare?ids=p1,p2",
+  "chars": 521,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/map",
+  "chars": 793,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASponsored · QA sample sponsor BSample banner oneSample bann",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/calculators",
+  "chars": 599,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/calculators/mortgage",
+  "chars": 599,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/professionals",
+  "chars": 655,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/business/b1",
+  "chars": 843,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/business/b1/book",
+  "chars": 174,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/notifications",
+  "chars": 657,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/app/explore/build",
+  "chars": 990,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/app/explore/build/categories",
+  "chars": 673,
+  "bad": true,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/build/pro/b1",
+  "chars": 357,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/build/pro/b1/reviews",
+  "chars": 252,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/account/delete",
+  "chars": 504,
+  "bad": false,
+  "head": "BackDelete your accountRead what changes before you continue.You are signed out on this de",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace",
+  "chars": 469,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace/projects",
+  "chars": 338,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/workspace/projects/new",
+  "chars": 487,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace/profile",
+  "chars": 745,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace/leads",
+  "chars": 331,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace/reviews",
+  "chars": 318,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace/engagements",
+  "chars": 429,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/app/account/workspace/portfolio",
+  "chars": 208,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "developer",
+  "path": "/workspace/enquiries",
+  "chars": 256,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "construction",
+  "path": "/workspace/requests",
+  "chars": 262,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "construction",
+  "path": "/app/account/workspace",
+  "chars": 433,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "architecture",
+  "path": "/app/account/workspace",
+  "chars": 432,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "interior",
+  "path": "/app/account/workspace",
+  "chars": 439,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "agent",
+  "path": "/agent/listings",
+  "chars": 248,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "agent",
+  "path": "/agent/leads",
+  "chars": 337,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "agent",
+  "path": "/app/home",
+  "chars": 806,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/login",
+  "chars": 184,
+  "bad": false,
+  "head": "BackCreate accountWelcome backLog in to continue your property journey.Show passwordForgot",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/forgot-password",
+  "chars": 176,
+  "bad": false,
+  "head": "BackLog inForgot your password?Enter your email and we will send a reset link if an accoun",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/signup/user",
+  "chars": 148,
+  "bad": false,
+  "head": "BackUser to Shop · AccountLet's start with you.Find your place in Oman.NextYour answers ar",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/signup/agent",
+  "chars": 182,
+  "bad": false,
+  "head": "BackReal Estate Agent · Your detailsLet's start with you.Build trust around every property",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/signup/construction",
+  "chars": 172,
+  "bad": false,
+  "head": "BackConstruction Company · Your detailsLet's start with you.Put your company where Oman bu",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/signup/development",
+  "chars": 203,
+  "bad": false,
+  "head": "BackProperty Development Company · Your detailsLet's start with you.Bring your development",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/signup/architecture",
+  "chars": 170,
+  "bad": false,
+  "head": "BackBuilding Architecture · Your detailsLet's start with you.Let your practice be discover",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/signup/interior",
+  "chars": 18,
+  "bad": true,
+  "head": "Page Not FoundHome",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/otp",
+  "chars": 186,
+  "bad": false,
+  "head": "BackUser to Shop · PhoneVerify your phoneWe sent a 6-digit code to +968 ••••0000.Code expi",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/verify-email",
+  "chars": 174,
+  "bad": false,
+  "head": "BackVerify your emailCheck your inbox and open the link. It may take a minute to arrive.We",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/onboarding/documents",
+  "chars": 790,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "buyer",
+  "path": "/verification",
+  "chars": 790,
+  "bad": false,
+  "head": "Sponsored · QA sample sponsor ASample banner oneReview-build sample. Not a real advertiser",
+  "errors": 0
+ },
+ {
+  "session": "agent-pending",
+  "path": "/verification",
+  "chars": 547,
+  "bad": false,
+  "head": "Real Estate Agent · ReviewUnder reviewYour application is under reviewYour documents are w",
+  "errors": 0
+ },
+ {
+  "session": "resubmission",
+  "path": "/verification",
+  "chars": 405,
+  "bad": false,
+  "head": "Building Architecture · ReviewResubmission requiredResubmission requiredSome documents nee",
+  "errors": 0
+ },
+ {
+  "session": "suspended",
+  "path": "/verification",
+  "chars": 424,
+  "bad": false,
+  "head": "Construction Company · ReviewSuspendedRole suspendedThis role is suspended. Business capab",
+  "errors": 0
+ }
+]

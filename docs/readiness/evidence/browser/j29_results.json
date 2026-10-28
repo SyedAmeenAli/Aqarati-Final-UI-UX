@@ -1,0 +1,72 @@
+[
+ {
+  "name": "Home: the four primary actions",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Explore: discovery (search, categories, development)",
+  "pass": true,
+  "note": "Choose a location: All OmanAccountEXPLORE OMANProperties, People and ServicesFind extraordinary places, truste"
+ },
+ {
+  "name": "Activity: four record types behind pills",
+  "pass": true,
+  "note": "ViewingsMaintenanceSellingRequestsMy ViewingsManage your viewing requests and appointments.All (6)Upcoming (3)"
+ },
+ {
+  "name": "Account: grouped settings, not a card grid",
+  "pass": true,
+  "note": "AccountDEMO DATA Accounts, viewings and verification are simulated in this build. Nothing is sent to AQARATI o"
+ },
+ {
+  "name": "the four tabs show four different pages",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Activity > Selling shows submission status or its empty state",
+  "pass": true,
+  "note": "ViewingsMaintenanceSellingRequestsNo submissions yetWhen you send a property it appears he"
+ },
+ {
+  "name": "Activity > Requests shows professional requests or its empty state",
+  "pass": true,
+  "note": "ViewingsMaintenanceSellingRequestsNo engagements yetOpen a professional's profile to reque"
+ },
+ {
+  "name": "Account: the Language row switches to Arabic",
+  "pass": true,
+  "note": "الحساببيانات تجريبية الحسابات والمعاينات والتحقق محاكاة في هذه النسخة. لا يُرسل أي شيء إلى"
+ },
+ {
+  "name": "Arabic account: no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Arabic Home: the four primary actions in Arabic",
+  "pass": true,
+  "note": "اختر الموقع: كل عُمانالحسابصباح الخيرلنجد مكانك القادم في عُمان.ماذا تريد أن تفعل؟شراء عقا"
+ },
+ {
+  "name": "Arabic Home: no overflow",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Search: customer navigation present",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Map: customer navigation present",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Favorites: customer navigation present",
+  "pass": true,
+  "note": ""
+ }
+]

@@ -1,0 +1,97 @@
+[
+ {
+  "name": "signed out: protected address shows the sign-in, not the queue",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "wrong email and wrong password give the same message",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "step two asks for the one-time code",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "wrong one-time code is refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "queue starts empty, honest",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "demo records: five applicants of five account types",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "resubmission is first in the queue",
+  "pass": true,
+  "note": "first row = Demo applicant: construction company, Construction company, Waiting fo"
+ },
+ {
+  "name": "filter by account type",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "unavailable document says so (no fake file)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "document viewer: watermark, recorded, no download",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "checklist: Registry lookup ticks",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "checklist: Name matches ticks",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "approve is blocked until the whole checklist is ticked",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "checklist: Call-back ticks",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "checklist: No duplicate ticks",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "reject without a reason is refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "a decision asks for a fresh code (step-up)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "wrong step-up code does not record anything",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "approval recorded with the audit entry",
+  "pass": true,
+  "note": "Decision recorded: approved."
+ }
+]

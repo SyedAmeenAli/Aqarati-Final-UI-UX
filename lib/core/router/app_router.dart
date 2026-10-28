@@ -25,6 +25,7 @@ import '../../features/flow/screens/approval_screens.dart';
 import '../../features/flow/screens/verification_onboarding_screens.dart';
 import '../../features/flow/screens/verification_status_screens.dart';
 import '../../features/entry/screens/purpose_selection_screen.dart';
+import '../../features/onboarding/interests.dart';
 import '../../features/entry/widgets/entry_common.dart';
 import '../../features/viewing/screens/viewing_detail_screen.dart';
 import '../../features/viewing/screens/viewing_schedule_screens.dart';
@@ -39,10 +40,20 @@ import '../../features/leads/lead_models.dart';
 import '../../features/leads/lead_screens.dart';
 import '../../features/workspace/aq_app_shell.dart';
 import '../../features/devbuild/db_routes.dart';
+import '../../admin/admin_host.dart';
+import '../../features/agent/agent_routes.dart';
+import '../../features/pro/pro_shell.dart';
+import '../../features/agent/agent_shell.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/entry',
   routes: [
+    // The Admin Web Console: its own sign-in, navigation and routes, hosted at `#/admin`.
+    GoRoute(
+      path: '/admin',
+      pageBuilder: (context, state) =>
+          AQRoute.fade(key: state.pageKey, child: const AdminConsoleHost()),
+    ),
     GoRoute(
       path: '/entry',
       pageBuilder: (context, state) =>
@@ -52,6 +63,18 @@ final appRouter = GoRouter(
       path: '/onboarding/purpose',
       pageBuilder: (context, state) =>
           brandPage(key: state.pageKey, child: const PurposeSelectionScreen()),
+    ),
+    GoRoute(
+      path: '/signup/business',
+      pageBuilder: (context, state) => brandPage(
+        key: state.pageKey,
+        child: const PurposeSelectionScreen(businessOnly: true),
+      ),
+    ),
+    GoRoute(
+      path: '/onboarding/interests',
+      pageBuilder: (context, state) =>
+          brandPage(key: state.pageKey, child: const InterestsScreen()),
     ),
     GoRoute(
       path: '/legal/terms',
@@ -205,7 +228,235 @@ final appRouter = GoRouter(
           pageBuilder: (context, state) =>
               AQRoute.tab(key: state.pageKey, child: const AccountTab()),
         ),
+        // Customer browsing screens live inside the shell so the bottom navigation stays put.
+    GoRoute(
+      path: '/properties',
+      // There is no separate Properties hub: Buy, Rent, Sell and My Favorites live on Home.
+      redirect: (context, state) {
+        final q = state.uri.queryParameters;
+        final plain = q['cat'] == null && q['tx'] == null && q['types'] == null;
+        return plain ? '/app/home' : null;
+      },
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQPropertiesScreen(
+          category: state.uri.queryParameters['cat'],
+          tx: state.uri.queryParameters['tx'],
+          types: state.uri.queryParameters['types'],
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/properties/categories',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQCategoryStepScreen(tx: state.uri.queryParameters['tx']),
+      ),
+    ),
+    GoRoute(
+      path: '/properties/types',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQTypeStepScreen(
+          tx: state.uri.queryParameters['tx'],
+          cat: state.uri.queryParameters['cat'],
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/properties/all',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQPropertiesScreen(
+          category: state.uri.queryParameters['cat'],
+          tx: state.uri.queryParameters['tx'],
+          types: state.uri.queryParameters['types'],
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/saved',
+      pageBuilder: (context, state) =>
+          AQRoute.forward(key: state.pageKey, child: const SavedScreen()),
+    ),
+    GoRoute(
+      path: '/property/:id',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: PropertyDetailScreen(propertyId: state.pathParameters['id']!),
+      ),
+    ),
+    GoRoute(
+      path: '/professionals',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQProfessionalsScreen(
+          key: ValueKey(state.uri.toString()),
+          query: state.uri.queryParameters['q'],
+          category: state.uri.queryParameters['cat'],
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/business/:id',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQBusinessProfileScreen(businessId: state.pathParameters['id']!),
+      ),
+    ),
+    GoRoute(
+      path: '/calculators',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: const CalculatorsListScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/calculators/:id',
+      pageBuilder: (context, state) {
+        final type = CalculatorType.values
+            .where((t) => t.name == state.pathParameters['id'])
+            .firstOrNull;
+        return AQRoute.forward(
+          key: state.pageKey,
+          child: type == null
+              ? const CalculatorsListScreen()
+              : CalculatorScreen(type: type),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/notifications',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: const NotificationsScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/map',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQMapScreen(tx: state.uri.queryParameters['tx']),
+      ),
+    ),
+    GoRoute(
+      path: '/search',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: SearchResultsScreen(
+          initialQuery: state.uri.queryParameters['q'],
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/search/start',
+      pageBuilder: (context, state) =>
+          AQRoute.forward(key: state.pageKey, child: const SearchScreen()),
+    ),
+        ...extraShellRoutes(),
         ...dbShellRoutes(),
+      ],
+    ),
+    // The business workspaces (Development, Construction, Architecture, Interior & Exterior).
+    ShellRoute(
+      builder: (context, state, child) => ProShell(child: child),
+      routes: [
+        GoRoute(
+          path: '/pro',
+          pageBuilder: (context, state) =>
+              AQRoute.tab(key: state.pageKey, child: const ProHomeScreen()),
+        ),
+        GoRoute(
+          path: '/pro/more',
+          pageBuilder: (context, state) =>
+              AQRoute.tab(key: state.pageKey, child: const ProMoreScreen()),
+        ),
+        ...dbProShellRoutes(),
+      ],
+    ),
+    // The Real Estate Agent workspace: its own navigation, never the customer's.
+    ShellRoute(
+      builder: (context, state, child) => AgentShell(child: child),
+      routes: [
+        ...agentShellRoutes(),
+    GoRoute(
+      path: '/agent/listings',
+      pageBuilder: (context, state) =>
+          AQRoute.forward(key: state.pageKey, child: const MyListingsScreen()),
+    ),
+    GoRoute(
+      path: '/agent/listings/new',
+      pageBuilder: (context, state) =>
+          AQRoute.forward(key: state.pageKey, child: const ListingFormScreen()),
+    ),
+    GoRoute(
+      path: '/agent/listings/:id',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: ListingDetailScreen(
+          id: state.pathParameters['id']!,
+          flash: state.uri.queryParameters['flash'],
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/agent/listings/:id/edit',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: ListingFormScreen(editId: state.pathParameters['id']),
+      ),
+    ),
+    GoRoute(
+      path: '/agent/leads',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: const LeadInboxScreen(scope: LeadScope.agent),
+      ),
+    ),
+    GoRoute(
+      path: '/agent/leads/:id',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: LeadDetailScreen(
+          scope: LeadScope.agent,
+          id: state.pathParameters['id']!,
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/workspace/enquiries',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: const LeadInboxScreen(scope: LeadScope.developer),
+      ),
+    ),
+    GoRoute(
+      path: '/workspace/enquiries/:id',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: LeadDetailScreen(
+          scope: LeadScope.developer,
+          id: state.pathParameters['id']!,
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/workspace/requests',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: const LeadInboxScreen(scope: LeadScope.service),
+      ),
+    ),
+    GoRoute(
+      path: '/workspace/requests/:id',
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: LeadDetailScreen(
+          scope: LeadScope.service,
+          id: state.pathParameters['id']!,
+        ),
+      ),
+    ),
       ],
     ),
     // Property viewing journey (screens 39-51). Back reverses the logical journey.
@@ -306,80 +557,7 @@ final appRouter = GoRouter(
         ),
       ),
     ),
-    GoRoute(
-      path: '/properties',
-      // There is no separate Properties hub: Buy, Rent, Sell and My Favorites live on Home.
-      redirect: (context, state) {
-        final q = state.uri.queryParameters;
-        final plain = q['cat'] == null && q['tx'] == null && q['types'] == null;
-        return plain ? '/app/home' : null;
-      },
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQPropertiesScreen(
-          category: state.uri.queryParameters['cat'],
-          tx: state.uri.queryParameters['tx'],
-          types: state.uri.queryParameters['types'],
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/properties/categories',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQCategoryStepScreen(tx: state.uri.queryParameters['tx']),
-      ),
-    ),
-    GoRoute(
-      path: '/properties/types',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQTypeStepScreen(
-          tx: state.uri.queryParameters['tx'],
-          cat: state.uri.queryParameters['cat'],
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/properties/all',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQPropertiesScreen(
-          category: state.uri.queryParameters['cat'],
-          tx: state.uri.queryParameters['tx'],
-          types: state.uri.queryParameters['types'],
-        ),
-      ),
-    ),
     ...dbStandaloneRoutes(),
-    GoRoute(
-      path: '/map',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQMapScreen(tx: state.uri.queryParameters['tx']),
-      ),
-    ),
-    GoRoute(
-      path: '/calculators',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: const CalculatorsListScreen(),
-      ),
-    ),
-    GoRoute(
-      path: '/calculators/:id',
-      pageBuilder: (context, state) {
-        final type = CalculatorType.values
-            .where((t) => t.name == state.pathParameters['id'])
-            .firstOrNull;
-        return AQRoute.forward(
-          key: state.pageKey,
-          child: type == null
-              ? const CalculatorsListScreen()
-              : CalculatorScreen(type: type),
-        );
-      },
-    ),
     GoRoute(
       path: '/business/:id/book',
       pageBuilder: (context, state) => AQRoute.forward(
@@ -394,92 +572,7 @@ final appRouter = GoRouter(
         child: MaintenanceDetailScreen(id: state.pathParameters['id']!),
       ),
     ),
-    GoRoute(
-      path: '/agent/listings',
-      pageBuilder: (context, state) =>
-          AQRoute.forward(key: state.pageKey, child: const MyListingsScreen()),
-    ),
-    GoRoute(
-      path: '/agent/listings/new',
-      pageBuilder: (context, state) =>
-          AQRoute.forward(key: state.pageKey, child: const ListingFormScreen()),
-    ),
-    GoRoute(
-      path: '/agent/listings/:id',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: ListingDetailScreen(
-          id: state.pathParameters['id']!,
-          flash: state.uri.queryParameters['flash'],
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/agent/listings/:id/edit',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: ListingFormScreen(editId: state.pathParameters['id']),
-      ),
-    ),
-    GoRoute(
-      path: '/agent/leads',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: const LeadInboxScreen(scope: LeadScope.agent),
-      ),
-    ),
-    GoRoute(
-      path: '/agent/leads/:id',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: LeadDetailScreen(
-          scope: LeadScope.agent,
-          id: state.pathParameters['id']!,
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/workspace/enquiries',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: const LeadInboxScreen(scope: LeadScope.developer),
-      ),
-    ),
-    GoRoute(
-      path: '/workspace/enquiries/:id',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: LeadDetailScreen(
-          scope: LeadScope.developer,
-          id: state.pathParameters['id']!,
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/workspace/requests',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: const LeadInboxScreen(scope: LeadScope.service),
-      ),
-    ),
-    GoRoute(
-      path: '/workspace/requests/:id',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: LeadDetailScreen(
-          scope: LeadScope.service,
-          id: state.pathParameters['id']!,
-        ),
-      ),
-    ),
     ...extraRoutes(),
-    GoRoute(
-      path: '/notifications',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: const NotificationsScreen(),
-      ),
-    ),
     GoRoute(
       path: '/account/delete',
       pageBuilder: (context, state) => AQRoute.forward(
@@ -497,50 +590,6 @@ final appRouter = GoRouter(
               .where((x) => x.isNotEmpty)
               .toList(),
         ),
-      ),
-    ),
-    GoRoute(
-      path: '/saved',
-      pageBuilder: (context, state) =>
-          AQRoute.forward(key: state.pageKey, child: const SavedScreen()),
-    ),
-    GoRoute(
-      path: '/search',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: SearchResultsScreen(
-          initialQuery: state.uri.queryParameters['q'],
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/search/start',
-      pageBuilder: (context, state) =>
-          AQRoute.forward(key: state.pageKey, child: const SearchScreen()),
-    ),
-    GoRoute(
-      path: '/property/:id',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: PropertyDetailScreen(propertyId: state.pathParameters['id']!),
-      ),
-    ),
-    GoRoute(
-      path: '/professionals',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQProfessionalsScreen(
-          key: ValueKey(state.uri.toString()),
-          query: state.uri.queryParameters['q'],
-          category: state.uri.queryParameters['cat'],
-        ),
-      ),
-    ),
-    GoRoute(
-      path: '/business/:id',
-      pageBuilder: (context, state) => AQRoute.forward(
-        key: state.pageKey,
-        child: AQBusinessProfileScreen(businessId: state.pathParameters['id']!),
       ),
     ),
   ],

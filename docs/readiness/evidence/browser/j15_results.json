@@ -1,0 +1,132 @@
+[
+ {
+  "name": "entry: property types leads to the e-Broker intro",
+  "pass": true,
+  "note": "BackSell with Aqary e-BrokerFor owners selling a property.How it works1Tell us about the property and the owner.2Add pho"
+ },
+ {
+  "name": "intro: nothing is charged",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "empty form lists what is missing",
+  "pass": true,
+  "note": "BackYour propertyFor owners selling a property.Owner documentsOwner photo ID *PDF, JPG or PNG.Choose a fileAdd the owner photo ID.Title deed document *PDF, JPG or PNG.Choose a fileAdd the title deed d"
+ },
+ {
+  "name": "market chosen",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "type chosen",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "market and type chosen",
+  "pass": true,
+  "note": "BackYour propertyFor owners selling a property.Owner documentsOwner photo ID *PDF, JPG or PNG.Choose a fileAdd the owner photo ID.Title deed document *PDF, JPG or PNG.Choose a fileAdd the title deed d"
+ },
+ {
+  "name": "both owner documents attached",
+  "pass": true,
+  "note": "BackYour propertyFor owners selling a property.Owner documentsOwner photo ID *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace fileTitle deed document *⁨1"
+ },
+ {
+  "name": "governorate chosen",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "wilayat chosen",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "bad deed number is refused with its message",
+  "pass": true,
+  "note": "BackYour propertyFor owners selling a property.Owner documentsOwner photo ID *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace fileTitle deed document *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace filePro"
+ },
+ {
+  "name": "no photo and no acceptance: both reported",
+  "pass": true,
+  "note": "BackYour propertyFor owners selling a property.Owner documentsOwner photo ID *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace fileTitle deed document *⁨11_Muscat_s"
+ },
+ {
+  "name": "a photo is listed and can be removed",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "removing it brings the empty note back",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "fee notice wording is the approved sentence only",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "submitting without accepting is refused",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "failure: clearly communicated, nothing submitted",
+  "pass": true,
+  "note": "BackYour propertyFor owners selling a property.We could not send this. Nothing was submitted. Your answers are still here.Owner documentsOwner photo ID *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace fi"
+ },
+ {
+  "name": "failure: the typed answers are still there",
+  "pass": true,
+  "note": "[\"\",\"\",\"420\",\"185000\",\"AB123456\"]"
+ },
+ {
+  "name": "failure: still on the form",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "retry sends it: in review, hidden from buyers, acceptance recorded",
+  "pass": true,
+  "note": "Back⁨Villa in Al Khuwair⁩OMR 185000Sent for review. It is not live. Buyers see it only after it is approved.In review Sent for review. It is not visible to buyers.PropertyProperty typeVillaGovernorate⁨Bawshar, Muscat⁩Size (m²)420 m²Title deed number⁨AB123456⁩Photos1Fee notice acceptedAqary Real Esta"
+ },
+ {
+  "name": "changes requested: feedback shown with an edit action",
+  "pass": true,
+  "note": "Back⁨Villa in Al Khuwair⁩OMR 185000Sent for review. It is not live. Buyers see it only after it is approved.Needs changes The reviewer asked for changes. Update it and send it again.Reviewer feedbackSample feedback: the title deed is hard to read.PropertyProperty typeVillaGovernorate⁨Bawshar, Muscat"
+ },
+ {
+  "name": "edit form keeps the earlier answers",
+  "pass": true,
+  "note": "BackUpdate and resubmitFor owners selling a property.Owner documentsOwner photo ID *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace fileTitle deed document *⁨11_Muscat_skyline_and_mountains.jpg⁩Replace f"
+ },
+ {
+  "name": "edit: earlier answers pre-filled",
+  "pass": true,
+  "note": "[\"\",\"\",\"\",\"\",\"\"]"
+ },
+ {
+  "name": "resubmitting needs the fee notice accepted again",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "resubmission failure: nothing changes, answers kept",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "resubmission sent: back in review",
+  "pass": true,
+  "note": "Back⁨Villa in Al Khuwair, updated⁩OMR 185000Sent for review. It is not live. Buyers see it only after it is approved.In review Sent for review. It is not visible to buyers.Reviewer feedbackSample feedback: the title deed is hard to read.PropertyPrope"
+ },
+ {
+  "name": "no edit action while in review",
+  "pass": true,
+  "note": ""
+ }
+]
