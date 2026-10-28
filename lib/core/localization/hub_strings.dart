@@ -44,6 +44,18 @@ const Map<String, (String, String)> hubStrings = {
   'bt.farm': ('Farmhouse', 'بيت مزرعة'),
   'ptype.commercialLand': ('Commercial Land', 'أرض تجارية'),
   'ptype.investmentLand': ('Land to invest', 'أرض للاستثمار'),
+  // Home primary actions
+  'hp.title': ('What would you like to do?', 'ماذا تريد أن تفعل؟'),
+  'hp.buy': ('Buy a property', 'شراء عقار'),
+  'hp.buy.s': ('Find your next home or investment.', 'اعثر على منزلك أو استثمارك القادم.'),
+  'hp.rent': ('Rent a property', 'استئجار عقار'),
+  'hp.rent.s': ('Discover places to rent.', 'اكتشف أماكن للإيجار.'),
+  'hp.sell': ('Sell with Aqary e-Broker', 'البيع عبر وسيط عقاري'),
+  'hp.sell.s': ('Start your property submission.', 'ابدأ تقديم عقارك.'),
+  'hp.fav': ('My Favorites', 'مفضلتي'),
+  'hp.fav.s': ('Return to saved properties.', 'عد إلى العقارات المحفوظة.'),
+  'hp.more': ('Explore more with AQARATI', 'اكتشف المزيد مع عقاراتي'),
+  'hm6.architecture': ('Architecture', 'العمارة'),
   // Home module grid
   'hm6.title': ('What do you need?', 'ماذا تحتاج؟'),
   'hm6.properties': ('Properties', 'العقارات'),

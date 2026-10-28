@@ -69,7 +69,7 @@ class EBrokerIntroScreen extends ConsumerWidget {
     final c = AQColors.of(context);
     final me = ref.watch(meProvider);
     final signedIn = me.hasValue;
-    void back() => aqBack(context, '/properties');
+    void back() => aqBack(context, '/app/home');
     return AQViewingScaffold(
       title: f.t('eb.title'),
       subtitle: f.t('eb.sub'),

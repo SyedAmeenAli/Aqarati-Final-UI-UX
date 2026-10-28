@@ -308,20 +308,20 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/properties',
-      pageBuilder: (context, state) {
+      // There is no separate Properties hub: Buy, Rent, Sell and My Favorites live on Home.
+      redirect: (context, state) {
         final q = state.uri.queryParameters;
         final plain = q['cat'] == null && q['tx'] == null && q['types'] == null;
-        return AQRoute.forward(
-          key: state.pageKey,
-          child: plain
-              ? const AQPropertiesHubScreen()
-              : AQPropertiesScreen(
-                  category: state.uri.queryParameters['cat'],
-                  tx: state.uri.queryParameters['tx'],
-                  types: state.uri.queryParameters['types'],
-                ),
-        );
+        return plain ? '/app/home' : null;
       },
+      pageBuilder: (context, state) => AQRoute.forward(
+        key: state.pageKey,
+        child: AQPropertiesScreen(
+          category: state.uri.queryParameters['cat'],
+          tx: state.uri.queryParameters['tx'],
+          types: state.uri.queryParameters['types'],
+        ),
+      ),
     ),
     GoRoute(
       path: '/properties/categories',

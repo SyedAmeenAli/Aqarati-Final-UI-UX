@@ -303,7 +303,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         : AQHero(image: 'assets/location/11_Muscat_skyline_and_mountains.jpg', eyebrow: f.t('srch.eyebrow'), title: f.t('srch.title'), sub: f.t('srch.sub'), onBack: () => aqBack(context, '/app/explore'));
 
     final tiles = [
-      _tile(context, icon: 'home', title: f.t('srch.tile.props'), body: f.t('srch.tile.props.s'), primary: true, onTap: () => context.push('/properties')),
+      _tile(context, icon: 'home', title: f.t('srch.tile.props'), body: f.t('srch.tile.props.s'), primary: true, onTap: () => context.push('/properties/all')),
       _tile(context, icon: 'agent', title: f.t('srch.tile.pros'), body: f.t('srch.tile.pros.s'), primary: false, onTap: () => context.push('/professionals')),
       _tile(context, icon: 'construction', title: f.t('srch.tile.maint'), body: f.t('srch.tile.maint.s'), primary: false, onTap: () => context.push('/professionals?cat=maintenance')),
     ];
@@ -344,18 +344,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           for (final t in recent) _recentRow(context, t),
         ],
         const SizedBox(height: AQSpacing.x6),
-        AQBanner(image: 'assets/location/12_Nizwa_Fort_and_mountains_landscape.jpg', title: f.t('srch.explore.t'), body: f.t('srch.explore.s'), cta: f.t('srch.browse'), onTap: () => context.push('/properties')),
+        AQBanner(image: 'assets/location/12_Nizwa_Fort_and_mountains_landscape.jpg', title: f.t('srch.explore.t'), body: f.t('srch.explore.s'), cta: f.t('srch.browse'), onTap: () => context.push('/properties/all')),
         _head(context, f.t('srch.quick')),
         large
             ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                _quick(context, PropCategory.residential.image, f.t('srch.tile.props'), () => context.push('/properties')),
+                _quick(context, PropCategory.residential.image, f.t('srch.tile.props'), () => context.push('/properties/all')),
                 const SizedBox(height: AQSpacing.x2),
                 _quick(context, 'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg', f.t('srch.tile.pros'), () => context.push('/professionals')),
                 const SizedBox(height: AQSpacing.x2),
                 _quick(context, 'assets/businesses/b4/05_Technician_servicing_air_conditi.jpg', f.t('srch.tile.maint'), () => context.push('/professionals?cat=maintenance')),
               ])
             : Row(children: [
-                Expanded(child: _quick(context, PropCategory.residential.image, f.t('srch.tile.props'), () => context.push('/properties'))),
+                Expanded(child: _quick(context, PropCategory.residential.image, f.t('srch.tile.props'), () => context.push('/properties/all'))),
                 const SizedBox(width: AQSpacing.x2),
                 Expanded(child: _quick(context, 'assets/businesses/b2/05_Construction_site_with_tower_crane.jpg', f.t('srch.tile.pros'), () => context.push('/professionals'))),
                 const SizedBox(width: AQSpacing.x2),

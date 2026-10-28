@@ -1,4 +1,3 @@
-import '../../core/aq/aq_help.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -19,139 +18,6 @@ String _catIcon(PropCategory k) => switch (k) {
   PropCategory.agriculture => 'globe',
   PropCategory.industrial => 'construction',
 };
-
-// ---------------------------------------------------------------- Properties hub
-
-/// First step of Properties: Buy, Rent, Sell or My Favorites. Nothing sits between Home and this.
-class AQPropertiesHubScreen extends StatelessWidget {
-  const AQPropertiesHubScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final f = FlowStrings.of(context);
-    final c = AQColors.of(context);
-    final large = aqLargeText(context);
-    Widget option(String icon, String key, String path) => _HubCard(
-      icon: icon,
-      title: f.t('hub.$key'),
-      sub: f.t('hub.$key.s'),
-      onTap: () {
-        AQHaptics.selection();
-        context.push(path);
-      },
-    );
-    final cards = [
-      option('home', 'buy', '/properties/categories?tx=buy'),
-      option('calendar', 'rent', '/properties/categories?tx=rent'),
-      option('verified', 'sell', '/sell'),
-      option('star', 'fav', '/saved'),
-    ];
-    return Scaffold(
-      backgroundColor: c.background,
-      body: aqPage(
-        context,
-        hero: AQHero(
-          image: 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
-          title: f.t('hub.title'),
-          sub: f.t('hub.sub'),
-          onBack: () => aqBack(context, '/app/home'),
-        ),
-        children: [
-          const Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: AQHelpButton(),
-          ),
-          if (large)
-            for (final w in cards) ...[w, const SizedBox(height: AQSpacing.x3)]
-          else
-            LayoutBuilder(
-              builder: (context, box) {
-                const gap = AQSpacing.x3;
-                final w = (box.maxWidth - gap) / 2;
-                return Wrap(
-                  spacing: gap,
-                  runSpacing: gap,
-                  children: [
-                    for (final card in cards) SizedBox(width: w, child: card),
-                  ],
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HubCard extends StatelessWidget {
-  final String icon, title, sub;
-  final VoidCallback onTap;
-  const _HubCard({
-    required this.icon,
-    required this.title,
-    required this.sub,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AQColors.of(context);
-    return Semantics(
-      button: true,
-      label: '$title. $sub',
-      excludeSemantics: true,
-      onTap: onTap,
-      child: AQPressable(
-        onTap: onTap,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 132),
-          padding: const EdgeInsets.all(AQSpacing.x4),
-          decoration: BoxDecoration(
-            color: c.surfaceRaised,
-            borderRadius: BorderRadius.circular(AQRadius.medium),
-            border: Border.all(color: c.hairline),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: c.surfaceSelected,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: AQIcon(icon, size: 22, color: c.accent),
-                    ),
-                  ),
-                  const Spacer(),
-                  AQIcon(
-                    'chevron-right',
-                    size: 16,
-                    color: c.inkSoft,
-                    directional: true,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AQSpacing.x3),
-              Text(title, style: AQTypography.of(context, AQText.titleMedium)),
-              const SizedBox(height: 2),
-              Text(
-                sub,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: AQTypography.of(context, AQText.bodySmall, soft: true),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ---------------------------------------------------------------- category and type steps
 
@@ -176,7 +42,7 @@ class AQCategoryStepScreen extends StatelessWidget {
           image: 'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
           title: f.t('hubcat.${t.name}'),
           sub: f.t('hubcat.sub'),
-          onBack: () => aqBack(context, '/properties'),
+          onBack: () => aqBack(context, '/app/home'),
         ),
         children: [
           LayoutBuilder(

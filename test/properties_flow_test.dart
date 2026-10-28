@@ -7,7 +7,9 @@ import 'package:aqarati_app/features/entry/models/signup_purpose.dart';
 import 'package:aqarati_app/features/flow/screens/auth_screens.dart';
 import 'package:aqarati_app/core/aq/aq_forms.dart' show AQTextField;
 import 'package:aqarati_app/features/search/aq_property_types.dart';
-import 'package:aqarati_app/features/viewing/widgets/viewing_components.dart' show AQNoticeCard;
+import 'package:aqarati_app/features/workspace/aq_action_card.dart';
+import 'package:aqarati_app/features/viewing/widgets/viewing_components.dart'
+    show AQNoticeCard;
 import 'package:aqarati_app/features/search/browse_taxonomy.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +21,13 @@ import 'package:go_router/go_router.dart';
 /// Where the last stub screen was reached, so the tests can read the route the app chose.
 String reached = '';
 
-GoRouter _router({String start = '/properties'}) => GoRouter(
+GoRouter _router({String start = '/'}) => GoRouter(
   initialLocation: start,
   routes: [
-    GoRoute(path: '/properties', builder: (_, _) => const AQPropertiesHubScreen()),
+    GoRoute(
+      path: '/',
+      builder: (_, _) => const Scaffold(body: AQHomeScreen()),
+    ),
     GoRoute(
       path: '/properties/categories',
       builder: (_, s) => AQCategoryStepScreen(tx: s.uri.queryParameters['tx']),
@@ -41,13 +46,29 @@ GoRouter _router({String start = '/properties'}) => GoRouter(
         return Scaffold(body: Text('RESULTS ${s.uri.query}'));
       },
     ),
-    GoRoute(path: '/sell', builder: (_, _) => const Scaffold(body: Text('SELL'))),
-    GoRoute(path: '/saved', builder: (_, _) => const Scaffold(body: Text('SAVED'))),
-    GoRoute(path: '/app/home', builder: (_, _) => const Scaffold(body: Text('HOME'))),
+    GoRoute(
+      path: '/sell',
+      builder: (_, _) => const Scaffold(body: Text('SELL')),
+    ),
+    GoRoute(
+      path: '/saved',
+      builder: (_, _) => const Scaffold(body: Text('SAVED')),
+    ),
   ],
 );
 
 Widget _app(GoRouter r, {double scale = 1}) => ProviderScope(
+  overrides: [
+    meProvider.overrideWith(
+      (ref) async => const MeSession(
+        account: AccountState.active,
+        purpose: SignupPurpose.userToShop,
+      ),
+    ),
+    adRepositoryProvider.overrideWithValue(
+      DemoAdRepository(latency: Duration.zero),
+    ),
+  ],
   child: MaterialApp.router(
     routerConfig: r,
     builder: (c, child) => MediaQuery(
@@ -130,41 +151,77 @@ void main() {
   });
 
   group('properties flow', () {
-    testWidgets('the hub offers Buy, Rent, Sell and My Favorites and nothing else', (
+    testWidgets('Home itself offers Buy, Rent, Sell and My Favorites first', (
       t,
     ) async {
-      _phone(t);
+      _phone(t, h: 2600);
       await t.pumpWidget(_app(_router()));
       await _settle(t);
-      for (final s in ['Buy', 'Rent', 'Sell', 'My Favorites']) {
-        expect(find.text(s), findsOneWidget, reason: s);
+      final titles = [
+        'Buy a property',
+        'Rent a property',
+        'Sell with Aqary e-Broker',
+        'My Favorites',
+      ];
+      final rects = [for (final x in titles) t.getRect(find.text(x))];
+      final search = t.getRect(find.byType(AQSearchEntry));
+      for (final r in rects) {
+        expect(r.top, lessThan(search.top), reason: 'above the search bar');
       }
-      expect(find.text('Residential'), findsNothing);
-      expect(find.textContaining('Buy / Sell'), findsNothing);
+      // two by two, each row aligned
+      expect(rects[0].top, rects[1].top);
+      expect(rects[2].top, rects[3].top);
+      expect(rects[2].top, greaterThan(rects[0].top));
+      // all four cards are exactly the same size
+      final cards = find.byType(AQActionCard);
+      expect(cards, findsNWidgets(4));
+      final sizes = [for (var i = 0; i < 4; i++) t.getSize(cards.at(i))];
+      for (final z in sizes) {
+        expect(z, sizes.first, reason: 'equal-size cards');
+      }
+      // a card shows a photo
+      expect(
+        find.descendant(of: cards.first, matching: find.byType(Image)),
+        findsWidgets,
+      );
+      // no second page of the same four actions
+      expect(find.text('Properties'), findsNothing);
     });
 
-    testWidgets('Buy leads straight to the four categories, then straight to types', (
-      t,
-    ) async {
-      _phone(t);
-      final r = _router();
-      await t.pumpWidget(_app(r));
-      await _settle(t);
-      await t.tap(find.text('Buy'));
-      await _settle(t);
-      for (final s in ['Residential', 'Commercial', 'Industrial', 'Agriculture']) {
-        expect(find.text(s), findsOneWidget, reason: s);
-      }
-      await t.tap(find.text('Commercial'));
-      await _settle(t);
-      for (final s in ['Shops', 'Offices', 'Building', 'Storage', 'Commercial Land']) {
-        expect(find.text(s), findsOneWidget, reason: s);
-      }
-      expect(find.text('Buy'), findsNothing);
-      await t.tap(find.text('Offices'));
-      await _settle(t);
-      expect(reached, '/properties/all?tx=buy&cat=commercial&types=office');
-    });
+    testWidgets(
+      'Buy leads straight to the four categories, then straight to types',
+      (t) async {
+        _phone(t);
+        final r = _router();
+        await t.pumpWidget(_app(r));
+        await _settle(t);
+        await t.tap(find.text('Buy a property'));
+        await _settle(t);
+        for (final s in [
+          'Residential',
+          'Commercial',
+          'Industrial',
+          'Agriculture',
+        ]) {
+          expect(find.text(s), findsOneWidget, reason: s);
+        }
+        await t.tap(find.text('Commercial'));
+        await _settle(t);
+        for (final s in [
+          'Shops',
+          'Offices',
+          'Building',
+          'Storage',
+          'Commercial Land',
+        ]) {
+          expect(find.text(s), findsOneWidget, reason: s);
+        }
+        expect(find.text('Buy a property'), findsNothing);
+        await t.tap(find.text('Offices'));
+        await _settle(t);
+        expect(reached, '/properties/all?tx=buy&cat=commercial&types=office');
+      },
+    );
 
     testWidgets('Rent keeps the category step and only offers rentable types', (
       t,
@@ -172,7 +229,7 @@ void main() {
       _phone(t);
       await t.pumpWidget(_app(_router()));
       await _settle(t);
-      await t.tap(find.text('Rent'));
+      await t.tap(find.text('Rent a property'));
       await _settle(t);
       expect(find.text('Industrial'), findsOneWidget);
       await t.tap(find.text('Residential'));
@@ -190,12 +247,16 @@ void main() {
       final r = _router();
       await t.pumpWidget(_app(r));
       await _settle(t);
-      await t.tap(find.text('Rent'));
+      await t.tap(find.text('Rent a property'));
       await _settle(t);
       await t.tap(find.text('Industrial'));
       await _settle(t);
       expect(find.text('Factory'), findsOneWidget);
-      expect(find.text('Land to invest'), findsOneWidget, reason: 'has rental ranges');
+      expect(
+        find.text('Land to invest'),
+        findsOneWidget,
+        reason: 'has rental ranges',
+      );
       r.pop();
       await _settle(t);
       expect(find.text('Rent: choose a category'), findsOneWidget);
@@ -209,7 +270,7 @@ void main() {
       final r = _router();
       await t.pumpWidget(_app(r));
       await _settle(t);
-      await t.tap(find.text('Sell'));
+      await t.tap(find.text('Sell with Aqary e-Broker'));
       await _settle(t);
       expect(find.text('SELL'), findsOneWidget);
       r.pop();
@@ -221,10 +282,12 @@ void main() {
 
     for (final w in [320.0, 360.0, 412.0]) {
       for (final scale in [1.0, 2.0]) {
-        testWidgets('hub, categories and types fit at $w px, scale $scale', (t) async {
+        testWidgets('Home, categories and types fit at $w px, scale $scale', (
+          t,
+        ) async {
           _phone(t, w: w, h: 2400);
           for (final start in [
-            '/properties',
+            '/',
             '/properties/categories?tx=buy',
             '/properties/types?tx=buy&cat=commercial',
             '/properties/types?tx=rent&cat=agriculture',
@@ -247,12 +310,17 @@ void main() {
             purpose: SignupPurpose.userToShop,
           ),
         ),
-        adRepositoryProvider.overrideWithValue(DemoAdRepository(latency: Duration.zero)),
+        adRepositoryProvider.overrideWithValue(
+          DemoAdRepository(latency: Duration.zero),
+        ),
       ],
       child: MaterialApp.router(
         routerConfig: GoRouter(
           routes: [
-            GoRoute(path: '/', builder: (_, _) => const Scaffold(body: AQHomeScreen())),
+            GoRoute(
+              path: '/',
+              builder: (_, _) => const Scaffold(body: AQHomeScreen()),
+            ),
             GoRoute(
               path: '/:p(.*)',
               builder: (_, s) => Scaffold(body: Text('AT ${s.uri}')),
@@ -268,13 +336,13 @@ void main() {
       ),
     );
 
-    testWidgets('six modules, in order, directly under the search bar', (t) async {
+    testWidgets('six services, in order, under Explore more', (t) async {
       _phone(t, h: 2600);
       await t.pumpWidget(home());
       await _settle(t);
       final order = [
-        'Properties',
         'Development',
+        'Architecture',
         'Interior & Exterior Designer',
         'Construction Company',
         'Loan Calculator',
@@ -283,8 +351,14 @@ void main() {
       final tops = <double>[];
       final lefts = <double>[];
       for (final s in order) {
-        final f = find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.label == s && w.properties.button == true,
+        final f = find.descendant(
+          of: find.byType(AQModuleGrid),
+          matching: find.byWidgetPredicate(
+            (w) =>
+                w is Semantics &&
+                w.properties.label == s &&
+                w.properties.button == true,
+          ),
         );
         expect(f, findsOneWidget, reason: s);
         final r = t.getRect(f);
@@ -297,16 +371,22 @@ void main() {
         final nextRow = tops[i] > tops[i - 1];
         expect(sameRowAfter || nextRow, isTrue, reason: order[i]);
       }
-      final search = t.getRect(find.byType(AQSearchEntry));
-      expect(tops.first, greaterThan(search.bottom - 1));
+      final more = t.getRect(find.text('Explore more with AQARATI'));
+      expect(tops.first, greaterThan(more.bottom - 1));
+      expect(
+        find.text('Properties'),
+        findsNothing,
+        reason: 'no generic Properties tile',
+      );
     });
 
     testWidgets('each module opens its own journey', (t) async {
       _phone(t, h: 2600);
       final expected = {
-        'Properties': '/properties',
         'Development': '/app/explore/build/results?cat=developer',
-        'Interior & Exterior Designer': '/app/explore/build/results?cat=interiorExterior',
+        'Architecture': '/app/explore/build/results?cat=architecture',
+        'Interior & Exterior Designer':
+            '/app/explore/build/results?cat=interiorExterior',
         'Construction Company': '/app/explore/build/results?cat=construction',
         'Loan Calculator': '/calculators',
         'Maintenance': '/professionals?cat=maintenance',
@@ -315,8 +395,14 @@ void main() {
         await t.pumpWidget(home());
         await _settle(t);
         await t.tap(
-          find.byWidgetPredicate(
-            (w) => w is Semantics && w.properties.label == e.key && w.properties.button == true,
+          find.descendant(
+            of: find.byType(AQModuleGrid),
+            matching: find.byWidgetPredicate(
+              (w) =>
+                  w is Semantics &&
+                  w.properties.label == e.key &&
+                  w.properties.button == true,
+            ),
           ),
         );
         await _settle(t);
@@ -325,7 +411,9 @@ void main() {
     });
 
     for (final w in [320.0, 360.0, 412.0]) {
-      testWidgets('the grid does not overflow at $w px or at 200% text', (t) async {
+      testWidgets('the grid does not overflow at $w px or at 200% text', (
+        t,
+      ) async {
         _phone(t, w: w, h: 2600);
         await t.pumpWidget(home());
         await _settle(t);
@@ -341,7 +429,11 @@ void main() {
       expect(EntryExperience.user.loginRoute, '/login?as=user');
       expect(EntryExperience.agent.loginRoute, '/login?as=agent');
       expect(entryExperienceFrom('agent'), EntryExperience.agent);
-      expect(entryExperienceFrom('admin'), isNull, reason: 'an unknown door grants nothing');
+      expect(
+        entryExperienceFrom('admin'),
+        isNull,
+        reason: 'an unknown door grants nothing',
+      );
     });
 
     test('all six public signup roles are still offered', () {

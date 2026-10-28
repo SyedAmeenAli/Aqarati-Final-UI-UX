@@ -1,5 +1,4 @@
 import 'package:aqarati_app/core/aq/aq_help.dart';
-import 'package:aqarati_app/features/search/aq_property_types.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -34,6 +33,8 @@ void main() {
     await t.pumpWidget(_app(const AQHomeScreen()));
     await _settle(t);
     expect(find.byType(AQHelpButton), findsOneWidget);
+    await t.ensureVisible(find.byType(AQHelpButton));
+    await _settle(t);
     await t.tap(find.byType(AQHelpButton));
     await _settle(t);
     expect(find.text('Real estate on AQARATI'), findsOneWidget);
@@ -46,21 +47,6 @@ void main() {
     expect(find.text('Real estate on AQARATI'), findsNothing);
     expect(find.byType(AQHomeScreen), findsOneWidget);
     expect(find.text('Browse Properties'), findsOneWidget);
-  });
-
-  testWidgets('on the properties hub nothing is lost when help closes', (
-    t,
-  ) async {
-    await t.binding.setSurfaceSize(const Size(393, 852));
-    addTearDown(() => t.binding.setSurfaceSize(null));
-    await t.pumpWidget(_app(const AQPropertiesHubScreen()));
-    await _settle(t);
-    await t.tap(find.byType(AQHelpButton));
-    await _settle(t);
-    await t.tap(find.text('Got it'));
-    await _settle(t);
-    expect(find.byType(AQPropertiesHubScreen), findsOneWidget);
-    expect(find.text('My Favorites'), findsOneWidget);
   });
 
   testWidgets('it is a labelled button for assistive technology', (t) async {

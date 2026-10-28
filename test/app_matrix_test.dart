@@ -44,7 +44,6 @@ final _screens = <String, _Build>{
   'Account': () => const AccountTab(),
   'Search start': () => const SearchScreen(),
   'Search results': () => const SearchResultsScreen(initialQuery: 'villa'),
-  'Properties hub': () => const AQPropertiesHubScreen(),
   'Properties categories': () => const AQCategoryStepScreen(tx: 'buy'),
   'Property types (rent, commercial)': () => const AQTypeStepScreen(tx: 'rent', cat: 'commercial'),
   'Properties (residential)': () => const AQPropertiesScreen(category: 'residential'),

@@ -7,6 +7,7 @@ import 'package:aqarati_app/features/ads/ad_repository.dart';
 import 'package:aqarati_app/features/ads/sponsored_banner.dart';
 import 'package:aqarati_app/features/entry/models/signup_purpose.dart';
 import 'package:aqarati_app/features/workspace/aq_explore.dart';
+import 'package:aqarati_app/features/workspace/aq_action_card.dart';
 import 'package:aqarati_app/features/workspace/aq_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -54,7 +55,7 @@ Future<void> _settle(WidgetTester t) async {
 }
 
 void main() {
-  testWidgets('Home shows one compact banner between the header and the hero', (
+  testWidgets('Home shows one compact banner below the primary actions', (
     t,
   ) async {
     await t.binding.setSurfaceSize(const Size(393, 844));
@@ -67,10 +68,15 @@ void main() {
     final banner = t.getRect(find.byType(SponsoredBannerView));
     expect(banner.height, kSponsoredBannerHeight);
     expect(banner.height, inInclusiveRange(80, 100));
-    final header = t.getRect(find.text('All Oman'));
-    final hero = t.getRect(find.textContaining('find your next'));
-    expect(banner.top, greaterThan(header.bottom - 4));
-    expect(hero.top, greaterThan(banner.bottom));
+    // Buy, Rent, Sell and Favorites come first; the banner never pushes them away.
+    final cards = find.byType(AQActionCard);
+    expect(cards, findsNWidgets(4));
+    final lastCardBottom = t.getRect(cards.at(3)).bottom;
+    final firstCardTop = t.getRect(cards.first).top;
+    expect(banner.top, greaterThan(lastCardBottom - 1));
+    expect(firstCardTop, lessThan(banner.top));
+    final search = t.getRect(find.byType(AQSearchEntry));
+    expect(search.top, greaterThan(banner.bottom - 1));
   });
 
   for (final w in [320.0, 360.0, 390.0, 412.0, 430.0]) {
@@ -114,12 +120,12 @@ void main() {
     );
     await _settle(t);
     expect(find.byType(SponsoredBannerView), findsNothing);
-    final without = t.getTopLeft(find.textContaining('find your next')).dy;
+    final without = t.getTopLeft(find.text('Explore more with AQARATI')).dy;
     final repo = DemoAdRepository(latency: Duration.zero)
       ..debugAdd(_ad('Acme', 'Offer'));
     await t.pumpWidget(_app(const AQHomeScreen(), repo));
     await _settle(t);
-    final withAd = t.getTopLeft(find.textContaining('find your next')).dy;
+    final withAd = t.getTopLeft(find.text('Explore more with AQARATI')).dy;
     expect(withAd - without, greaterThan(kSponsoredBannerHeight - 1));
   });
 

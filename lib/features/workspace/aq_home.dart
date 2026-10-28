@@ -13,6 +13,7 @@ import '../../core/localization/flow_strings.dart';
 import '../../data/models/enums.dart';
 import '../../core/aq/aq_help.dart';
 import '../ads/sponsored_banner.dart';
+import 'aq_action_card.dart';
 import '../../data/models/property.dart';
 import '../../data/repositories/app_state_providers.dart'
     show savedPropertyIdsProvider;
@@ -1292,6 +1293,71 @@ Widget aqPage(
 
 /// The six modules of User to Shop, in the approved order. One entry point to each; the
 /// sections below stay as they were.
+/// The four primary property actions, first thing under the greeting: Buy, Rent, Sell with
+/// Aqary e-Broker and My Favorites. Each goes straight to its own journey.
+class AQHomePrimary extends StatelessWidget {
+  const AQHomePrimary({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final f = FlowStrings.of(context);
+    Widget card(String icon, String key, String image, String path) =>
+        AQActionCard(
+          icon: icon,
+          image: image,
+          title: f.t('hp.$key'),
+          sub: f.t('hp.$key.s'),
+          onTap: () => context.push(path),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: AQSpacing.x2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: AQSpacing.x3),
+            child: Semantics(
+              header: true,
+              child: Text(
+                f.t('hp.title'),
+                style: AQTypography.of(context, AQText.headlineMedium),
+              ),
+            ),
+          ),
+          AQActionGrid(
+            cards: [
+              card(
+                'home',
+                'buy',
+                'assets/properties/p1/08_Contemporary_villa_front_facade_.jpg',
+                '/properties/categories?tx=buy',
+              ),
+              card(
+                'calendar',
+                'rent',
+                'assets/properties/p5/03_Contemporary_apartment_property_.jpg',
+                '/properties/categories?tx=rent',
+              ),
+              card(
+                'verified',
+                'sell',
+                'assets/location/09_Modern_villa_exterior_in_Seeb.jpg',
+                '/sell',
+              ),
+              card(
+                'star',
+                'fav',
+                'assets/location/10_Muscat_corniche_at_warm_evening.jpg',
+                '/saved',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class AQModuleGrid extends StatelessWidget {
   const AQModuleGrid({super.key});
 
@@ -1301,8 +1367,12 @@ class AQModuleGrid extends StatelessWidget {
     final c = AQColors.of(context);
     final large = aqLargeText(context);
     final modules = <(String, String, String)>[
-      ('home', 'properties', '/properties'),
       ('development', 'development', '/app/explore/build/results?cat=developer'),
+      (
+        'architecture',
+        'architecture',
+        '/app/explore/build/results?cat=architecture',
+      ),
       (
         'interior',
         'interior',
@@ -1411,17 +1481,30 @@ class AQHomeScreen extends ConsumerWidget {
         eyebrow: _greeting(f),
         title: f.t('home.lead'),
         sub: '',
-        belowHeader: const SponsoredBannerSlot(),
       ),
       children: [
         ?topSlot,
+        const AQHomePrimary(),
+        // Sponsored content sits below the primary actions so it never pushes them out of view.
+        const SponsoredBannerSlot(),
+        const SizedBox(height: AQSpacing.x4),
         AQSearchEntry(hint: f.t('home.search.hint')),
+        Padding(
+          padding: const EdgeInsets.only(top: AQSpacing.x5),
+          child: Semantics(
+            header: true,
+            child: Text(
+              f.t('hp.more'),
+              style: AQTypography.of(context, AQText.headlineMedium),
+            ),
+          ),
+        ),
         const AQModuleGrid(),
         AQSectionHeader(
           f.t('home.browse'),
           help: true,
           action: f.t('home.seeAll'),
-          onAction: () => context.push('/properties'),
+          onAction: () => context.push('/properties/all'),
         ),
         _TileRow([
           for (final k in PropCategory.values)

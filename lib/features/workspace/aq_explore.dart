@@ -81,7 +81,7 @@ class AQExploreScreen extends StatelessWidget {
           title: f.t('ex.props.t'),
           body: f.t('ex.props.b'),
           cta: f.t('ex.props.cta'),
-          onTap: () => go('/properties'),
+          onTap: () => go('/properties/all'),
         ),
         const SizedBox(height: AQSpacing.x3),
         _iconTiles(context, [

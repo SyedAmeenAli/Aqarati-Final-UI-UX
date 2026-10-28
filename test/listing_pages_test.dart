@@ -255,7 +255,6 @@ void main() {
             listingLabel: 'Muscat',
             listingTitle: 'Al Noor Realty',
           ),
-          const AQPropertiesHubScreen(),
           const AQCategoryStepScreen(tx: 'rent'),
           const AQTypeStepScreen(tx: 'rent', cat: 'commercial'),
         ]) {
