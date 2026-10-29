@@ -12,22 +12,22 @@
  {
   "name": "admin: the submission is in the moderation queue as an e-Broker record",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsListing moderationList"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopment projectsConstructionArchitecture and designSERVICESMaintenanceViewings and requestsMARKETINGAds & SponsorsAnnouncementsCategories and contentINSIGHTReportsAnalyticsActivity logListing mode"
  },
  {
   "name": "admin: detail shows the submitted values",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsBack to moderationLinked sea villaAqary e-Broker · ID m1Waiting for reviewAqary e-BrokerPropertyReviewDecisionTitleCategor"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopment projectsConstructionArchitecture and designSERVICESMaintenanceViewings and requestsMARKETINGAds & SponsorsAnnouncementsCategories and contentINSIGHTReportsAnalyticsActivity logBack to moderationLinked sea villaAqary e-Broker · ID m1Waiting for reviewAqary e-BrokerReviewPropertyTitleCateg"
  },
  {
   "name": "admin: decision recorded on the record",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCateg"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopment projectsConstructionArchitecture and designSERVICESMaintenanceViewings and requestsMARKE"
  },
  {
   "name": "admin: the activity log notes the e-Broker decision",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment projectsConstructionArchitecture and designMaintenanceViewings and requestsAds & SponsorsCategories and contentAnnouncementsAnalyticsReportsActivity logProfile and settingsActivity logFictional "
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopment projectsConstructionArchitecture and designSERVICESMaintenanceViewings and requestsMARKETINGAds & SponsorsAnnouncementsCategories and contentINSIGHTReportsAnalyticsActivity logActivity log"
  },
  {
   "name": "customer: Activity > Selling now shows Approved (same record)",

@@ -1,0 +1,82 @@
+[
+ {
+  "name": "PREVIEW Building Architecture: Skip enters the correct home",
+  "pass": true,
+  "note": "/pro :: THE PRACTICEArchitecture with intention.A studio profile built around trust, place and cla"
+ },
+ {
+  "name": "PREVIEW Building Architecture: role navigation",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW Building Architecture: sponsorship banner for this role",
+  "pass": true,
+  "note": "Studio Light"
+ },
+ {
+  "name": "PREVIEW Building Architecture: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW Building Architecture: the banner CTA opens its destination",
+  "pass": true,
+  "note": "BackAccountDEVELOPMENT & BUILDINGArchitecture StudiosStudios designing inspiring buildings.AllDevelo"
+ },
+ {
+  "name": "PREVIEW Interior & Exterior Design: Skip enters the correct home",
+  "pass": true,
+  "note": "/pro :: DESIGN STUDIOSpaces with a point of view.LIGHT / MATERIAL / FORMA considered way of living"
+ },
+ {
+  "name": "PREVIEW Interior & Exterior Design: role navigation",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW Interior & Exterior Design: sponsorship banner for this role",
+  "pass": true,
+  "note": "Dar Fabrics"
+ },
+ {
+  "name": "PREVIEW Interior & Exterior Design: no other role's campaign",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW Interior & Exterior Design: the banner CTA opens its destination",
+  "pass": true,
+  "note": "BackAccountDEVELOPMENT & BUILDINGInterior & Exterior DesignDesigners for homes and outdoor spaces.Al"
+ },
+ {
+  "name": "PREVIEW: the Admin Console link opens the separate admin sign-in",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW: the one-tap demo option and simulated notice are shown",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW: the demo option opens the admin dashboard",
+  "pass": true,
+  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelo"
+ },
+ {
+  "name": "PREVIEW: direct #/admin works",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "PREVIEW: refresh on #/admin keeps the admin route",
+  "pass": true,
+  "note": "https://aqarati-final-ui-dvuafm5i8-amelio123ali-2093s-projects.vercel.app/#/admin"
+ },
+ {
+  "name": "PREVIEW: after a reload the address is still #/admin",
+  "pass": true,
+  "note": "https://aqarati-final-ui-dvuafm5i8-amelio123ali-2093s-projects.vercel.app/#/admin"
+ }
+]

@@ -426,6 +426,7 @@ void main() {
         await login(t, 'reviewer');
         await t.tap(find.text('Add demo records'));
         await settle(t);
+        await t.ensureVisible(find.textContaining('architecture studio').first);
         await t.tap(find.textContaining('architecture studio').first);
         await settle(t);
         expect(find.text('Not available to view'), findsOneWidget);

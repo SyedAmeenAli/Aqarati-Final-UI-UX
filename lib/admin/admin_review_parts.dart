@@ -9,6 +9,7 @@ import '../core/aq/aq_typography.dart';
 import '../features/viewing/domain/viewing_presentation.dart' show AQTone;
 import 'admin_models.dart';
 import 'admin_widgets.dart';
+import 'admin_ui.dart';
 
 /// The documents of one item. Opening one shows the streamed file in a watermarked viewer; a
 /// document the service cannot stream is flagged here so the reviewer knows before opening it.
@@ -26,7 +27,7 @@ class AdminDocumentList extends ConsumerWidget {
         body: 'Request a resubmission if documents are required for this item.',
       );
     }
-    return AQSurface(
+    return AdminPanel(
       padding: const EdgeInsets.symmetric(vertical: AQSpacing.x2),
       child: Column(
         children: [
@@ -68,7 +69,7 @@ class AdminDocumentList extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  AQTextButton(
+                  AdminTextButton(
                     label: 'View',
                     color: c.accent,
                     onPressed: () =>
@@ -98,7 +99,7 @@ class AdminHistoryList extends StatelessWidget {
         style: AQTypography.of(context, AQText.bodyMedium, soft: true),
       );
     }
-    return AQSurface(
+    return AdminPanel(
       padding: const EdgeInsets.all(AQSpacing.x4),
       child: Column(
         children: [
@@ -176,7 +177,7 @@ class AdminChecklist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AQSurface(
+    return AdminPanel(
       padding: const EdgeInsets.symmetric(
         horizontal: AQSpacing.x4,
         vertical: AQSpacing.x2,

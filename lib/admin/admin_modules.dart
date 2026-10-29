@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/aq/aq_forms.dart';
-import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
 import '../features/search/aq_filter_sheet.dart' show AQChoicePill;
@@ -14,6 +12,7 @@ import 'admin_directory.dart';
 import 'admin_directory_screens.dart' show adminConfirm;
 import 'admin_models.dart';
 import 'admin_widgets.dart';
+import 'admin_ui.dart';
 
 /// The platform management modules that share one list-and-detail pattern: property listings,
 /// trusted brokers, development projects, construction, architecture and design portfolios,
@@ -329,9 +328,9 @@ class _ListState extends ConsumerState<AdminModuleListScreen> {
           content: SizedBox(
             width: 420,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              AQTextField(label: 'Title', controller: title),
+              AdminField(label: 'Title', controller: title),
               const SizedBox(height: AQSpacing.x3),
-              AQTextField(label: 'Message', controller: msg, minLines: 2, maxLines: 4),
+              AdminField(label: 'Message', controller: msg, minLines: 2, maxLines: 4),
               const SizedBox(height: AQSpacing.x3),
               Wrap(spacing: AQSpacing.x2, children: [
                 for (final a in const ['All customers', 'Agents', 'Professionals'])
@@ -340,8 +339,8 @@ class _ListState extends ConsumerState<AdminModuleListScreen> {
             ]),
           ),
           actions: [
-            AQTextButton(label: 'Cancel', color: AQColors.of(d).inkSoft, onPressed: () => Navigator.of(d).pop(false)),
-            AQTextButton(label: 'Save draft', color: AQColors.of(d).accent, onPressed: () => Navigator.of(d).pop(true)),
+            AdminTextButton(label: 'Cancel', color: AQColors.of(d).inkSoft, onPressed: () => Navigator.of(d).pop(false)),
+            AdminTextButton(label: 'Save draft', color: AQColors.of(d).accent, onPressed: () => Navigator.of(d).pop(true)),
           ],
         ),
       ),
@@ -365,7 +364,7 @@ class _ListState extends ConsumerState<AdminModuleListScreen> {
       subtitle: def.subtitle,
       actions: [
         if (widget.modKey == ModKey.announcements && canWrite)
-          AQPrimaryButton(label: 'New announcement', leadingIcon: 'plus', trailingChevron: false, compact: true, onPressed: _newAnnouncement),
+          AdminPrimaryButton(label: 'New announcement', leadingIcon: 'plus', trailingChevron: false, compact: true, onPressed: _newAnnouncement),
       ],
       children: [
         AdminSearchField(controller: _q, hint: def.searchHint, onChanged: (_) => setState(() {})),
@@ -437,12 +436,9 @@ class AdminModuleDetailScreen extends ConsumerWidget {
             runSpacing: AQSpacing.x3,
             children: [
               for (final a in actions)
-                SizedBox(
-                  width: 210,
-                  child: a.primary
-                      ? AQPrimaryButton(label: a.label, trailingChevron: false, onPressed: () => _go(context, ref, r, a))
-                      : AQSecondaryButton(label: a.label, trailingChevron: false, onPressed: () => _go(context, ref, r, a)),
-                ),
+                a.primary
+                      ? AdminPrimaryButton(label: a.label, trailingChevron: false, onPressed: () => _go(context, ref, r, a))
+                      : AdminSecondaryButton(label: a.label, trailingChevron: false, onPressed: () => _go(context, ref, r, a)),
             ],
           ),
         adminSection(context, 'Activity on this record'),
@@ -480,7 +476,7 @@ class AdminAnalyticsScreen extends ConsumerWidget {
     int n(ModKey k, String s) => (mods[k] ?? const []).where((r) => r.status == s).length;
     Widget tile(String label, String value, {bool sample = false}) => SizedBox(
       width: 240,
-      child: AQSurface(
+      child: AdminPanel(
         padding: const EdgeInsets.all(AQSpacing.x4),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(value, style: AQTypography.of(context, AQText.displaySmall)),
@@ -511,7 +507,7 @@ class AdminAnalyticsScreen extends ConsumerWidget {
           tile('Sample banner taps this week', '146', sample: true),
         ]),
         const SizedBox(height: AQSpacing.x4),
-        AQSurface(
+        AdminPanel(
           padding: const EdgeInsets.all(AQSpacing.x4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Semantics(header: true, child: Text('Sample enquiries by week', style: AQTypography.of(context, AQText.titleSmall))),
@@ -547,21 +543,18 @@ class AdminSettingsScreen extends ConsumerWidget {
       children: [
         AdminKeyValues([
           ('Name', s?.name ?? '-'),
-          ('Role', s == null ? '-' : s.role.name),
+          ('Role', s == null ? '-' : roleLabel(s.role)),
           ('Can decide on reviews', (s?.role.canDecide ?? false) ? 'Yes' : 'No (read-only)'),
           ('Can manage ads', (s?.role.canManageAds ?? false) ? 'Yes' : 'No'),
           ('Sign-in', 'Simulated. Nothing protects this console.'),
           ('Two-step code', 'Illustrative. Any real use needs a real service.'),
         ]),
         adminSection(context, 'Session'),
-        SizedBox(
-          width: 220,
-          child: AQSecondaryButton(
+        AdminSecondaryButton(
             label: 'Sign out',
             trailingChevron: false,
             onPressed: () => ref.read(adminAuthProvider.notifier).signOut(),
           ),
-        ),
         adminDemoNotice(),
       ],
     );

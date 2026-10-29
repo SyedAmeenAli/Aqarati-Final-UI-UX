@@ -11,13 +11,14 @@ import '../core/aq/aq_typography.dart';
 import '../core/config/backend_mode.dart';
 import '../data/api/account_api.dart' show ApiException;
 import '../features/devbuild/db_widgets.dart'
-    show DbPillRow, DbSelectField, showDbChoiceSheet;
+    show DbSelectField, showDbChoiceSheet;
 import '../features/entry/widgets/entry_common.dart' show MasterLogo;
 import '../features/viewing/domain/viewing_presentation.dart' show AQTone;
 import '../features/viewing/widgets/viewing_format.dart';
 import 'admin_auth.dart';
 import 'admin_models.dart';
 import 'admin_repository.dart';
+import 'admin_ui.dart';
 
 // ------------------------------------------------------------------ copy for error and reason keys
 
@@ -141,28 +142,137 @@ class _NavItem {
   const _NavItem(this.label, this.icon, this.route);
 }
 
-const _nav = [
-  _NavItem('Overview', 'home', '/overview'),
-  _NavItem('Accounts', 'account', '/accounts'),
-  _NavItem('Verification', 'verified', '/verification'),
-  _NavItem('Listing moderation', 'development', '/moderation'),
-  _NavItem('Property listings', 'home', '/m/listings'),
-  _NavItem('Agents and brokers', 'agent', '/m/brokers'),
-  _NavItem('Development projects', 'development', '/m/projects'),
-  _NavItem('Construction', 'construction', '/m/construction'),
-  _NavItem('Architecture and design', 'architecture', '/m/design'),
-  _NavItem('Maintenance', 'construction', '/m/maintenance'),
-  _NavItem('Viewings and requests', 'calendar', '/m/viewings'),
-  _NavItem('Ads & Sponsors', 'star', '/ads'),
-  _NavItem('Categories and content', 'globe', '/m/content'),
-  _NavItem('Announcements', 'alert', '/m/announcements'),
-  _NavItem('Analytics', 'activity', '/analytics'),
-  _NavItem('Reports', 'alert', '/reports'),
-  _NavItem('Activity log', 'clock', '/audit'),
-  _NavItem('Profile and settings', 'account', '/settings'),
+class _NavGroup {
+  final String? title;
+  final List<_NavItem> items;
+  const _NavGroup(this.title, this.items);
+}
+
+/// Every existing route, grouped by what the person is doing. Nothing here is a placeholder.
+const _groups = [
+  _NavGroup(null, [_NavItem('Overview', 'home', '/overview')]),
+  _NavGroup('People', [
+    _NavItem('Accounts', 'account', '/accounts'),
+    _NavItem('Verification', 'verified', '/verification'),
+    _NavItem('Agents and brokers', 'agent', '/m/brokers'),
+  ]),
+  _NavGroup('Listings', [
+    _NavItem('Listing moderation', 'shield', '/moderation'),
+    _NavItem('Property listings', 'home', '/m/listings'),
+    _NavItem('Development projects', 'development', '/m/projects'),
+    _NavItem('Construction', 'construction', '/m/construction'),
+    _NavItem('Architecture and design', 'architecture', '/m/design'),
+  ]),
+  _NavGroup('Services', [
+    _NavItem('Maintenance', 'construction', '/m/maintenance'),
+    _NavItem('Viewings and requests', 'calendar', '/m/viewings'),
+  ]),
+  _NavGroup('Marketing', [
+    _NavItem('Ads & Sponsors', 'star', '/ads'),
+    _NavItem('Announcements', 'send', '/m/announcements'),
+    _NavItem('Categories and content', 'globe', '/m/content'),
+  ]),
+  _NavGroup('Insight', [
+    _NavItem('Reports', 'alert', '/reports'),
+    _NavItem('Analytics', 'activity', '/analytics'),
+    _NavItem('Activity log', 'clock', '/audit'),
+  ]),
 ];
 
-/// One frame for every console page: a sidebar on wide screens, a top bar and tabs on narrow ones.
+const _settingsItem = _NavItem('Profile and settings', 'user', '/settings');
+
+/// The navigation, used as the fixed sidebar on wide screens and inside the drawer on narrow ones.
+class _Sidebar extends ConsumerWidget {
+  final String section;
+  final bool inDrawer;
+  const _Sidebar({required this.section, this.inDrawer = false});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = AQColors.of(context);
+    final s = ref.watch(adminAuthProvider).session;
+    return Container(
+      width: inDrawer ? null : AdminSize.sidebar,
+      decoration: BoxDecoration(
+        color: c.surfaceRaised,
+        border: inDrawer ? null : BorderDirectional(end: BorderSide(color: c.hairline)),
+      ),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  MasterLogo(width: 76),
+                  const SizedBox(width: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('Admin', style: AQTypography.of(context, AQText.labelMedium, color: c.accentDeep)),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, thickness: 1, color: c.hairline),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final g in _groups) ...[
+                      if (g.title != null)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 12, 10, 4),
+                          child: Text(
+                            g.title!.toUpperCase(),
+                            style: AQTypography.of(context, AQText.labelSmall, color: c.inkFaint).copyWith(letterSpacing: 1.1),
+                          ),
+                        ),
+                      for (final n in g.items) _SideItem(item: n, selected: section == n.route, closeDrawer: inDrawer),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            Divider(height: 1, thickness: 1, color: c.hairline),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: _SideItem(item: _settingsItem, selected: section == _settingsItem.route, closeDrawer: inDrawer),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 8, 12, 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(s?.name ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.titleSmall)),
+                        Text(s == null ? '' : roleLabel(s.role), maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+                      ],
+                    ),
+                  ),
+                  AdminTextButton(
+                    label: 'Sign out',
+                    color: c.accentDeep,
+                    onPressed: () => ref.read(adminAuthProvider.notifier).signOut(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One console page: a sidebar on wide screens, a menu button and drawer on narrow ones, then a
+/// compact header (back link, title, one line of context, the page's actions) and the content.
 class AdminFrame extends ConsumerWidget {
   final String section;
   final String title;
@@ -185,106 +295,67 @@ class AdminFrame extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = AQColors.of(context);
-    final auth = ref.watch(adminAuthProvider);
-    final s = auth.session;
     final wide = MediaQuery.sizeOf(context).width >= 960;
+    final side = wide ? 32.0 : AQSpacing.gutter;
 
-    Widget body = Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1100),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            wide ? 40 : AQSpacing.gutter,
-            wide ? 32 : AQSpacing.x4,
-            wide ? 40 : AQSpacing.gutter,
-            64,
+    final header = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (onBack != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: AdminTextButton(
+                label: backLabel ?? 'Back',
+                leadingIcon: 'chevron-left',
+                color: c.accentDeep,
+                onPressed: onBack,
+              ),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (onBack != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AQSpacing.x3),
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: AQTextButton(
-                      label: backLabel ?? 'Back',
-                      color: c.accent,
-                      onPressed: onBack,
-                    ),
-                  ),
-                ),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                runSpacing: AQSpacing.x3,
-                spacing: AQSpacing.x4,
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          runSpacing: 12,
+          spacing: 16,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 640),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Semantics(
-                          header: true,
-                          child: Text(
-                            title,
-                            style: AQTypography.of(
-                              context,
-                              AQText.displaySmall,
-                            ),
-                          ),
-                        ),
-                        if (subtitle != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: AQSpacing.x1),
-                            child: Text(
-                              subtitle!,
-                              style: AQTypography.of(
-                                context,
-                                AQText.bodyMedium,
-                                soft: true,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                  Semantics(
+                    header: true,
+                    child: Text(title, style: AQTypography.of(context, AQText.headlineMedium)),
                   ),
-                  if (actions.isNotEmpty)
-                    Wrap(
-                      spacing: AQSpacing.x2,
-                      runSpacing: AQSpacing.x2,
-                      children: [
-                        for (final a in actions) SizedBox(width: 190, child: a),
-                      ],
+                  if (subtitle != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(subtitle!, style: AQTypography.of(context, AQText.bodyMedium, soft: true)),
                     ),
                 ],
               ),
-              const SizedBox(height: AQSpacing.x5),
-              ...children,
-            ],
+            ),
+            if (actions.isNotEmpty) Wrap(spacing: 8, runSpacing: 8, children: actions),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+
+    final body = Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AdminSize.content),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(side, wide ? 28 : 12, side, 56),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [header, ...children],
           ),
         ),
       ),
-    );
-
-    Widget account() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(s?.name ?? '', style: AQTypography.of(context, AQText.titleSmall)),
-        Text(
-          s == null ? '' : roleLabel(s.role),
-          style: AQTypography.of(context, AQText.bodySmall, soft: true),
-        ),
-        const SizedBox(height: AQSpacing.x2),
-        AQTextButton(
-          label: 'Sign out',
-          color: c.accent,
-          onPressed: () => ref.read(adminAuthProvider.notifier).signOut(),
-        ),
-      ],
     );
 
     if (wide) {
@@ -292,45 +363,7 @@ class AdminFrame extends ConsumerWidget {
         backgroundColor: c.background,
         body: Row(
           children: [
-            Container(
-              width: 264,
-              decoration: BoxDecoration(
-                color: c.surfaceRaised,
-                border: BorderDirectional(end: BorderSide(color: c.hairline)),
-              ),
-              padding: const EdgeInsets.all(AQSpacing.x5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: MasterLogo(width: 120),
-                  ),
-                  const SizedBox(height: AQSpacing.x2),
-                  Text(
-                    'Admin console',
-                    style: AQTypography.of(
-                      context,
-                      AQText.labelMedium,
-                      color: c.accentDeep,
-                    ),
-                  ),
-                  const SizedBox(height: AQSpacing.x6),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          for (final n in _nav)
-                            _SideItem(item: n, selected: section == n.route),
-                        ],
-                      ),
-                    ),
-                  ),
-                  account(),
-                ],
-              ),
-            ),
+            _Sidebar(section: section),
             Expanded(child: body),
           ],
         ),
@@ -338,103 +371,117 @@ class AdminFrame extends ConsumerWidget {
     }
     return Scaffold(
       backgroundColor: c.background,
+      drawer: Drawer(
+        width: 290,
+        backgroundColor: c.surfaceRaised,
+        child: _Sidebar(section: section, inDrawer: true),
+      ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AQSpacing.gutter,
-                AQSpacing.x3,
-                AQSpacing.gutter,
-                AQSpacing.x2,
-              ),
-              child: Row(
-                children: [
-                  MasterLogo(width: 84),
-                  const SizedBox(width: AQSpacing.x3),
-                  Expanded(
-                    child: Text(
-                      'Admin console',
-                      style: AQTypography.of(
-                        context,
-                        AQText.labelMedium,
-                        color: c.accentDeep,
-                      ),
+        child: Builder(
+          builder: (context) => Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(8, 6, AQSpacing.gutter, 6),
+                decoration: BoxDecoration(
+                  color: c.surfaceRaised,
+                  border: Border(bottom: BorderSide(color: c.hairline)),
+                ),
+                child: Row(
+                  children: [
+                    AdminIconButton(
+                      icon: 'menu',
+                      semanticsLabel: 'Open navigation',
+                      onPressed: () => Scaffold.of(context).openDrawer(),
                     ),
-                  ),
-                  AQTextButton(
-                    label: 'Sign out',
-                    color: c.accent,
-                    onPressed: () =>
-                        ref.read(adminAuthProvider.notifier).signOut(),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    MasterLogo(width: 56),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('Admin', style: AQTypography.of(context, AQText.labelMedium, color: c.accentDeep)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AQSpacing.gutter),
-              child: DbPillRow(
-                scroll: true,
-                pills: [
-                  for (final n in _nav)
-                    (n.label, section == n.route, () => context.go(n.route)),
-                ],
-              ),
-            ),
-            Expanded(child: body),
-          ],
+              Expanded(child: body),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _SideItem extends StatelessWidget {
+class _SideItem extends StatefulWidget {
   final _NavItem item;
-  final bool selected;
-  const _SideItem({required this.item, required this.selected});
+  final bool selected, closeDrawer;
+  const _SideItem({required this.item, required this.selected, this.closeDrawer = false});
+  @override
+  State<_SideItem> createState() => _SideItemState();
+}
+
+class _SideItemState extends State<_SideItem> {
+  bool _hover = false;
+
+  void _go() {
+    if (widget.closeDrawer) Navigator.of(context).maybePop();
+    context.go(widget.item.route);
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = AQColors.of(context);
+    final selected = widget.selected;
     return Padding(
-      padding: const EdgeInsets.only(bottom: AQSpacing.x1),
+      padding: const EdgeInsets.only(bottom: 2),
       child: Semantics(
         button: true,
         focusable: true,
         onFocus: () {},
         selected: selected,
-        label: item.label,
+        label: widget.item.label,
         excludeSemantics: true,
-      onTap: () => context.go(item.route),
-        child: AQPressable(
-          onTap: () => context.go(item.route),
-          child: AnimatedContainer(
-            duration: AQMotion.scaled(context, AQMotion.fast),
-            constraints: const BoxConstraints(minHeight: AQControl.tap),
-            padding: const EdgeInsets.symmetric(horizontal: AQSpacing.x3),
-            decoration: BoxDecoration(
-              color: selected ? c.surfaceSelected : Colors.transparent,
-              borderRadius: BorderRadius.circular(AQRadius.medium),
-            ),
-            child: Row(
-              children: [
-                AQIcon(
-                  item.icon,
-                  size: 20,
-                  color: selected ? c.accentDeep : c.inkSoft,
-                ),
-                const SizedBox(width: AQSpacing.x3),
-                Expanded(
-                  child: Text(
-                    item.label,
-                    style: AQTypography.of(
-                      context,
-                      AQText.labelLarge,
-                      color: selected ? c.accentDeep : c.ink,
+        onTap: _go,
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _hover = true),
+          onExit: (_) => setState(() => _hover = false),
+          cursor: SystemMouseCursors.click,
+          child: AQPressable(
+            onTap: _go,
+            pressedScale: 0.99,
+            child: AnimatedContainer(
+              duration: AQMotion.scaled(context, AQMotion.fast),
+              height: 36,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: selected ? c.surfaceSelected : (_hover ? c.ink.withValues(alpha: 0.04) : Colors.transparent),
+                borderRadius: BorderRadius.circular(AdminSize.control),
+              ),
+              child: Row(
+                children: [
+                  AnimatedContainer(
+                    duration: AQMotion.scaled(context, AQMotion.fast),
+                    width: 3,
+                    height: 16,
+                    margin: const EdgeInsetsDirectional.only(end: 8),
+                    decoration: BoxDecoration(
+                      color: selected ? c.accent : Colors.transparent,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
-              ],
+                  AQIcon(widget.item.icon, size: 18, color: selected ? c.accentDeep : c.inkSoft),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      widget.item.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AQTypography.of(context, AQText.titleSmall, color: selected ? c.accentDeep : c.ink).copyWith(
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -505,6 +552,7 @@ class AdminTable extends StatelessWidget {
     if (!wide) {
       return Column(
         children: [
+          const SizedBox(height: 12),
           for (final r in rows)
             Padding(
               padding: const EdgeInsets.only(bottom: AQSpacing.x3),
@@ -513,10 +561,10 @@ class AdminTable extends StatelessWidget {
                 AQPressable(
                   onTap: r.onTap,
                   child: Container(
-                    padding: const EdgeInsets.all(AQSpacing.x4),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: c.surfaceRaised,
-                      borderRadius: BorderRadius.circular(AQRadius.large),
+                      borderRadius: BorderRadius.circular(AdminSize.panel),
                       border: Border.all(color: c.hairline),
                     ),
                     child: Column(
@@ -561,10 +609,12 @@ class AdminTable extends StatelessWidget {
         ],
       );
     }
-    return Container(
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Container(
       decoration: BoxDecoration(
         color: c.surfaceRaised,
-        borderRadius: BorderRadius.circular(AQRadius.large),
+        borderRadius: BorderRadius.circular(AdminSize.panel),
         border: Border.all(color: c.hairline),
       ),
       clipBehavior: Clip.antiAlias,
@@ -572,10 +622,7 @@ class AdminTable extends StatelessWidget {
         children: [
           Container(
             color: c.surface,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AQSpacing.x4,
-              vertical: AQSpacing.x3,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
                 for (var i = 0; i < headers.length; i++)
@@ -587,7 +634,7 @@ class AdminTable extends StatelessWidget {
                         context,
                         AQText.labelMedium,
                         color: c.inkSoft,
-                      ),
+                      ).copyWith(fontSize: 12, letterSpacing: 0.4),
                     ),
                   ),
               ],
@@ -603,11 +650,8 @@ class AdminTable extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border(top: BorderSide(color: c.hairline)),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AQSpacing.x4,
-                    vertical: AQSpacing.x3,
-                  ),
-                  constraints: const BoxConstraints(minHeight: 56),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  constraints: const BoxConstraints(minHeight: 48),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -626,6 +670,7 @@ class AdminTable extends StatelessWidget {
             ),
         ],
       ),
+    ),
     );
   }
 }
@@ -671,7 +716,7 @@ class AdminAsyncView<T> extends ConsumerWidget {
       }
       return AQErrorBanner(
         text: 'We could not load this. Check the connection and try again.',
-        action: AQTextButton(
+        action: AdminTextButton(
           label: 'Try again',
           color: c.accent,
           onPressed: onRetry,
@@ -718,41 +763,29 @@ class AdminNotice extends StatelessWidget {
     final c = AQColors.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AQSpacing.x5),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       decoration: BoxDecoration(
         color: c.surface,
-        borderRadius: BorderRadius.circular(AQRadius.large),
+        borderRadius: BorderRadius.circular(AdminSize.panel),
         border: Border.all(color: c.hairline),
       ),
       child: Column(
         children: [
-          AQIcon(icon, size: 28, color: c.accent),
-          const SizedBox(height: AQSpacing.x3),
+          AQIcon(icon, size: 22, color: c.accent),
+          const SizedBox(height: 10),
           Semantics(
             header: true,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: AQTypography.of(context, AQText.headlineSmall),
-            ),
+            child: Text(title, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.titleMedium)),
           ),
           if (body.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: AQSpacing.x2),
-              child: Text(
-                body,
-                textAlign: TextAlign.center,
-                style: AQTypography.of(context, AQText.bodyMedium, soft: true),
-              ),
-            ),
-          if (action != null)
-            Padding(
-              padding: const EdgeInsets.only(top: AQSpacing.x4),
+              padding: const EdgeInsets.only(top: 4),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 260),
-                child: action!,
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Text(body, textAlign: TextAlign.center, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
               ),
             ),
+          if (action != null) Padding(padding: const EdgeInsets.only(top: 14), child: action!),
         ],
       ),
     );
@@ -764,36 +797,24 @@ class AdminKeyValues extends StatelessWidget {
   const AdminKeyValues(this.rows, {super.key});
   @override
   Widget build(BuildContext context) {
-    return AQSurface(
-      padding: const EdgeInsets.all(AQSpacing.x4),
+    final c = AQColors.of(context);
+    return AdminPanel(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(
         children: [
-          for (final r in rows)
+          for (final (i, r) in rows.indexed) ...[
+            if (i > 0) Divider(height: 1, thickness: 1, color: c.hairline),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: AQSpacing.x1),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 140,
-                    child: Text(
-                      r.$1,
-                      style: AQTypography.of(
-                        context,
-                        AQText.bodySmall,
-                        soft: true,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      VFmt.iso(r.$2),
-                      style: AQTypography.of(context, AQText.bodyMedium),
-                    ),
-                  ),
+                  SizedBox(width: 148, child: Text(r.$1, style: AQTypography.of(context, AQText.bodySmall, soft: true))),
+                  Expanded(child: Text(VFmt.iso(r.$2), style: AQTypography.of(context, AQText.bodyMedium))),
                 ],
               ),
             ),
+          ],
         ],
       ),
     );
@@ -802,16 +823,13 @@ class AdminKeyValues extends StatelessWidget {
 
 Widget adminSection(BuildContext context, String title, {Widget? trailing}) =>
     Padding(
-      padding: const EdgeInsets.only(top: AQSpacing.x6, bottom: AQSpacing.x3),
+      padding: const EdgeInsets.only(top: 28, bottom: 12),
       child: Row(
         children: [
           Expanded(
             child: Semantics(
               header: true,
-              child: Text(
-                title,
-                style: AQTypography.of(context, AQText.headlineSmall),
-              ),
+              child: Text(title, style: AQTypography.of(context, AQText.titleMedium)),
             ),
           ),
           ?trailing,
@@ -1043,7 +1061,7 @@ class _StepUpDialogState extends State<_StepUpDialog> {
                   child: AQErrorBanner(text: _error!),
                 ),
               const SizedBox(height: AQSpacing.x4),
-              AQSecondaryButton(
+              AdminSecondaryButton(
                 label: 'Cancel',
                 trailingChevron: false,
                 onPressed: _state == AQOtpState.verifying
@@ -1180,7 +1198,7 @@ class _DecisionPanelState extends ConsumerState<DecisionPanel> {
     final blocked = _decision == Decision.approve
         ? widget.approveBlockedReason
         : null;
-    return AQSurface(
+    return AdminPanel(
       padding: const EdgeInsets.all(AQSpacing.x4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1193,16 +1211,10 @@ class _DecisionPanelState extends ConsumerState<DecisionPanel> {
             ),
           ),
           const SizedBox(height: AQSpacing.x3),
-          DbPillRow(
-            pills: [
-              for (final d in Decision.values)
-                (
-                  decisionLabel(d),
-                  _decision == d,
-                  () => setState(() => _decision = d),
-                ),
-            ],
-          ),
+          adminChoiceRow([
+            for (final d in Decision.values)
+              (decisionLabel(d), _decision == d, () => setState(() => _decision = d)),
+          ]),
           AnimatedSize(
             duration: AQMotion.scaled(context, AQMotion.fast),
             alignment: Alignment.topCenter,
@@ -1250,7 +1262,7 @@ class _DecisionPanelState extends ConsumerState<DecisionPanel> {
                       ),
                     ),
                   const SizedBox(height: AQSpacing.x3),
-                  AQTextField(
+                  AdminField(
                     label: _reason == ReasonCode.other
                         ? 'Note (required)'
                         : 'Note for the applicant (optional)',
@@ -1279,9 +1291,7 @@ class _DecisionPanelState extends ConsumerState<DecisionPanel> {
           const SizedBox(height: AQSpacing.x4),
           Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: SizedBox(
-              width: 260,
-              child: AQPrimaryButton(
+            child: AdminPrimaryButton(
                 label: _decision == null
                     ? 'Choose a decision'
                     : decisionLabel(_decision!),
@@ -1291,7 +1301,6 @@ class _DecisionPanelState extends ConsumerState<DecisionPanel> {
                     ? null
                     : _submit,
               ),
-            ),
           ),
         ],
       ),
@@ -1332,39 +1341,59 @@ class AdminSearchField extends StatelessWidget {
     required this.onChanged,
   });
   @override
-  Widget build(BuildContext context) => AQTextField(
-    label: hint,
-    controller: controller,
-    hint: hint,
-    action: TextInputAction.search,
-    prefix: Padding(
-      padding: const EdgeInsets.only(left: AQSpacing.x3),
-      child: AQIcon('search', size: 20, color: AQColors.of(context).inkSoft),
+  Widget build(BuildContext context) => Align(
+    alignment: AlignmentDirectional.centerStart,
+    child: ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 520),
+    child: AdminField(
+      label: hint,
+      controller: controller,
+      hint: 'Type to search',
+      action: TextInputAction.search,
+      prefix: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: AQIcon('search', size: 16, color: AQColors.of(context).inkSoft),
+      ),
+      onChanged: onChanged,
     ),
-    onChanged: onChanged,
+    ),
   );
 }
 
-/// Label above a group of filter pills.
+/// A labelled row of small filter chips. The label sits beside the chips, so a toolbar of several
+/// filters stays two or three lines high.
 Widget adminFilterRow(
   BuildContext context,
   String label,
   List<(String, bool, VoidCallback)> pills,
 ) => Padding(
-  padding: const EdgeInsets.only(bottom: AQSpacing.x3),
-  child: Column(
+  padding: const EdgeInsets.only(top: 12),
+  child: Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-        padding: const EdgeInsets.only(bottom: AQSpacing.x2),
-        child: Text(
-          label,
-          style: AQTypography.of(context, AQText.labelMedium, soft: true),
+      SizedBox(
+        width: 72,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Text(label, style: AQTypography.of(context, AQText.labelMedium, soft: true)),
         ),
       ),
-      DbPillRow(scroll: true, pills: pills),
+      Expanded(
+        child: Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [for (final p in pills) AdminChip(label: p.$1, selected: p.$2, onTap: p.$3)],
+        ),
+      ),
     ],
   ),
+);
+
+/// A wrapped row of choice chips, for forms.
+Widget adminChoiceRow(List<(String, bool, VoidCallback)> pills) => Wrap(
+  spacing: 6,
+  runSpacing: 6,
+  children: [for (final p in pills) AdminChip(label: p.$1, selected: p.$2, onTap: p.$3)],
 );
 
 /// A dialog whose children keep their own accessibility nodes (so the close button and the code field

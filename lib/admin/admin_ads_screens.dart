@@ -5,13 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/aq/aq_forms.dart';
-import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
 import '../features/ads/ad_models.dart';
 import '../features/ads/ad_repository.dart';
 import '../features/ads/sponsored_banner.dart';
-import '../features/devbuild/db_widgets.dart' show DbFieldFrame, DbPillRow;
+import '../features/devbuild/db_widgets.dart' show DbFieldFrame;
 import '../features/flow/state/document_state.dart' show documentPickerProvider;
 import '../features/viewing/domain/viewing_presentation.dart' show AQTone;
 import '../features/viewing/widgets/viewing_format.dart';
@@ -20,6 +19,7 @@ import 'admin_directory.dart' show adminLog, decisionVerb;
 import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_widgets.dart';
+import 'admin_ui.dart';
 
 String adStatusLabel(AdStatus s) => switch (s) {
   AdStatus.draft => 'Draft',
@@ -157,7 +157,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
       subtitle: 'Banners shown to signed-in customers. A banner is shown only after it is approved and while its schedule is open.',
       actions: [
         if (role.canManageAds)
-          AQPrimaryButton(
+          AdminPrimaryButton(
             label: 'New banner',
             leadingIcon: 'plus',
             trailingChevron: false,
@@ -188,7 +188,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                     ? 'Create the first banner. It is reviewed before customers see it.'
                     : 'No banners have been created.',
                 action: role.canManageAds
-                    ? AQPrimaryButton(
+                    ? AdminPrimaryButton(
                         label: 'New banner',
                         trailingChevron: false,
                         onPressed: () => context.go('/ads/new'),
@@ -254,7 +254,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                       'Status',
                       'Actions',
                     ],
-                    flex: const [4, 2, 3, 3, 4],
+                    flex: const [5, 3, 2, 2, 5],
                     rows: [
                       for (final a in shown)
                         AdminTableRow(
@@ -327,7 +327,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                                 spacing: 0,
                                 children: [
                                   if (role.canManageAds && a.canSubmit)
-                                    AQTextButton(
+                                    AdminTextButton(
                                       key: ValueKey('ad-${a.id}-submit'),
                                       label: 'Submit',
                                       color: c.accent,
@@ -340,7 +340,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                                             ),
                                     ),
                                   if (role.canManageAds && a.canPause)
-                                    AQTextButton(
+                                    AdminTextButton(
                                       key: ValueKey('ad-${a.id}-pause'),
                                       label: 'Pause',
                                       color: c.inkSoft,
@@ -353,7 +353,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                                             ),
                                     ),
                                   if (role.canManageAds && a.canResume)
-                                    AQTextButton(
+                                    AdminTextButton(
                                       key: ValueKey('ad-${a.id}-resume'),
                                       label: 'Resume',
                                       color: c.accent,
@@ -367,7 +367,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                                     ),
                                   if (role.canManageAds &&
                                       a.status == AdStatus.approved) ...[
-                                    AQTextButton(
+                                    AdminTextButton(
                                       key: ValueKey('ad-${a.id}-up'),
                                       label: 'Move up',
                                       color: c.inkSoft,
@@ -375,7 +375,7 @@ class _AdsListScreenState extends ConsumerState<AdsListScreen> {
                                           ? null
                                           : () => _move(all, a, -1),
                                     ),
-                                    AQTextButton(
+                                    AdminTextButton(
                                       key: ValueKey('ad-${a.id}-down'),
                                       label: 'Move down',
                                       color: c.inkSoft,
@@ -655,21 +655,21 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
               text: 'Reviewer feedback: ${ex.feedback}',
             ),
           ),
-        AQTextField(
+        AdminField(
           label: 'Sponsor name',
           controller: _sponsor,
           error: e('sponsor'),
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: AQSpacing.x4),
-        AQTextField(
+        AdminField(
           label: 'Headline',
           controller: _headline,
           error: e('headline'),
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: AQSpacing.x4),
-        AQTextField(
+        AdminField(
           label: 'Short text (optional)',
           controller: _body,
           minLines: 2,
@@ -679,14 +679,14 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: AQSpacing.x4),
-        AQTextField(
+        AdminField(
           label: 'Button label',
           controller: _cta,
           error: e('cta'),
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: AQSpacing.x4),
-        AQTextField(
+        AdminField(
           label: 'Destination',
           controller: _destination,
           hint: 'https://… or /app/explore',
@@ -699,7 +699,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
         DbFieldFrame(
           label: 'Placement',
           required: true,
-          child: DbPillRow(
+          child: _Choices(
             pills: [
               for (final p in AdPlacement.values)
                 (
@@ -715,7 +715,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
           label: 'Shown on the Home of',
           required: true,
           error: e('audience'),
-          child: DbPillRow(
+          child: _Choices(
             pills: [
               for (final a in AdAudience.values)
                 (
@@ -736,9 +736,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
           required: true,
           child: Row(
             children: [
-              SizedBox(
-                width: 190,
-                child: AQSecondaryButton(
+              AdminSecondaryButton(
                   label: _bytes == null && _imageRef == null
                       ? 'Choose image'
                       : 'Replace image',
@@ -747,7 +745,6 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
                   loading: _picking,
                   onPressed: _picking ? null : _pickImage,
                 ),
-              ),
               const SizedBox(width: AQSpacing.x3),
               Expanded(
                 child: Text(
@@ -780,9 +777,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
             spacing: AQSpacing.x2,
             runSpacing: AQSpacing.x2,
             children: [
-              SizedBox(
-                width: 210,
-                child: AQSecondaryButton(
+              AdminSecondaryButton(
                   label: _start == null
                       ? 'Start date'
                       : 'Starts ${VFmt.shortDate(context, _start!)}',
@@ -790,10 +785,7 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
                   compact: true,
                   onPressed: () => _pickDate(true),
                 ),
-              ),
-              SizedBox(
-                width: 210,
-                child: AQSecondaryButton(
+              AdminSecondaryButton(
                   label: _end == null
                       ? 'End date'
                       : 'Ends ${VFmt.shortDate(context, _end!)}',
@@ -801,9 +793,8 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
                   compact: true,
                   onPressed: () => _pickDate(false),
                 ),
-              ),
               if (_start != null || _end != null)
-                AQTextButton(
+                AdminTextButton(
                   label: 'Clear',
                   color: c.inkSoft,
                   onPressed: () => setState(() => _start = _end = null),
@@ -838,24 +829,18 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
           spacing: AQSpacing.x3,
           runSpacing: AQSpacing.x3,
           children: [
-            SizedBox(
-              width: 220,
-              child: AQSecondaryButton(
+            AdminSecondaryButton(
                 label: 'Save draft',
                 trailingChevron: false,
                 loading: _saving,
                 onPressed: _saving ? null : () => _save(submit: false),
               ),
-            ),
-            SizedBox(
-              width: 260,
-              child: AQPrimaryButton(
+            AdminPrimaryButton(
                 label: 'Save and send for review',
                 trailingChevron: false,
                 loading: _saving,
                 onPressed: _saving ? null : () => _save(submit: true),
               ),
-            ),
           ],
         ),
       ],
@@ -980,4 +965,12 @@ class _AdReview extends ConsumerWidget {
       },
     );
   }
+}
+
+/// Chip row for the banner form (placement, audiences).
+class _Choices extends StatelessWidget {
+  final List<(String, bool, VoidCallback)> pills;
+  const _Choices({required this.pills});
+  @override
+  Widget build(BuildContext context) => adminChoiceRow(pills);
 }
