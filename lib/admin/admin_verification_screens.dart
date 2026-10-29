@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_status.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
@@ -15,6 +14,7 @@ import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_review_parts.dart';
 import 'admin_widgets.dart';
+import 'admin_ui.dart';
 
 const _pageSize = 8;
 
@@ -55,7 +55,7 @@ class _VerificationQueueScreenState
       title: 'Verification queue',
       subtitle: 'Agents and companies waiting for review. Resubmissions come first, then the oldest.',
       actions: [
-        AQSecondaryButton(
+        AdminSecondaryButton(
           label: 'Refresh',
           leadingIcon: 'refresh',
           trailingChevron: false,
@@ -74,7 +74,7 @@ class _VerificationQueueScreenState
                 title: 'The queue is empty',
                 body: 'New applications from agents and companies appear here.',
                 action: kUseDemoBackend && store != null
-                    ? AQSecondaryButton(
+                    ? AdminSecondaryButton(
                         label: 'Add demo records',
                         trailingChevron: false,
                         onPressed: () {
@@ -223,7 +223,7 @@ class _VerificationQueueScreenState
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AQTextButton(
+                        AdminTextButton(
                           label: 'Previous',
                           color: c.accent,
                           onPressed: page == 0
@@ -239,7 +239,7 @@ class _VerificationQueueScreenState
                             style: AQTypography.of(context, AQText.bodyMedium),
                           ),
                         ),
-                        AQTextButton(
+                        AdminTextButton(
                           label: 'Next',
                           color: c.accent,
                           onPressed: page >= pages - 1

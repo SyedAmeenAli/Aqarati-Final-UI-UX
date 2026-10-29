@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/aq/aq_forms.dart';
 import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
 import '../features/viewing/domain/viewing_presentation.dart' show AQTone;
 import '../features/viewing/widgets/viewing_format.dart';
+import '../features/ads/ad_models.dart';
+import '../features/ads/sponsored_banner.dart' show SponsoredBannerView;
 import 'admin_auth.dart';
 import 'admin_directory.dart';
 import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_widgets.dart';
+import 'admin_ui.dart';
 
 String _actor(WidgetRef ref) => ref.read(adminAuthProvider).session?.name ?? 'Admin';
 bool _canDecide(WidgetRef ref) => ref.watch(adminAuthProvider).session?.role.canDecide ?? false;
@@ -33,16 +35,53 @@ String _date(BuildContext c, DateTime d) => '${VFmt.shortDate(c, d)}, ${VFmt.tim
   ReportStatus.dismissed => (AQTone.neutral, 'close'),
 };
 
+/// A confirmation: what will happen, in one or two lines, and two content-sized buttons. A
+/// destructive action gets the restrained red treatment.
 Future<bool> adminConfirm(BuildContext context, {required String title, required String body, required String action}) async {
+  const destructive = ['suspend', 'reject', 'remove', 'delete', 'dismiss', 'cancel request'];
+  final danger = destructive.any((w) => action.toLowerCase().startsWith(w));
+  final c = AQColors.of(context);
   final yes = await showDialog<bool>(
     context: context,
-    builder: (d) => AlertDialog(
-      title: Text(title),
-      content: Text(body),
-      actions: [
-        AQTextButton(label: 'Cancel', color: AQColors.of(context).inkSoft, onPressed: () => Navigator.of(d).pop(false)),
-        AQTextButton(label: action, color: AQColors.of(context).accent, onPressed: () => Navigator.of(d).pop(true)),
-      ],
+    builder: (d) => Dialog(
+      backgroundColor: c.surfaceRaised,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AdminSize.panel), side: BorderSide(color: c.hairline)),
+      child: Semantics(
+        scopesRoute: true,
+        namesRoute: true,
+        explicitChildNodes: true,
+        label: title,
+        child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 22, 24, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(header: true, child: Text(title, style: AQTypography.of(d, AQText.titleLarge))),
+              const SizedBox(height: 8),
+              Text(body, style: AQTypography.of(d, AQText.bodyMedium, soft: true)),
+              const SizedBox(height: 20),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    AdminSecondaryButton(label: 'Cancel', onPressed: () => Navigator.of(d).pop(false)),
+                    danger
+                        ? AdminDangerButton(label: action, onPressed: () => Navigator.of(d).pop(true))
+                        : AdminPrimaryButton(label: action, onPressed: () => Navigator.of(d).pop(true)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      ),
     ),
   );
   return yes == true;
@@ -63,86 +102,203 @@ class AdminOverviewScreen extends ConsumerWidget {
     final openReports = dir.reports.where((r) => r.status == ReportStatus.open || r.status == ReportStatus.inReview).length;
     final pendingListings = listings?.where((l) => l.status == ModerationStatus.pending).length;
 
-    Widget metric(String label, String value, String route) => SizedBox(
-      width: 240,
-      child: Semantics(
-        button: true,
-        focusable: true,
-        onFocus: () {},
-        label: '$label: $value',
-        excludeSemantics: true,
+    Widget metric(String label, String value, String route) => Semantics(
+      button: true,
+      focusable: true,
+      onFocus: () {},
+      label: '$label: $value',
+      excludeSemantics: true,
+      onTap: () => context.go(route),
+      child: AQPressable(
         onTap: () => context.go(route),
-        child: AQPressable(
-          onTap: () => context.go(route),
-          child: Container(
-            padding: const EdgeInsets.all(AQSpacing.x4),
-            decoration: BoxDecoration(color: c.surfaceRaised, borderRadius: BorderRadius.circular(AQRadius.medium), border: Border.all(color: c.hairline)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: AQTypography.of(context, AQText.displaySmall)),
-                Text(label, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
-              ],
-            ),
+        pressedScale: 0.99,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(color: c.surfaceRaised, borderRadius: BorderRadius.circular(AdminSize.panel), border: Border.all(color: c.hairline)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(value, style: AQTypography.of(context, AQText.headlineMedium)),
+              const SizedBox(height: 2),
+              Text(label, maxLines: 2, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall, soft: true)),
+            ],
           ),
         ),
       ),
     );
+
+    Widget queueRow(String icon, String label, String? count, String route) => Semantics(
+      button: true,
+      focusable: true,
+      onFocus: () {},
+      label: '$label${count == null ? '' : ': $count'}',
+      excludeSemantics: true,
+      onTap: () => context.go(route),
+      child: AQPressable(
+        onTap: () => context.go(route),
+        pressedScale: 1,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              AQIcon(icon, size: 18, color: c.inkSoft),
+              const SizedBox(width: 12),
+              Expanded(child: Text(label, style: AQTypography.of(context, AQText.bodyMedium))),
+              if (count != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(color: c.surfaceSelected, borderRadius: BorderRadius.circular(6)),
+                  child: Text(count, style: AQTypography.of(context, AQText.labelMedium, color: c.accentDeep)),
+                ),
+              const SizedBox(width: 8),
+              AQIcon('chevron-right', size: 16, color: c.inkFaint, directional: true),
+            ],
+          ),
+        ),
+      ),
+    );
+
     final byRole = {for (final r in AcctRole.values) r: dir.accounts.where((a) => a.role == r).length};
     final maxRole = byRole.values.fold<int>(1, (m, v) => v > m ? v : m);
+    final live = ads?.where((a) => a.status == AdStatus.approved).toList() ?? const <SponsoredAd>[];
+    final paused = ads?.where((a) => a.status == AdStatus.paused).length ?? 0;
+    final waiting = ads?.where((a) => a.status == AdStatus.pendingVerification).length ?? 0;
+
+    final queue = AdminPanel(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          queueRow('account', 'Review accounts waiting for a decision', '${count(AcctStatus.underReview)}', '/accounts'),
+          Divider(height: 1, thickness: 1, color: c.hairline),
+          queueRow('verified', 'Decide verification applications', verif == null ? null : '${verif.length}', '/verification'),
+          Divider(height: 1, thickness: 1, color: c.hairline),
+          queueRow('shield', 'Moderate new listing submissions', pendingListings == null ? null : '$pendingListings', '/moderation'),
+          Divider(height: 1, thickness: 1, color: c.hairline),
+          queueRow('alert', 'Handle open complaints', '$openReports', '/reports'),
+        ],
+      ),
+    );
+
+    final activity = AdminTable(
+      headers: const ['When', 'Who', 'Action', 'Record'],
+      flex: const [4, 4, 4, 4],
+      rows: [
+        for (final (i, e) in dir.audit.take(6).indexed)
+          AdminTableRow(
+            key: 'ov$i',
+            semantics: '${e.actor}, ${e.text}, ${e.target ?? ''}',
+            cells: [
+              Text(_date(context, e.at), style: AQTypography.of(context, AQText.bodySmall)),
+              Text(e.actor, maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall)),
+              Text(e.text, maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall)),
+              Text(e.target ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall)),
+            ],
+          ),
+      ],
+    );
+
+    final sponsored = AdminPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            ads == null ? 'Loading placements' : '${live.length} live, $paused paused, $waiting waiting for review',
+            style: AQTypography.of(context, AQText.bodySmall, soft: true),
+          ),
+          if (live.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            SponsoredBannerView(ads: [live.first], onTap: (_) => context.go('/ads')),
+          ],
+          const SizedBox(height: 12),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: AdminSecondaryButton(label: 'Manage placements', compact: true, onPressed: () => context.go('/ads')),
+          ),
+        ],
+      ),
+    );
+
+    final roles = AdminPanel(
+      child: Column(
+        children: [
+          for (final e in byRole.entries)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Row(
+                children: [
+                  SizedBox(width: 150, child: Text(roleName(e.key), maxLines: 1, overflow: TextOverflow.ellipsis, style: AQTypography.of(context, AQText.bodySmall))),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(value: e.value / maxRole, minHeight: 6, color: c.accent, backgroundColor: c.hairline),
+                    ),
+                  ),
+                  SizedBox(width: 28, child: Text('${e.value}', textAlign: TextAlign.end, style: AQTypography.of(context, AQText.labelMedium))),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+
     return AdminFrame(
       section: '/overview',
       title: 'Overview',
       subtitle: 'What needs attention across AQARATI. Demo data only.',
       children: [
-        Wrap(
-          spacing: AQSpacing.x3,
-          runSpacing: AQSpacing.x3,
-          children: [
-            metric('Accounts', '${dir.accounts.length}', '/accounts'),
-            metric('Accounts under review', '${count(AcctStatus.underReview)}', '/accounts'),
-            metric('Applications in the verification queue', verif == null ? '...' : '${verif.length}', '/verification'),
-            metric('Listings waiting for moderation', pendingListings == null ? '...' : '$pendingListings', '/moderation'),
-            metric('Open reports and complaints', '$openReports', '/reports'),
-            metric('Sponsored placements', ads == null ? '...' : '${ads.length}', '/ads'),
-          ],
+        LayoutBuilder(
+          builder: (context, box) {
+            final cols = box.maxWidth >= 860 ? 3 : 2;
+            const gap = 12.0;
+            final w = (box.maxWidth - gap * (cols - 1)) / cols;
+            Widget cell(Widget m) => SizedBox(width: w, child: m);
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                cell(metric('Accounts', '${dir.accounts.length}', '/accounts')),
+                cell(metric('Accounts under review', '${count(AcctStatus.underReview)}', '/accounts')),
+                cell(metric('Applications in the verification queue', verif == null ? '...' : '${verif.length}', '/verification')),
+                cell(metric('Listings waiting for moderation', pendingListings == null ? '...' : '$pendingListings', '/moderation')),
+                cell(metric('Open reports and complaints', '$openReports', '/reports')),
+                cell(metric('Sponsored placements', ads == null ? '...' : '${ads.length}', '/ads')),
+              ],
+            );
+          },
         ),
-        adminSection(context, 'Accounts by role'),
-        AQSurface(
-          padding: const EdgeInsets.all(AQSpacing.x4),
-          child: Column(
-            children: [
-              for (final e in byRole.entries)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AQSpacing.x1),
-                  child: Row(
-                    children: [
-                      SizedBox(width: 200, child: Text(roleName(e.key), style: AQTypography.of(context, AQText.bodyMedium))),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(value: e.value / maxRole, minHeight: 8, color: c.accent, backgroundColor: c.hairline),
-                        ),
-                      ),
-                      SizedBox(width: 36, child: Text('${e.value}', textAlign: TextAlign.end, style: AQTypography.of(context, AQText.labelMedium))),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-        adminSection(context, 'Recent administrative activity', trailing: AQTextButton(label: 'Open the log', color: c.accent, onPressed: () => context.go('/audit'))),
-        AdminTable(
-          headers: const ['When', 'Who', 'Action', 'Record'],
-          flex: const [2, 2, 3, 3],
-          rows: [
-            for (final (i, e) in dir.audit.take(6).indexed)
-              AdminTableRow(
-                key: 'ov$i',
-                semantics: '${e.actor}, ${e.text}, ${e.target ?? ''}',
-                cells: [Text(_date(context, e.at)), Text(e.actor), Text(e.text), Text(e.target ?? '')],
-              ),
-          ],
+        LayoutBuilder(
+          builder: (context, box) {
+            final twoCol = box.maxWidth >= 900;
+            final left = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                adminSection(context, 'Needs attention'),
+                queue,
+                adminSection(context, 'Recent administrative activity', trailing: AdminTextButton(label: 'Open the log', color: c.accentDeep, onPressed: () => context.go('/audit'))),
+                activity,
+              ],
+            );
+            final right = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                adminSection(context, 'Sponsored placements'),
+                sponsored,
+                adminSection(context, 'Accounts by role'),
+                roles,
+              ],
+            );
+            if (!twoCol) return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [left, right]);
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 6, child: left),
+                const SizedBox(width: 24),
+                Expanded(flex: 4, child: right),
+              ],
+            );
+          },
         ),
         adminDemoNotice(),
       ],
@@ -272,11 +428,11 @@ class AdminAccountDetailScreen extends ConsumerWidget {
             runSpacing: AQSpacing.x3,
             children: [
               if (a.status != AcctStatus.active)
-                SizedBox(width: 200, child: AQPrimaryButton(label: 'Set active', trailingChevron: false, onPressed: () => change(AcctStatus.active, 'Set active', 'The account would be treated as active in this demo.'))),
+                AdminPrimaryButton(label: 'Set active', trailingChevron: false, onPressed: () => change(AcctStatus.active, 'Set active', 'The account would be treated as active in this demo.')),
               if (a.status != AcctStatus.underReview)
-                SizedBox(width: 200, child: AQSecondaryButton(label: 'Mark under review', trailingChevron: false, onPressed: () => change(AcctStatus.underReview, 'Mark under review', 'The account moves back to review in this demo.'))),
+                AdminSecondaryButton(label: 'Mark under review', trailingChevron: false, onPressed: () => change(AcctStatus.underReview, 'Mark under review', 'The account moves back to review in this demo.')),
               if (a.status != AcctStatus.suspended)
-                SizedBox(width: 200, child: AQSecondaryButton(label: 'Suspend', trailingChevron: false, onPressed: () => change(AcctStatus.suspended, 'Suspend', 'Suspending is simulated: no real account is affected.'))),
+                AdminSecondaryButton(label: 'Suspend', trailingChevron: false, onPressed: () => change(AcctStatus.suspended, 'Suspend', 'Suspending is simulated: no real account is affected.')),
             ],
           ),
         adminSection(context, 'Activity on this account'),
@@ -424,16 +580,16 @@ class _ReportDetailState extends ConsumerState<AdminReportDetailScreen> {
         if (!can)
           const AdminNotice(icon: 'lock', title: 'Read-only', body: 'Your role can read reports but not change them.')
         else ...[
-          AQTextField(label: 'Resolution note (optional)', controller: _note, minLines: 2, maxLines: 4, action: TextInputAction.newline),
+          AdminField(label: 'Resolution note (optional)', controller: _note, minLines: 2, maxLines: 4, action: TextInputAction.newline),
           const SizedBox(height: AQSpacing.x3),
           Wrap(
             spacing: AQSpacing.x3,
             runSpacing: AQSpacing.x3,
             children: [
-              if (r.status == ReportStatus.open) SizedBox(width: 200, child: AQSecondaryButton(label: 'Start review', trailingChevron: false, onPressed: () => _set(r, ReportStatus.inReview))),
-              if (r.status != ReportStatus.resolved) SizedBox(width: 200, child: AQPrimaryButton(label: 'Resolve', trailingChevron: false, onPressed: () => _set(r, ReportStatus.resolved))),
-              if (r.status != ReportStatus.dismissed) SizedBox(width: 200, child: AQSecondaryButton(label: 'Dismiss', trailingChevron: false, onPressed: () => _set(r, ReportStatus.dismissed))),
-              if (r.status == ReportStatus.resolved || r.status == ReportStatus.dismissed) SizedBox(width: 200, child: AQSecondaryButton(label: 'Reopen', trailingChevron: false, onPressed: () => _set(r, ReportStatus.open))),
+              if (r.status == ReportStatus.open) AdminSecondaryButton(label: 'Start review', trailingChevron: false, onPressed: () => _set(r, ReportStatus.inReview)),
+              if (r.status != ReportStatus.resolved) AdminPrimaryButton(label: 'Resolve', trailingChevron: false, onPressed: () => _set(r, ReportStatus.resolved)),
+              if (r.status != ReportStatus.dismissed) AdminSecondaryButton(label: 'Dismiss', trailingChevron: false, onPressed: () => _set(r, ReportStatus.dismissed)),
+              if (r.status == ReportStatus.resolved || r.status == ReportStatus.dismissed) AdminSecondaryButton(label: 'Reopen', trailingChevron: false, onPressed: () => _set(r, ReportStatus.open)),
             ],
           ),
         ],

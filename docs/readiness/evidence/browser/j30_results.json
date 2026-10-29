@@ -37,12 +37,12 @@
  {
   "name": "signed in: Overview with metrics and recent activity",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopmen"
  },
  {
   "name": "Accounts: 14 demo accounts with role and status filters",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopmen"
  },
  {
   "name": "Accounts: search narrows to one",
@@ -52,7 +52,7 @@
  {
   "name": "Account detail with review status actions and activity",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopmen"
  },
  {
   "name": "status change asks for confirmation first",
@@ -62,7 +62,7 @@
  {
   "name": "after confirming, the status is Active and the log has an entry",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopmen"
  },
  {
   "name": "Reports: list with status and kind filters",
@@ -72,12 +72,12 @@
  {
   "name": "Report resolved with a note",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopmen"
  },
  {
   "name": "Activity log shows this session's changes at the top",
   "pass": true,
-  "note": "Admin consoleOverviewAccountsVerificationListing moderationProperty listingsAgents and brokersDevelopment proj"
+  "note": "AdminOverviewPEOPLEAccountsVerificationAgents and brokersLISTINGSListing moderationProperty listingsDevelopmen"
  },
  {
   "name": "Listing moderation (existing queue) is in the same console",

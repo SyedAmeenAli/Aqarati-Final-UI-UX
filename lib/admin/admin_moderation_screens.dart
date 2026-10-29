@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/aq/aq_forms.dart';
-import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
 import '../core/config/backend_mode.dart';
@@ -17,6 +16,7 @@ import 'admin_models.dart';
 import 'admin_repository.dart';
 import 'admin_review_parts.dart';
 import 'admin_widgets.dart';
+import 'admin_ui.dart';
 
 const _pageSize = 8;
 
@@ -73,7 +73,7 @@ class _ModerationQueueScreenState extends ConsumerState<ModerationQueueScreen> {
       title: 'Listing moderation',
       subtitle: 'Listings from agents and Aqary e-Broker submissions waiting for review.',
       actions: [
-        AQSecondaryButton(
+        AdminSecondaryButton(
           label: 'Refresh',
           leadingIcon: 'refresh',
           trailingChevron: false,
@@ -92,7 +92,7 @@ class _ModerationQueueScreenState extends ConsumerState<ModerationQueueScreen> {
                 title: 'No listings are waiting',
                 body: 'Submissions from agents and e-Broker appear here.',
                 action: kUseDemoBackend && store != null
-                    ? AQSecondaryButton(
+                    ? AdminSecondaryButton(
                         label: 'Add demo records',
                         trailingChevron: false,
                         onPressed: () {
@@ -240,7 +240,7 @@ class _ModerationQueueScreenState extends ConsumerState<ModerationQueueScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AQTextButton(
+                        AdminTextButton(
                           label: 'Previous',
                           color: c.accent,
                           onPressed: page == 0
@@ -256,7 +256,7 @@ class _ModerationQueueScreenState extends ConsumerState<ModerationQueueScreen> {
                             style: AQTypography.of(context, AQText.bodyMedium),
                           ),
                         ),
-                        AQTextButton(
+                        AdminTextButton(
                           label: 'Next',
                           color: c.accent,
                           onPressed: page >= pages - 1

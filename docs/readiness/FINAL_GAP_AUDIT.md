@@ -278,3 +278,26 @@ Sponsorship six roles x six widths plus CTA and Back: 73 of 73. Admin walk (ads,
 - No screen-reader walk. Keyboard and focus-ring checks were made in headless Chromium only.
 - Developer "update project status" has no local action; status changes come from the admin decision.
 - The 20 formatting-only files are committed as they are (verified formatting-only earlier); nothing was bulk-restored.
+
+---
+
+# Eighth pass (2026-10-29): Admin Console UI polish
+
+Admin-only: the customer and agent design system was not changed. New scoped kit: `lib/admin/admin_ui.dart`.
+
+## Problems found in the "before" screenshots (`evidence/browser/adm_before_*`)
+Header actions forced to a 190 px width (stretched buttons); secondary buttons that looked like plain text; 66 px two-line inputs; oversized pill filters with the label on a separate line; one flat list of 18 sidebar items with wrapping labels and the profile block overlapping the last item; the login inside a tall card with a 140 px logo and an edge-to-edge Continue; 18 px-radius cards everywhere; ragged metric cards with 32 px numbers; 56 px table rows; the narrow layout used a row of 18 pills for navigation.
+
+## What changed
+- **Controls**: button 40 px (compact 34), content-sized (full width only for the sign-in Continue and the demo shortcut); primary, secondary, destructive and text variants; 38 px icon buttons; 44 px inputs with the label on the border; 30 px chips with 8 px corners; hover, press and focus states; loading and disabled states kept.
+- **Sidebar**: 244 px, grouped (People, Listings, Services, Marketing, Insight), 36 px rows with a subtle selected state, settings and profile pinned at the bottom, scrolls independently. Below 960 px it becomes a menu button and drawer.
+- **Page**: one compact header (back link, 24 px title, one line of context, content-sized actions), 32 px margins, 1240 px max width.
+- **Overview**: six compact metric cards, a "Needs attention" queue, recent activity, a sponsored-placements panel using the shared banner, accounts by role.
+- **Tables, filters, dialogs**: 12 px radius, 48 px rows, small header labels, a toolbar of search plus labelled chip rows, a small confirmation dialog with a red variant for destructive actions.
+- **Sponsored placements**: compact list with audience and status filters, banner preview at its natural size beside the form.
+
+## Evidence
+Before and after screenshots: `docs/readiness/evidence/browser/adm_before_*` and `adm_after_*` (1280 and 390 px, 768 px after). 913 tests pass; analyzer 55 info items, no warnings. Browser: admin 64, keyboard 44, hosted admin 22, professional 38, portfolio 15, Explore 12, agent 48, customer tabs 14, sponsorship 73, failure states 5; admin fits without horizontal scroll at 320, 360, 390, 412, 430, 768, 1024, 1280 and 1920 px.
+
+## Remaining
+The sign-in and code pages were checked at 1280 and 390 px only. Dark mode in the admin was not reviewed (the console is light-only). No screen-reader walk.

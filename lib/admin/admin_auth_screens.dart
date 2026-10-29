@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/aq/aq_demo.dart';
 import '../core/aq/aq_forms.dart';
-import '../core/aq/aq_primitives.dart';
 import '../core/aq/aq_tokens.dart';
 import '../core/aq/aq_typography.dart';
 import '../core/config/demo_mode.dart';
@@ -12,6 +11,7 @@ import '../features/entry/widgets/entry_common.dart' show MasterLogo;
 import 'admin_auth.dart';
 import 'admin_models.dart';
 import 'admin_repository.dart';
+import 'admin_ui.dart';
 
 class _AuthFrame extends StatelessWidget {
   final String title, subtitle;
@@ -32,20 +32,20 @@ class _AuthFrame extends StatelessWidget {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(AQSpacing.gutter),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
+              constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: MasterLogo(width: 140),
+                    child: MasterLogo(width: 96),
                   ),
-                  const SizedBox(height: AQSpacing.x6),
+                  const SizedBox(height: 20),
                   Container(
-                    padding: const EdgeInsets.all(AQSpacing.x6),
+                    padding: const EdgeInsets.all(28),
                     decoration: BoxDecoration(
                       color: c.surfaceRaised,
-                      borderRadius: BorderRadius.circular(AQRadius.large),
+                      borderRadius: BorderRadius.circular(AdminSize.panel),
                       border: Border.all(color: c.hairline),
                     ),
                     child: Column(
@@ -66,7 +66,7 @@ class _AuthFrame extends StatelessWidget {
                             title,
                             style: AQTypography.of(
                               context,
-                              AQText.headlineLarge,
+                              AQText.headlineMedium,
                             ),
                           ),
                         ),
@@ -79,7 +79,7 @@ class _AuthFrame extends StatelessWidget {
                             soft: true,
                           ),
                         ),
-                        const SizedBox(height: AQSpacing.x5),
+                        const SizedBox(height: 22),
                         ...children,
                       ],
                     ),
@@ -183,7 +183,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AQTextField(
+              AdminField(
                 label: 'Email',
                 controller: _email,
                 keyboardType: TextInputType.emailAddress,
@@ -194,7 +194,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: AQSpacing.x4),
-              AQPasswordField(
+              AdminPasswordField(
                 label: 'Password',
                 controller: _password,
                 showLabel: 'Show password',
@@ -214,7 +214,8 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
             child: AQErrorBanner(text: _error!),
           ),
         const SizedBox(height: AQSpacing.x5),
-        AQPrimaryButton(
+        AdminPrimaryButton(
+          expand: true,
           label: 'Continue',
           loading: _busy,
           onPressed: _busy ? null : _submit,
@@ -231,7 +232,8 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         ),
         if (kDemoMode) ...[
           const SizedBox(height: AQSpacing.x3),
-          AQSecondaryButton(
+          AdminSecondaryButton(
+            expand: true,
             label: 'Open the demo console',
             trailingChevron: false,
             onPressed: _busy ? null : _demoEnter,
@@ -273,7 +275,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         if (ref.watch(adminExitProvider) != null)
           Align(
             alignment: AlignmentDirectional.centerStart,
-            child: AQTextButton(
+            child: AdminTextButton(
               label: 'Back to AQARATI',
               color: AQColors.of(context).accent,
               onPressed: ref.read(adminExitProvider),
@@ -343,7 +345,7 @@ class _AdminTotpScreenState extends ConsumerState<AdminTotpScreen> {
             child: AQErrorBanner(text: _error!),
           ),
         const SizedBox(height: AQSpacing.x5),
-        AQSecondaryButton(
+        AdminSecondaryButton(
           label: 'Back to sign in',
           trailingChevron: false,
           onPressed: _state == AQOtpState.verifying
